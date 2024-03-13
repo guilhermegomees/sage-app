@@ -1,11 +1,21 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ImageBackground } from 'react-native';
+
+import { useNavigation } from '@react-navigation/native';
+
 import { colors } from '../css/colors';
 import { base } from '../css/base';
 
+import TabNavigator from '../navigation/tabNavigator';
+
 const LoginScreen = () => {
+  const navigation = useNavigation();
+
   const handleLogin = () => {
     // Lógica de login
+
+    // Navegar para a tela TabNavigator
+    //navigation.navigate('TabNavigator')
   };
 
   const handleRegister = () => {
@@ -50,9 +60,9 @@ const LoginScreen = () => {
           <Text style={styles.googleText}>Continue com Google</Text>
         </TouchableOpacity>
         <ImageBackground
-        source={require('../image/backgroundLogin.png')}
-        style={styles.backgroundImage}
-      />
+          source={require('../image/backgroundLogin.png')}
+          style={styles.backgroundImage}
+        />
       </View>
     </View>
   );
@@ -64,7 +74,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.gray_900,
-    fontFamily: 'Outfit', // Nome da fonte personalizada
   },
   logo: {
     fontWeight: 'bold',
@@ -72,7 +81,6 @@ const styles = StyleSheet.create({
     color: colors.white_100,
     marginBottom: 40,
     marginTop: 200,
-    fontFamily: 'Outfit', // Nome da fonte personalizada
   },
   subLogo: {
     fontWeight: 'bold',
@@ -93,7 +101,6 @@ const styles = StyleSheet.create({
   inputText: {
     height: 50,
     color: colors.white,
-    fontFamily: 'Outfit', // Nome da fonte personalizada
   },
   loginBtn: {
     width: '80%',
@@ -113,7 +120,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 100,
+    marginTop: 60,
     marginBottom: 10,
     paddingHorizontal: 20,
   },
@@ -126,8 +133,8 @@ const styles = StyleSheet.create({
   googleText: {
   },
   image: {
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 30,
   },
   halfContainer: {
     width: '100%',
@@ -142,7 +149,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     height: '75%',
-    bottom: 0,
+    bottom: -80,
+    zIndex: -1,
   },
 });
 

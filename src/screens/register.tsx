@@ -1,5 +1,16 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ImageBackground, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons'; // Importe o pacote de ícones que você deseja usar
 
 import { useNavigation } from '@react-navigation/native';
@@ -12,11 +23,11 @@ import TabNavigator from '../navigation/tabNavigator';
 const RegisterScreen = () => {
   const navigation = useNavigation();
 
+  const [showPassword, setShowPassword] = useState(false); // Estado para controlar a visibilidade da senha
   const [keyboardIsShown, setKeyboardIsShown] = useState(false);
 
   const handleLogin = () => {
     // Lógica de login
-
     // Navegar para a tela TabNavigator
     //navigation.navigate('TabNavigator')
   };
@@ -37,28 +48,28 @@ const RegisterScreen = () => {
     setKeyboardIsShown(false);
   };
 
+  const toggleShowPassword = () => {
+    // Função para alternar entre mostrar e ocultar a senha
+    setShowPassword(!showPassword);
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
-        scrollEnabled={!keyboardIsShown}
-      >
+        scrollEnabled={!keyboardIsShown}>
+        <Image source={require('../image/logo.png')} style={styles.imageLogo} />
         <Text style={styles.logo}>SAGE</Text>
         <View style={styles.halfContainer}>
-          <Text style={styles.subLogo}>Bem vindo(a) de volta</Text>
-          <View style={styles.inputView}>
+          <Text style={styles.subLogo}>Bem vindo(a)</Text>
+          <View style={[styles.inputView, { flexDirection: 'row-reverse' }]}>
             <MaterialIcons name="person" size={20} color="white" style={styles.icon} />
-            <TextInput
-              style={styles.inputText}
-              placeholder="Nome"
-              placeholderTextColor="#F8F1F1"
-            />
+            <TextInput style={styles.inputText} placeholder="Nome" placeholderTextColor="#F8F1F1" />
           </View>
-          <View style={styles.inputView}>
+          <View style={[styles.inputView, { flexDirection: 'row-reverse' }]}>
             <MaterialIcons name="email" size={20} color="white" style={styles.icon} />
             <TextInput
               style={styles.inputText}
@@ -66,24 +77,39 @@ const RegisterScreen = () => {
               placeholderTextColor="#F8F1F1"
             />
           </View>
-          <View style={styles.inputView}>
-            <MaterialIcons name="lock" size={20} color="white" style={styles.icon} />
+          <View style={[styles.inputView, { flexDirection: 'row' }]}>
             <TextInput
               style={styles.inputText}
               placeholder="Senha"
               placeholderTextColor="#F8F1F1"
-              secureTextEntry={true}
+              secureTextEntry={!showPassword}
             />
+            <TouchableOpacity onPress={toggleShowPassword}>
+              <MaterialIcons
+                name={showPassword ? 'visibility-off' : 'visibility'}
+                size={20}
+                color="white"
+                style={styles.icon}
+              />
+            </TouchableOpacity>
           </View>
-          <View style={styles.inputView}>
-            <MaterialIcons name="lock" size={20} color="white" style={styles.icon} />
+          <View style={[styles.inputView, { flexDirection: 'row' }]}>
             <TextInput
               style={styles.inputText}
               placeholder="Confirmar Senha"
               placeholderTextColor="#F8F1F1"
-              secureTextEntry={true}
+              secureTextEntry={!showPassword}
             />
+             <TouchableOpacity onPress={toggleShowPassword}>
+              <MaterialIcons
+                name={showPassword ? 'visibility-off' : 'visibility'}
+                size={20}
+                color="white"
+                style={styles.icon}
+              />
+            </TouchableOpacity>
           </View>
+
           <TouchableOpacity style={styles.loginBtn} onPress={handleRegister}>
             <Text style={styles.loginText}>Criar Conta</Text>
           </TouchableOpacity>
@@ -91,10 +117,7 @@ const RegisterScreen = () => {
             <Text style={styles.signupText}>Já possui conta? Clique Aqui</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.loginGoogleBtn} onPress={handleGoogleLogin}>
-            <Image
-              source={require('../image/google.png')}
-              style={styles.image}
-            />
+            <Image source={require('../image/google.png')} style={styles.image} />
             <Text style={styles.googleText}>Continue com Google</Text>
           </TouchableOpacity>
           <ImageBackground
@@ -122,7 +145,6 @@ const styles = StyleSheet.create({
     fontSize: 40,
     color: colors.white_100,
     marginBottom: 40,
-    marginTop: 100,
   },
   subLogo: {
     fontWeight: 'bold',
@@ -147,7 +169,7 @@ const styles = StyleSheet.create({
     marginLeft: 10, // Adiciona um espaçamento entre o ícone e o texto
   },
   icon: {
-    marginLeft: 10, // Adiciona um espaçamento entre o ícone e a borda do input
+    marginRight: 10,
   },
   loginBtn: {
     width: '80%',
@@ -177,11 +199,17 @@ const styles = StyleSheet.create({
   signupText: {
     color: colors.white,
   },
-  googleText: {
-  },
+  googleText: {},
   image: {
     width: 30,
     height: 30,
+  },
+  imageLogo: {
+    marginTop: 100,
+    width: 45,
+    height: 45,
+    marginRight: 20,
+    alignSelf: 'flex-end',
   },
   halfContainer: {
     width: '100%',

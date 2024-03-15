@@ -572,6 +572,9 @@ export const base = StyleSheet.create({
   px_50: {
     paddingHorizontal: 50,
   },
+  px_65: {
+    paddingHorizontal: 65,
+  },
 
   // Displays
   dflex: {

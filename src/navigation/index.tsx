@@ -18,7 +18,7 @@ export default function RootStack() {
   return (
     <NavigationContainer>
       {/* Mudar a initialRouterName */}
-      <Stack.Navigator initialRouteName="Register">
+      <Stack.Navigator initialRouteName="TabNavigator">
         <Stack.Screen
           name="Register"
           component={RegisterScreen}

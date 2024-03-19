@@ -12,7 +12,7 @@ export const colors = {
     blue_100   : '#105DFB',
     green_500  : '#2DD148',
     gray_400   : '#2F4659',
-    yellow_100 : '#EE8B60'
+    yellow_100 : '#EE8B60',
     green_1 : '#2DD148',
     red_1 : '#F03838'
 }

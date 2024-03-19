@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, View, StyleSheet, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
 import { colors } from '../css/colors';
 import { base } from '../css/base';
-import ProgressBar from 'react-native-progress/Bar';
+import { Bar } from 'react-native-progress';
 import { MaterialIcons } from '@expo/vector-icons'; // Importe o MaterialIcons
 
 export default function Goals() {
@@ -40,7 +40,7 @@ export default function Goals() {
               <View style={styles.iconContainer}>{goal.icon}</View>
               <Text style={styles.text}>{goal.name}</Text>
               <View style={styles.progressBarContainer}>
-                <ProgressBar
+                <Bar
                   progress={goal.currentValue / goal.goalValue}
                   width={Dimensions.get('window').width * 0.6 - 60} // Largura da barra de progresso
                   height={10}

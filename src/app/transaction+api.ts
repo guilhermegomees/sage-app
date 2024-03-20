@@ -16,7 +16,8 @@ export async function GET(request : ExpoRequest): Promise<ExpoResponse> {
                              'T.VALUE, '+
                              'T.TRANSACTION_DATE AS DATE, '+
                              'T.IS_EXPENSE, '+
-                             'I.NAME_FONT AS ICON '+
+                             'I.NAME_FONT AS ICON, '+
+                             'T.ID_WALLET AS WALLET '+
                       'FROM TRANSACTIONS T '+
                       'INNER JOIN WALLET W ON W.ID = T.ID_WALLET '+
                       'INNER JOIN USER U ON U.ID = W.ID_USER '+

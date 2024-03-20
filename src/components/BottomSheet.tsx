@@ -35,6 +35,16 @@ function formatValue(value: number, isExpense: number): string {
     return minus + 'R$ ' + valueStr;
 }
 
+function formatDate(dateStr: string): any {
+    const date = dateStr.split('/');
+
+    const day = date[1].length == 1 ? '0'+date[1] : date[1];
+    const month = date[0].length == 1 ? '0'+date[0] : date[0];
+    const year = date[2];
+    
+     return (`${day}/${month}/${year}`);
+}
+
 const BottomSheet: React.FC<BottomSheetProps> = ({ data }) => {
     // Agrupar transações por data
     const groupedTransactions: Record<string, Transaction[]> = data.reduce((acc, transaction) => {
@@ -61,8 +71,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ data }) => {
                                 base.mt_15,
                                 base.px_65
                             ]}>
-                                {/* TODO: Formatar corretamente a data da transação */}
-                                <Text style={[styles.date]}>{date}</Text>
+                                <Text style={[styles.date]}>{formatDate(date)}</Text>
                                 <View style={[styles.line]} />
                             </View>
                             <View>
@@ -104,16 +113,6 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ data }) => {
         </View>
     );
 };
-
-function formatDate(dateStr: string): string {
-    const date = new Date(dateStr);
-    
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-
-    return `${day}/${month}/${year}`;
-}
 
 const styles = StyleSheet.create({
     container: {

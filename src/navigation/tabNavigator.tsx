@@ -33,7 +33,7 @@ export default function TabLayout({ navigation }: Props) {
             </View>
           </View>
           <View style={[styles.containerUser]}>
-            <Image source={require('./../images/user-circle.png')} style={styles.iconUser} />
+            <Image source={require('./../image/user-circle.png')} style={styles.iconUser} />
           </View>
         </View>
         <Tab.Navigator
@@ -47,9 +47,6 @@ export default function TabLayout({ navigation }: Props) {
           <Tab.Screen name="Cards" component={Cards} options={{ tabBarLabel: 'Cartões' }} />
         </Tab.Navigator>
       </View>
-      {/* <BottomSheet ref={ref}>
-        <View style={{ flex: 1, backgroundColor: colors.gray_800 }} />
-      </BottomSheet> */}
     </SafeAreaView>
   );
 }

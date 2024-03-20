@@ -9,8 +9,7 @@ const TBar: React.FC<any> = ({ state, descriptors, navigation }: any) => {
                 {state.routes.map((route: any, index: number) => {
                     const { options } = descriptors[route.key];
                     const label = options.tabBarLabel !== undefined ? options.tabBarLabel : options.title !== undefined ? options.title : route.name;
-
-                    const isDisabled = route.name === 'Cards';
+            
                     const isFocused = state.index === index;
 
                     const onPress = () => {
@@ -31,7 +30,7 @@ const TBar: React.FC<any> = ({ state, descriptors, navigation }: any) => {
                             accessibilityState={isFocused ? { selected: true } : {}}
                             accessibilityLabel={options.tabBarAccessibilityLabel}
                             testID={options.tabBarTestID}
-                            onPress={isDisabled ? ()=>{} : onPress}
+                            onPress={onPress}
                             style={[
                                 {backgroundColor: isFocused ? colors.orange_300 : 'transparent'},
                                 base.rounded_95,
@@ -39,13 +38,12 @@ const TBar: React.FC<any> = ({ state, descriptors, navigation }: any) => {
                                 base.justifyContentCenter,
                             ]}
                             key={route.key}
-                            activeOpacity={isDisabled ? 1 : 0.5}
                         >
                             <Text style={[
                                 base.fw_500, 
                                 base.fs_medium, 
                                 base.px_20, 
-                                { color: isDisabled ? colors.gray_disabled : colors.white_100 }
+                                { color: colors.white_100 }
                             ]}>{label}</Text>
                         </TouchableOpacity>
                     );

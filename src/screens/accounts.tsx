@@ -3,6 +3,8 @@ import { colors } from '../css/colors';
 import { base } from '../css/base';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
+import { TypeScreem } from '~/enums';
+
 // Icons
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
@@ -43,8 +45,7 @@ export default function Accounts() {
       const formattedData = response.data.data.filter((item: any) => item.WALLET === wallet);
       setData(formattedData);
     } catch (error) {
-      console.error('Erro:', error);
-      throw error;
+      console.log(error);
     }
   };
 
@@ -134,7 +135,8 @@ export default function Accounts() {
         </View>
       </View>
 
-      <BottomSheet data={data} />
+      {/* Painel de transações */}
+      <BottomSheet data={data} type={TypeScreem.Account} />
     </View>
   );
 }

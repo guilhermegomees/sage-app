@@ -39,12 +39,7 @@ const TBar: React.FC<any> = ({ state, descriptors, navigation }: any) => {
                             ]}
                             key={route.key}
                         >
-                            <Text style={[
-                                base.fw_500, 
-                                base.fs_medium, 
-                                base.px_20, 
-                                { color: colors.white_100 }
-                            ]}>{label}</Text>
+                            <Text style={[styles.label]}>{label}</Text>
                         </TouchableOpacity>
                     );
                 })}
@@ -58,6 +53,12 @@ const styles = StyleSheet.create({
         backgroundColor: colors.gray_900,
         height: 58
     },
+    label: {
+        fontFamily: 'Outfit_500Medium',
+        fontSize: 16,
+        paddingHorizontal: 20,
+        color: colors.white_100
+    }
 })
 
 export default TBar;

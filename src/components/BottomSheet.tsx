@@ -62,11 +62,9 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
     return (
         <View style={[styles.panelTransactions, base.px_25, base.p_20]}>
             {type == TypeScreem.Card &&
-                <View style={[base.alignItemsCenter, base.mb_10, base.gap_5]}>
-                    <View style={[base.flexRow, base.gap_5]}>
-                        {/* TODO: Aplicar valores de limite e limite utilizado vindos do data */}
-                        <Text style={[styles.cardValuesLimit]}>R$ 1.430 / R$ 3.200</Text>
-                    </View>
+                <View style={[base.alignItemsCenter, base.mb_15, base.gap_10]}>
+                    {/* TODO: Aplicar valores de limite e limite utilizado vindos do data */}
+                    <Text style={[styles.cardValuesLimit]}>R$ 1.430 / R$ 3.200</Text>
                     {/* TODO: Calcular diferença entre limite e limite utilizado */}
                     <Text style={[styles.cardValueDifference]}>R$ 1.770</Text>
                 </View>
@@ -75,14 +73,13 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
             {Object.keys(groupedTransactions).length > 0 && (
                 <ScrollView showsVerticalScrollIndicator={false}>
                     {Object.entries(groupedTransactions).map(([date, transactionsForDate]) => (
-                        <View key={date}>
+                        <View key={date} style={[base.mb_15]}>
                             <View style={[
                                 base.flexRow,
                                 base.alignItemsCenter,
                                 base.justifyContentCenter,
                                 base.gap_12,
-                                base.mt_15,
-                                base.px_65
+                                base.px_65,
                             ]}>
                                 <Text style={[styles.date]}>{formatDate(date)}</Text>
                                 <View style={[styles.line]} />
@@ -182,14 +179,15 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 25,
     },
     latestTransactions: {
+        fontFamily: 'Outfit_600SemiBold',
         fontSize: 18,
-        fontWeight: '600',
+        marginBottom: 20,
         color: colors.white_100
     },
     date: {
+        fontFamily: 'Outfit_500Medium',
         fontSize: 13,
-        fontWeight: '500',
-        color: colors.white_100
+        color: colors.white_100,
     },
     line: {
         width: '100%',
@@ -210,13 +208,13 @@ const styles = StyleSheet.create({
         marginTop: 10
     },
     textTransaction: {
+        fontFamily: 'Outfit_600SemiBold',
         fontSize: 12,
-        fontWeight: '600',
         color: colors.white_100
     },
     valueTransaction: {
+        fontFamily: 'Outfit_500Medium',
         fontSize: 12,
-        fontWeight: '500',
     },
     divisor: {
         width: 324,
@@ -228,19 +226,19 @@ const styles = StyleSheet.create({
         height: 30
     },
     noTransactionsMessage: {
+        fontFamily: 'Outfit_500Medium',
         textAlign: 'center',
         color: colors.white_100,
         fontSize: 16,
-        fontWeight: '500'
     },
     cardValuesLimit: {
+        fontFamily: 'Outfit_600SemiBold',
         color: colors.white_100,
-        fontWeight: '600',
         fontSize: 18
     },
     cardValueDifference: {
+        fontFamily: 'Outfit_600SemiBold',
         color: colors.blue_50,
-        fontWeight: '600',
         fontSize: 12
     }
 })

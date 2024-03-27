@@ -1,11 +1,12 @@
 import { Text, View, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+
 import { colors } from '../css/colors';
 import { base } from '../css/base';
 
 import { TypeScreem } from '~/enums';
 
 import BottomSheet from '~/components/BottomSheet';
-import { useEffect, useState } from 'react';
 
 export default function Cards() {
   const [data, setData] = useState<any[]>([]);
@@ -34,13 +35,13 @@ export default function Cards() {
         <View style={[base.p_13, base.flexColumn, base.flexSpaceBetween, base.flex_1]}>
           <View style={[styles.containerTop]}>
             <Text style={[styles.cardName]}>Cartão 1</Text>
-            <Image source={require('./../image/contactless.png')} style={styles.contactless} />
+            <Image source={require('./../assets/images/contactless.png')} style={styles.contactless} />
           </View>
           <View style={[styles.containerChip]}>
-            <Image source={require('./../image/chipcard.png')} style={styles.chipcard} />
+            <Image source={require('./../assets/images/chipcard.png')} style={styles.chipcard} />
           </View>
           <View style={[styles.containerBottom]}>
-            <Text style={[styles.cardName, base.mb_5, base.fw_400]}>Sage</Text>
+            <Text style={[styles.sage]}>Sage</Text>
           </View>
         </View>
       </View>
@@ -50,7 +51,7 @@ export default function Cards() {
         <View style={[base.alignItemsCenter, base.justifyContentCenter, base.gap_8]}>
           <TouchableOpacity>
             <View style={[styles.buttonsActions]}>
-              <Image source={require('./../image/card-recive.png')} style={styles.iconButtonAction} />
+              <Image source={require('./../assets/images/card-recive.png')} style={styles.iconButtonAction} />
             </View>
           </TouchableOpacity>
           <Text style={[styles.textBtnsActions]}>Transação</Text>
@@ -58,7 +59,7 @@ export default function Cards() {
         <View style={[base.alignItemsCenter, base.justifyContentCenter, base.gap_8]}>
           <TouchableOpacity>
             <View style={[styles.buttonsActions]}>
-              <Image source={require('./../image/edit.png')} style={styles.iconButtonActionEdit} />
+              <Image source={require('./../assets/images/edit.png')} style={styles.iconButtonActionEdit} />
             </View>
           </TouchableOpacity>
           <Text style={[styles.textBtnsActions]}>Editar</Text>
@@ -101,10 +102,17 @@ const styles = StyleSheet.create({
     marginRight: 1
   },
   cardName: {
-    fontWeight: '600',
+    fontFamily: 'Outfit_600SemiBold',
     fontSize: 20,
     color: colors.gray_900,
     marginTop: 5
+  },
+  sage: {
+    fontFamily: 'Outfit_400Regular',
+    fontSize: 20,
+    color: colors.gray_900,
+    lineHeight: 20,
+    marginBottom: 5
   },
   chipcard: {
     width: 40,
@@ -130,9 +138,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   textBtnsActions: {
+    fontFamily: 'Outfit_500Medium',
     color: colors.white_300,
     fontSize: 14,
-    fontWeight: '500',
     lineHeight: 22
   },
   iconButtonAction: {

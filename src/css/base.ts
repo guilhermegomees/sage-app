@@ -973,6 +973,17 @@ export const base = StyleSheet.create({
     fontWeight: '900',
   },
 
+  //fonts
+  outfit400: {
+    fontFamily: 'Outfit_400Regular'
+  },
+  outfit500: {
+    fontFamily: 'Outfit_500Medium'
+  },
+  outfit600: {
+    fontFamily: 'Outfit_600SemiBold'
+  },
+
   // zIndex
   zn_2: {
     zIndex: -2,

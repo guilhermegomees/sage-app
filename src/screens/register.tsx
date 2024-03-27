@@ -18,7 +18,7 @@ import { useNavigation } from '@react-navigation/native';
 import { colors } from '../css/colors';
 import { base } from '../css/base';
 
-import TabNavigator from '../navigation/tabNavigator';
+import TabNavigator from '../navigation/tabs';
 
 const RegisterScreen = () => {
   const navigation = useNavigation();
@@ -61,7 +61,7 @@ const RegisterScreen = () => {
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
         scrollEnabled={!keyboardIsShown}>
-        <Image source={require('../image/logo.png')} style={styles.imageLogo} />
+        <Image source={require('../assets/images/logo.png')} style={styles.imageLogo} />
         <Text style={styles.logo}>SAGE</Text>
         <View style={styles.halfContainer}>
           <Text style={styles.subLogo}>Bem vindo(a)</Text>
@@ -117,11 +117,11 @@ const RegisterScreen = () => {
             <Text style={styles.signupText}>Já possui conta? Clique Aqui</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.loginGoogleBtn} onPress={handleGoogleLogin}>
-            <Image source={require('../image/google.png')} style={styles.image} />
+            <Image source={require('../assets/images/google.png')} style={styles.image} />
             <Text style={styles.googleText}>Continue com Google</Text>
           </TouchableOpacity>
           <ImageBackground
-            source={require('../image/backgroundLogin.png')}
+            source={require('../assets/images/backgroundLogin.png')}
             style={styles.backgroundImage}
           />
         </View>

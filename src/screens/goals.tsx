@@ -10,7 +10,7 @@ import {
   MaterialIcons,
   colors,
   base
-} from './imports';
+} from '../imports';
 
 export default function Goals() {
   const goalsData = [
@@ -44,22 +44,21 @@ export default function Goals() {
         {goalsData.map((goal) => (
           <View key={goal.id} style={styles.goalContainer}>
             <View style={styles.infoContainer}>
-              <View style={styles.iconContainer}>{goal.icon}</View>
-              <Text style={styles.text}>{goal.name}</Text>
-              <View style={styles.progressBarContainer}>
-                <Bar
-                  progress={goal.currentValue / goal.goalValue}
-                  width={Dimensions.get('window').width * 0.4 - 60} // Largura da barra de progresso
-                  height={8}
-                  unfilledColor={colors.gray_400}
-                  borderWidth={0}
-                />
+              <View style={[base.flexRow, base.gap_13, base.alignItemsCenter]}>
+                <View>{goal.icon}</View>
+                <Text style={styles.text}>{goal.name}</Text>
               </View>
+              <Bar
+                progress={goal.currentValue / goal.goalValue}
+                width={Dimensions.get('window').width * 0.4 - 60} // Largura da barra de progresso
+                height={8}
+                unfilledColor={colors.gray_400}
+                borderWidth={0}
+              />
             </View>
             <View style={styles.textContainer}>
               <Text style={styles.textValue}>
-                R${goal.currentValue.toLocaleString('pt-BR')} / R$
-                {goal.goalValue.toLocaleString('pt-BR')}
+                R$ {goal.currentValue.toLocaleString('pt-BR')} / R$ {goal.goalValue.toLocaleString('pt-BR')}
               </Text>
               <Text
                 style={[
@@ -69,84 +68,86 @@ export default function Goals() {
                 R${(goal.goalValue - goal.currentValue).toLocaleString('pt-BR')}
               </Text>
             </View>
-            <View style={styles.infoContainer}>
+            <View style={styles.containerBtns}>
               <TouchableOpacity style={styles.Btn}>
-                <Text style={styles.text}>
+                <Text style={styles.textBtn}>
                   {goal.goalValue - goal.currentValue === 0 ? 'Reativar a meta' : 'Editar'}
                 </Text>
               </TouchableOpacity>
               <View style={{ width: 20 }} />
               <TouchableOpacity style={styles.btnDelete}>
-                <Text style={styles.text}>Excluir</Text>
+                <Text style={styles.textBtn}>Excluir</Text>
               </TouchableOpacity>
             </View>
           </View>
         ))}
         <TouchableOpacity style={styles.btnNew}>
-          <Text style={styles.text}>Adicionar uma nova meta</Text>
+          <Text style={[styles.textBtn, {fontSize: 16}]}>Adicionar uma nova meta</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
   );
 }
 
-const windowHeight = Dimensions.get('window').height;
-
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.gray_900,
+    paddingTop: 20,
   },
   scrollContainer: {
     flexGrow: 1,
-    paddingBottom: 20,
-    alignItems: 'center', // Alinhe os itens centralmente no ScrollView
+    alignItems: 'center',
+    gap: 20
   },
   goalContainer: {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     width: Dimensions.get('window').width * 0.85, // 90% da largura da tela
-    marginVertical: 10, // Margem vertical entre os contêineres de meta
     paddingHorizontal: 20,
+    paddingTop: 15,
+    paddingBottom: 25,
     borderWidth: 1,
     borderRadius: 20,
     backgroundColor: colors.gray_800,
   },
   infoContainer: {
-    marginTop: 15,
     flexDirection: 'row',
     alignItems: 'center',
-
+    gap: 90
   },
-  iconContainer: {
-    marginRight: 10,
+  containerBtns: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   textContainer: {
-    marginTop: 10,
+    marginTop: 20,
+    gap: 15
   },
   text: {
+    fontFamily: 'Outfit_600SemiBold',
     color: colors.white_100,
     fontSize: 16,
-    fontWeight: 'bold',
+  },
+  textBtn: {
+    fontFamily: 'Outfit_500Medium',
+    color: colors.white_100,
+    fontSize: 14,
   },
   textValue: {
+    fontFamily: 'Outfit_600SemiBold',
     color: colors.white_100,
     fontSize: 20,
-    fontWeight: 'bold',
   },
   textValue2: {
+    fontFamily: 'Outfit_600SemiBold',
     color: colors.white_100,
     fontSize: 12,
-    fontWeight: 'bold',
     textAlign: 'center',
     textAlignVertical: 'center',
   },
   greenText: {
     color: colors.green_500,
-  },
-  progressBarContainer: {
-    marginLeft: 50,
-    marginRight: 10
   },
   Btn: {
     width: '45%',
@@ -156,7 +157,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 20,
-    marginBottom: 10,
   },
   btnDelete: {
     width: '45%',
@@ -166,7 +166,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 20,
-    marginBottom: 10,
   },
   btnNew: {
     width: '95%',

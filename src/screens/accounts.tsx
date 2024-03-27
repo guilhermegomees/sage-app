@@ -5,6 +5,9 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { TypeScreem } from '~/enums';
 
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+
 // Icons
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
@@ -34,7 +37,11 @@ function formatValue(value: number): string {
   return 'R$ ' + valueStr;
 }
 
+type AccountsScreenNavigationProp = StackNavigationProp<any, 'Accounts'>;
+
 export default function Accounts() {
+  const navigation = useNavigation<AccountsScreenNavigationProp>();
+
   const [data, setData] = useState<any[]>([]);
   const userId = 2; // TODO: Trazer id com base no usuário logado
   const wallet = 2; // TODO: Trazer id da wallet com base na carteira selecionada
@@ -71,13 +78,17 @@ export default function Accounts() {
     }
   }
 
+  const handleNavigateToGraphic = () => {
+    navigation.navigate('Graphic');
+  };
+
   return (
     <View style={[styles.container, base.flex_1, base.alignItemsCenter, base.pt_25, base.gap_25]}>
       
       {/* Conta */}
       <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_8]}>
         {/* TODO: Aplicar nome da carteira vindo do data */}
-        <Text style={[styles.textAccount]}>[Wallet]</Text>
+        <Text style={[styles.textWallet]}>[Wallet]</Text>
         <View style={[styles.containerRetweet, base.alignItemsCenter, base.justifyContentCenter]}>
           <FontAwesome6 name='repeat' color={colors.white} size={12} />
         </View>
@@ -104,7 +115,7 @@ export default function Accounts() {
         <View style={[base.alignItemsCenter, base.justifyContentCenter, base.gap_8]}>
           <TouchableOpacity>
             <View style={[styles.buttonsActions]}>
-              <Image source={require('./../image/recive.png')} style={styles.iconButtonAction} />
+              <Image source={require('./../assets/images/recive.png')} style={styles.iconButtonAction} />
             </View>
           </TouchableOpacity>
           <Text style={[styles.textBtnsActions]}>Receber</Text>
@@ -112,7 +123,7 @@ export default function Accounts() {
         <View style={[base.alignItemsCenter, base.justifyContentCenter, base.gap_8]}>
           <TouchableOpacity>
             <View style={[styles.buttonsActions]}>
-              <Image source={require('./../image/expense.png')} style={styles.iconButtonAction} />
+              <Image source={require('./../assets/images/expense.png')} style={styles.iconButtonAction} />
             </View>
           </TouchableOpacity>
           <Text style={[styles.textBtnsActions]}>Despesa</Text>
@@ -120,13 +131,13 @@ export default function Accounts() {
         <View style={[base.alignItemsCenter, base.justifyContentCenter, base.gap_8]}>
           <TouchableOpacity>
             <View style={[styles.buttonsActions]}>
-              <Image source={require('./../image/balance.png')} style={[styles.iconButtonAction, { height: 28 }]} />
+              <Image source={require('./../assets/images/balance.png')} style={[styles.iconButtonAction, { height: 28 }]} />
             </View>
           </TouchableOpacity>
           <Text style={[styles.textBtnsActions]}>Balancear</Text>
         </View>
         <View style={[base.alignItemsCenter, base.justifyContentCenter, base.gap_8]}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleNavigateToGraphic}>
             <View style={[styles.buttonsActions]}>
               <FontAwesome6 name="chart-pie" color={colors.white_100} size={28} />
             </View>
@@ -145,10 +156,10 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.gray_900
   },
-  textAccount: {
+  textWallet: {
+    fontFamily: 'Outfit_500Medium',
     color: colors.white_300,
     fontSize: 16,
-    fontWeight: '500',
     lineHeight: 22
   },
   containerRetweet: {
@@ -158,20 +169,20 @@ const styles = StyleSheet.create({
     height: 14
   },
   textValue: {
+    fontFamily: 'Outfit_500Medium',
     color: colors.white_200,
     fontSize: 40,
-    fontWeight: '500'
   },
   textValueEntrance: {
+    fontFamily: 'Outfit_500Medium',
     color: colors.green_1,
     fontSize: 14,
-    fontWeight: '500',
     lineHeight: 22
   },
   textValueOutPut: {
+    fontFamily: 'Outfit_500Medium',
     color: colors.red_1,
     fontSize: 14,
-    fontWeight: '500',
     lineHeight: 22
   },
   buttonsActions: {
@@ -183,9 +194,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   textBtnsActions: {
+    fontFamily: 'Outfit_500Medium',
     color: colors.white_300,
     fontSize: 14,
-    fontWeight: '500',
     lineHeight: 22
   },
   panelTransactions: {

@@ -1,9 +1,16 @@
-import React from 'react';
-import { Text, View, StyleSheet, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
-import { colors } from '../css/colors';
-import { base } from '../css/base';
-import { Bar } from 'react-native-progress';
-import { MaterialIcons } from '@expo/vector-icons'; // Importe o MaterialIcons
+import {
+  React,
+  Text,
+  View,
+  StyleSheet,
+  Dimensions,
+  ScrollView,
+  TouchableOpacity,
+  Bar,
+  MaterialIcons,
+  colors,
+  base
+} from './imports';
 
 export default function Goals() {
   const goalsData = [
@@ -42,8 +49,8 @@ export default function Goals() {
               <View style={styles.progressBarContainer}>
                 <Bar
                   progress={goal.currentValue / goal.goalValue}
-                  width={Dimensions.get('window').width * 0.6 - 60} // Largura da barra de progresso
-                  height={10}
+                  width={Dimensions.get('window').width * 0.4 - 60} // Largura da barra de progresso
+                  height={8}
                   unfilledColor={colors.gray_400}
                   borderWidth={0}
                 />
@@ -57,7 +64,7 @@ export default function Goals() {
               <Text
                 style={[
                   styles.textValue2,
-                  goal.goalValue - goal.currentValue === 0 && styles.greenText,
+                  goal.goalValue - goal.currentValue === 0 ? styles.greenText : styles.blueText
                 ]}>
                 R${(goal.goalValue - goal.currentValue).toLocaleString('pt-BR')}
               </Text>
@@ -109,6 +116,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     flexDirection: 'row',
     alignItems: 'center',
+
   },
   iconContainer: {
     marginRight: 10,
@@ -137,12 +145,13 @@ const styles = StyleSheet.create({
     color: colors.green_500,
   },
   progressBarContainer: {
-    marginLeft: 10,
+    marginLeft: 50,
+    marginRight: 10
   },
   Btn: {
     width: '45%',
     backgroundColor: colors.blue_100,
-    borderRadius: 5,
+    borderRadius: 10,
     height: 35,
     alignItems: 'center',
     justifyContent: 'center',
@@ -152,7 +161,7 @@ const styles = StyleSheet.create({
   btnDelete: {
     width: '45%',
     backgroundColor: colors.yellow_100,
-    borderRadius: 5,
+    borderRadius: 10,
     height: 35,
     alignItems: 'center',
     justifyContent: 'center',
@@ -169,4 +178,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 10,
   },
+  blueText: {
+    color: colors.blue_200,
+  }
 });

@@ -14,7 +14,9 @@ export const colors = {
     gray_400   : '#2F4659',
     yellow_100 : '#EE8B60',
     green_1 : '#2DD148',
-    red_1 : '#F03838'
+    red_1 : '#F03838',
+    blue_200: '#8AC7FF',
+    subTitle: '#687FAB',
 }
 
 export default colors;

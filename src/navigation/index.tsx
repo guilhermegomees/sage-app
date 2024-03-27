@@ -5,11 +5,13 @@ import React from 'react';
 import TabNavigator from './tabNavigator';
 import LoginScreen from '../screens/login';
 import RegisterScreen from '../screens/register';
+import Graphic from '../screens/graphic';
 
 export type RootStackParamList = {
   TabNavigator: undefined;
   Login: undefined;
   Register: undefined;
+  Graphic: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -18,7 +20,12 @@ export default function RootStack() {
   return (
     <NavigationContainer>
       {/* Mudar a initialRouterName */}
-      <Stack.Navigator initialRouteName="TabNavigator">
+      <Stack.Navigator initialRouteName="Graphic">
+      <Stack.Screen
+          name="Graphic"
+          component={Graphic}
+          options={{ headerShown: false }}
+        />
         <Stack.Screen
           name="Register"
           component={RegisterScreen}

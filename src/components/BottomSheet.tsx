@@ -1,6 +1,8 @@
 import React from 'react';
 import { Dimensions, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { TypeScreem } from '~/enums';
+
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 
@@ -18,6 +20,7 @@ interface Transaction {
 
 interface BottomSheetProps {
     data: Transaction[];
+    type: TypeScreem;
 }
 
 function formatValue(value: number, isExpense: number): string {
@@ -45,7 +48,7 @@ function formatDate(dateStr: string): any {
      return (`${day}/${month}/${year}`);
 }
 
-const BottomSheet: React.FC<BottomSheetProps> = ({ data }) => {
+const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
     // Agrupar transações por data
     const groupedTransactions: Record<string, Transaction[]> = data.reduce((acc, transaction) => {
         const date = new Date(transaction.DATE).toLocaleDateString();
@@ -58,6 +61,16 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ data }) => {
 
     return (
         <View style={[styles.panelTransactions, base.px_25, base.p_20]}>
+            {type == TypeScreem.Card &&
+                <View style={[base.alignItemsCenter, base.mb_10, base.gap_5]}>
+                    <View style={[base.flexRow, base.gap_5]}>
+                        {/* TODO: Aplicar valores de limite e limite utilizado vindos do data */}
+                        <Text style={[styles.cardValuesLimit]}>R$ 1.430 / R$ 3.200</Text>
+                    </View>
+                    {/* TODO: Calcular diferença entre limite e limite utilizado */}
+                    <Text style={[styles.cardValueDifference]}>R$ 1.770</Text>
+                </View>
+            }
             <Text style={[styles.latestTransactions]}>Últimas transações</Text>
             {Object.keys(groupedTransactions).length > 0 && (
                 <ScrollView showsVerticalScrollIndicator={false}>
@@ -219,6 +232,16 @@ const styles = StyleSheet.create({
         color: colors.white_100,
         fontSize: 16,
         fontWeight: '500'
+    },
+    cardValuesLimit: {
+        color: colors.white_100,
+        fontWeight: '600',
+        fontSize: 18
+    },
+    cardValueDifference: {
+        color: colors.blue_50,
+        fontWeight: '600',
+        fontSize: 12
     }
 })
 

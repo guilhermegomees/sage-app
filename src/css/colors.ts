@@ -10,6 +10,7 @@ export const colors = {
     white_300 : '#B2ADAD',
     orange_300 : '#EE8B60',
     blue_100   : '#105DFB',
+    blue_50 : '#8AC7FF',
     green_500  : '#2DD148',
     gray_400   : '#2F4659',
     yellow_100 : '#EE8B60',

@@ -338,6 +338,9 @@ export const base = StyleSheet.create({
   p_10: {
     padding: 10,
   },
+  p_13: {
+    padding: 13,
+  },
   p_15: {
     padding: 15,
   },

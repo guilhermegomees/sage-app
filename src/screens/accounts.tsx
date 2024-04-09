@@ -16,8 +16,6 @@ import BottomSheet from '~/components/BottomSheet';
 
 import { api } from '~/server/api'
 
-import { useFocusEffect } from '@react-navigation/native';
-
 // Formatar valores com duas casas decimais
 function formatValue(value: number): string {
   let valueStr = value.toString();
@@ -60,12 +58,6 @@ export default function Accounts() {
     fetchData();
   }, []);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchData();
-    }, [])
-  );
-
   // Calcular o total de entradas e saídas para a wallet específica
   let totalExpenses = 0;
   let totalIncome = 0;
@@ -80,6 +72,10 @@ export default function Accounts() {
 
   const handleNavigateToGraphic = () => {
     navigation.navigate('Graphic');
+  };
+
+  const handleNavigateToTransactions = () => {
+    navigation.navigate('Transactions');
   };
 
   return (
@@ -111,38 +107,38 @@ export default function Accounts() {
       </View>
 
       {/* Botões de ação */}
-      <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_25]}>
-        <View style={[base.alignItemsCenter, base.justifyContentCenter, base.gap_8]}>
+      <View style={[styles.buttonsActionsContainer]}>
+        <View style={[styles.buttonAction]}>
           <TouchableOpacity>
-            <View style={[styles.buttonsActions]}>
-              <Image source={require('./../assets/images/recive.png')} style={styles.iconButtonAction} />
+            <View style={[styles.button]}>
+              <Image source={require('./../assets/images/dolar.png')} style={styles.iconButtonAction} />
             </View>
           </TouchableOpacity>
-          <Text style={[styles.textBtnsActions]}>Receber</Text>
+          <Text style={[styles.textBtnsActions]}>Registrar</Text>
         </View>
-        <View style={[base.alignItemsCenter, base.justifyContentCenter, base.gap_8]}>
+        <View style={[styles.buttonAction]}>
           <TouchableOpacity>
-            <View style={[styles.buttonsActions]}>
-              <Image source={require('./../assets/images/expense.png')} style={styles.iconButtonAction} />
-            </View>
-          </TouchableOpacity>
-          <Text style={[styles.textBtnsActions]}>Despesa</Text>
-        </View>
-        <View style={[base.alignItemsCenter, base.justifyContentCenter, base.gap_8]}>
-          <TouchableOpacity>
-            <View style={[styles.buttonsActions]}>
-              <Image source={require('./../assets/images/balance.png')} style={[styles.iconButtonAction, { height: 28 }]} />
+            <View style={[styles.button]}>
+              <Image source={require('./../assets/images/balance.png')} style={[styles.iconBalanceButtonAction]} />
             </View>
           </TouchableOpacity>
           <Text style={[styles.textBtnsActions]}>Balancear</Text>
         </View>
-        <View style={[base.alignItemsCenter, base.justifyContentCenter, base.gap_8]}>
+        <View style={[styles.buttonAction]}>
           <TouchableOpacity onPress={handleNavigateToGraphic}>
-            <View style={[styles.buttonsActions]}>
-              <FontAwesome6 name="chart-pie" color={colors.white_100} size={28} />
+            <View style={[styles.button]}>
+              <Image source={require('./../assets/images/chart-pie.png')} style={[styles.iconButtonAction]} />
             </View>
           </TouchableOpacity>
-          <Text style={[styles.textBtnsActions]}>Gráficos</Text>
+          <Text style={[styles.textBtnsActions]}>Gráfico</Text>
+        </View>
+        <View style={[styles.buttonAction]}>
+          <TouchableOpacity onPress={handleNavigateToTransactions}>
+            <View style={[styles.button]}>
+              <Image source={require('./../assets/images/money-transactions.png')} style={styles.iconButtonAction} />
+            </View>
+          </TouchableOpacity>
+          <Text style={[styles.textBtnsActions]}>Transações</Text>
         </View>
       </View>
 
@@ -185,7 +181,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 22
   },
-  buttonsActions: {
+  buttonsActionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  buttonAction: {
+    width: 77,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  button: {
     backgroundColor: colors.gray_800,
     width: 50,
     height: 50,
@@ -258,7 +265,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.gray_4
   },
   iconButtonAction: {
-    width: 30,
-    height: 30
+    width: 29,
+    height: 29
+  },
+  iconBalanceButtonAction: {
+    width: 28,
+    height: 26
   }
 })

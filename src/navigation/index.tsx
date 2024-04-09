@@ -6,12 +6,14 @@ import Home from '~/screens/home';
 import LoginScreen from '~/screens/login';
 import RegisterScreen from '~/screens/register';
 import Graphic from '~/screens/graphic';
+import Transactions from '~/screens/transactions'
 
 export type RootStackParamList = {
   Home: undefined;
   Login: undefined;
   Register: undefined;
   Graphic: undefined;
+  Transactions: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -21,13 +23,8 @@ export default function RootStack() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen
-          name="Graphic"
-          component={Graphic}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Register"
-          component={RegisterScreen}
+          name="Home"
+          component={Home}
           options={{ headerShown: false }}
         />
         <Stack.Screen
@@ -36,8 +33,18 @@ export default function RootStack() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="Home"
-          component={Home}
+          name="Register"
+          component={RegisterScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Graphic"
+          component={Graphic}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Transactions"
+          component={Transactions}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

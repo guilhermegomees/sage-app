@@ -45,7 +45,7 @@ function formatDate(dateStr: string): any {
     const month = date[0].length == 1 ? '0'+date[0] : date[0];
     const year = date[2];
     
-     return (`${day}/${month}/${year}`);
+    return (`${day}/${month}/${year}`);
 }
 
 const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
@@ -60,55 +60,73 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
     }, {} as Record<string, Transaction[]>);
 
     return (
-        <View style={[styles.panelTransactions, base.px_25, base.p_20]}>
+        <View style={[
+            styles.panelTransactions,
+            { padding: type == TypeScreem.Transaction ? 0 : 20 },
+            { paddingHorizontal: type == TypeScreem.Transaction ? 0 : 25 },
+            { backgroundColor: type == TypeScreem.Transaction ? 'transparent' : colors.gray_800 }]}>
             {type == TypeScreem.Card &&
                 <View style={[base.alignItemsCenter, base.mb_15, base.gap_10]}>
-                    {/* TODO: Aplicar valores de limite e limite utilizado vindos do data */}
+                    {/* TODO: Aplicar valores de 'limite' e 'limite utilizado' vindos do data */}
                     <Text style={[styles.cardValuesLimit]}>R$ 1.430 / R$ 3.200</Text>
-                    {/* TODO: Calcular diferença entre limite e limite utilizado */}
+                    {/* TODO: Calcular diferença entre 'limite' e 'limite utilizado' */}
                     <Text style={[styles.cardValueDifference]}>R$ 1.770</Text>
                 </View>
             }
-            <Text style={[styles.latestTransactions]}>Últimas transações</Text>
+            {type == TypeScreem.Account && <Text style={[styles.latestTransactions]}>Últimas transações</Text>}
             {Object.keys(groupedTransactions).length > 0 && (
                 <ScrollView showsVerticalScrollIndicator={false}>
-                    {Object.entries(groupedTransactions).map(([date, transactionsForDate]) => (
-                        <View key={date} style={[base.mb_15]}>
-                            <View style={[
-                                base.flexRow,
-                                base.alignItemsCenter,
-                                base.justifyContentCenter,
-                                base.gap_12,
-                                base.px_65,
-                            ]}>
-                                <Text style={[styles.date]}>{formatDate(date)}</Text>
-                                <View style={[styles.line]} />
-                            </View>
-                            <View>
-                                <View style={[styles.containerTrasactions]}>
-                                    {transactionsForDate.map((transaction, index) => (
-                                        <View key={transaction.ID} style={[base.alignItemsCenter]}>
-                                            <View style={[base.p_10, base.flexRow, base.flexSpaceBetween, base.alignItemsCenter, base.w_100]}>
-                                                <View style={[base.flexRow, base.alignItemsCenter, base.gap_9]}>
-                                                    <View style={[styles.containerIconTransactions, {
-                                                        backgroundColor: transaction.IS_EXPENSE ? colors.red_1 : colors.green_1
-                                                    }]}>
-                                                        {/* TODO: Aplicar icon vindo do data */}
-                                                        <FontAwesome6 name='car' color={colors.gray_900} size={15} />
+                    {Object.entries(groupedTransactions).map(([date, transactionsForDate]) => {
+                        // Calcula o valor total das transações para a data
+                        const totalValue = transactionsForDate.reduce((acc, transaction) => {
+                            return acc + (transaction.IS_EXPENSE ? -transaction.VALUE : transaction.VALUE);
+                        }, 0);
+
+                        return (
+                            <View key={date} style={[base.mb_15]}>
+                                <View style={[
+                                    base.flexRow,
+                                    base.alignItemsCenter,
+                                    { justifyContent: type != TypeScreem.Transaction ? 'center' : 'space-between' },
+                                    { gap: type != TypeScreem.Transaction ? 12 : 0 },
+                                    { paddingHorizontal: type != TypeScreem.Transaction ? 65 : 10 }
+                                ]}>
+                                    <Text style={[styles.date]}>{formatDate(date)}</Text>
+                                    {type != TypeScreem.Transaction && <View style={[styles.line]} />}
+                                    {type == TypeScreem.Transaction &&
+                                        <Text style={[styles.valueTransaction, {
+                                            color: totalValue < 0 ? colors.red_1 : colors.green_1
+                                        }]}>
+                                            {formatValue(Math.abs(totalValue), totalValue < 0 ? 1 : 0)}
+                                        </Text>
+                                    }
+                                </View>
+                                <View>
+                                    <View style={[styles.containerTrasactions]}>
+                                        {transactionsForDate.map((transaction, index) => (
+                                            <View key={transaction.ID} style={[base.alignItemsCenter]}>
+                                                <View style={[base.p_10, base.flexRow, base.flexSpaceBetween, base.alignItemsCenter, base.w_100]}>
+                                                    <View style={[base.flexRow, base.alignItemsCenter, base.gap_9]}>
+                                                        <View style={[styles.containerIconTransactions, {
+                                                            backgroundColor: transaction.IS_EXPENSE ? colors.red_1 : colors.green_1
+                                                        }]}>
+                                                            {/* TODO: Aplicar icon vindo do data */}
+                                                            <FontAwesome6 name='car' color={colors.gray_900} size={15} />
+                                                        </View>
+                                                        <Text style={[styles.textTransaction]}>{transaction.DESCRIPTION}</Text>
                                                     </View>
-                                                    <Text style={[styles.textTransaction]}>{transaction.DESCRIPTION}</Text>
+                                                    <Text style={[styles.valueTransaction, {
+                                                        color: transaction.IS_EXPENSE ? colors.red_1 : colors.green_1
+                                                    }]}>{formatValue(transaction.VALUE, transaction.IS_EXPENSE)}</Text>
                                                 </View>
-                                                <Text style={[styles.valueTransaction, {
-                                                    color: transaction.IS_EXPENSE ? colors.red_1 : colors.green_1
-                                                }]}>{formatValue(transaction.VALUE, transaction.IS_EXPENSE)}</Text>
+                                                {index !== transactionsForDate.length - 1 && <View style={[styles.divisor]} />}
                                             </View>
-                                            {index !== transactionsForDate.length - 1 && <View style={[styles.divisor]} />}
-                                        </View>
-                                    ))}
+                                        ))}
+                                    </View>
                                 </View>
                             </View>
-                        </View>
-                    ))}
+                        );
+                    })}
                 </ScrollView>
             )}
             <View style={[base.justifyContentCenter, base.alignItemsCenter, base.flex_1]}>
@@ -174,7 +192,6 @@ const styles = StyleSheet.create({
     panelTransactions: {
         flex: 1,
         width: '100%',
-        backgroundColor: colors.gray_800,
         borderTopLeftRadius: 25,
         borderTopRightRadius: 25,
     },

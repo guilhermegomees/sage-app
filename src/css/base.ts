@@ -297,6 +297,9 @@ export const base = StyleSheet.create({
   mx_0: {
     marginHorizontal: 0,
   },
+  mx_2: {
+    marginHorizontal: 2,
+  },
   mx_5: {
     marginHorizontal: 5,
   },

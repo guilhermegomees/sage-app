@@ -13,6 +13,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 
 
+
 type EntryExitGraphicScreenNavigationProp = StackNavigationProp<any, 'EntryExitGraphic'>;
 
 export default function EntryExitGraphic() {

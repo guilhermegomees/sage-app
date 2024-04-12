@@ -1,18 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, TextInput, StyleSheet } from 'react-native';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { colors } from '~/imports';
 
-const SearchBar = () => {
+interface SearchBarProps {
+    onSearch: (text: string) => void;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
+    const [searchText, setSearchText] = useState('');
+
+    const handleSearch = (text: string) => {
+        setSearchText(text);
+        onSearch(text);
+    };
+    
     return (
         <View style={[styles.searchSection, {backgroundColor: colors.gray_800}]}>
             <Ionicons name="search" size={18} color={colors.gray_200} />
             <TextInput
-                style={[styles.input]}
+                style={[styles.input, { color: colors.gray_200 }]}
                 placeholder="Pesquisa"
-                underlineColorAndroid="transparent"
                 placeholderTextColor={colors.gray_200}
+                value={searchText}
+                onChangeText={handleSearch}
             />
         </View>
     );

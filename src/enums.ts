@@ -1,5 +1,6 @@
 // Tipos de telas
 export enum TypeScreem {
   Account = 1,
-  Card = 2
+  Card = 2,
+  Transaction = 3
 }

@@ -9,17 +9,10 @@ import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import base from '~/css/base';
 import colors from '~/css/colors';
 
-interface Transaction {
-    ID : number;
-    DESCRIPTION : string;
-    VALUE : number;
-    DATE : Date;
-    IS_EXPENSE:  number; 
-    ICON : string;
-}
+import { ITransaction } from '~/interfaces';
 
 interface BottomSheetProps {
-    data: Transaction[];
+    data: ITransaction[];
     type: TypeScreem;
 }
 
@@ -50,14 +43,14 @@ function formatDate(dateStr: string): any {
 
 const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
     // Agrupar transações por data
-    const groupedTransactions: Record<string, Transaction[]> = data.reduce((acc, transaction) => {
+    const groupedTransactions: Record<string, ITransaction[]> = data.reduce((acc, transaction) => {
         const date = new Date(transaction.DATE).toLocaleDateString();
         if (!acc[date]) {
             acc[date] = [];
         }
         acc[date].push(transaction);
         return acc;
-    }, {} as Record<string, Transaction[]>);
+    }, {} as Record<string, ITransaction[]>);
 
     return (
         <View style={[
@@ -133,8 +126,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
                 {Object.keys(groupedTransactions).length === 0 && (
                     <View style={[base.justifyContentCenter, base.alignItemsCenter, base.gap_15]}>
                         <FontAwesome5 name="exclamation-triangle" size={40} color={'#F7D358'} />
-                        <Text style={styles.noTransactionsMessage}>Parece que você ainda não fez nenhuma transação.</Text>
-                        <Text style={styles.noTransactionsMessage}>Continue explorando!</Text>
+                        <Text style={styles.noTransactionsMessage}>Parece que você ainda não fez nenhuma transação ou nenhuma transação foi encontrada!</Text>
                     </View>
                 )}
             </View>

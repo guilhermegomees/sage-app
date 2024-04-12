@@ -6,13 +6,12 @@ import {
     TouchableOpacity,
     colors,
     base,
-    Image,
     MaterialIcons,
     useNavigation,
     StackNavigationProp
 } from '~/imports';
-import { TypeScreem } from '~/enums';
 
+import { TypeScreem } from '~/enums';
 import { ITransaction } from '~/interfaces';
 
 import BottomSheet from '~/components/BottomSheet';
@@ -22,18 +21,16 @@ type TransactionsScreenNavigationProp = StackNavigationProp<any, 'Transactions'>
 
 export default function Transactions() {
     const navigation = useNavigation<TransactionsScreenNavigationProp>();
-    const [data, setData] = useState<any[]>([]);
-    const [searchText, setSearchText] = useState('');
-    const [filteredData, setFilteredData] = useState<any[]>([]);
-    const [showNoResultsMessage, setShowNoResultsMessage] = useState(false);
+    const [transactions, setTransactions] = useState<ITransaction[]>([]);
+    const [filteredTransactions, setFilteredTransactions] = useState<ITransaction[]>([]);
 
     const handleNavigateToBack = () => {
         navigation.navigate('Home');
     };
 
-    const fetchData = async (): Promise<any> => {
+    const fetchTransactions = async (): Promise<void> => {
         //TODO: Trazer transações através do banco e popular o data
-        const data = [
+        const data: ITransaction[] = [
             { "DATE": "2024-03-04T03:00:00.000Z", "DESCRIPTION": "Compra em supermercado", "ICON": "shopping-cart", "ID": 1, "IS_EXPENSE": 1, "VALUE": 150.75, "WALLET": 1 },
             { "DATE": "2024-03-04T03:00:00.000Z", "DESCRIPTION": "Pagamento de conta de luz", "ICON": "bolt", "ID": 2, "IS_EXPENSE": 1, "VALUE": 80.50, "WALLET": 1 },
             { "DATE": "2024-03-08T03:00:00.000Z", "DESCRIPTION": "Jantar em restaurante", "ICON": "utensils", "ID": 3, "IS_EXPENSE": 1, "VALUE": 65.30, "WALLET": 1 },
@@ -44,21 +41,19 @@ export default function Transactions() {
             { "DATE": "2024-03-15T03:00:00.000Z", "DESCRIPTION": "Assinatura de serviço online", "ICON": "subscription", "ID": 8, "IS_EXPENSE": 1, "VALUE": 15.99, "WALLET": 1 }
         ];
 
-        setData(data);
-        setFilteredData(data);
+        setTransactions(data);
+        setFilteredTransactions(data);
     };
 
     useEffect(() => {
-        fetchData();
+        fetchTransactions();
     }, []);
 
     const handleSearch = (text: string) => {
-        setSearchText(text);
-        const filtered: any = data.filter((transaction: ITransaction) =>
+        const filtered: ITransaction[] = transactions.filter((transaction: ITransaction) =>
             transaction.DESCRIPTION.toLowerCase().startsWith(text.toLowerCase())
         );
-        setFilteredData(filtered);
-        setShowNoResultsMessage(filtered.length === 0);
+        setFilteredTransactions(filtered);
     };
 
     return (
@@ -69,12 +64,10 @@ export default function Transactions() {
                 </TouchableOpacity>
                 <Text style={[styles.titleTransactions]}>Transações</Text>
             </View>
-
             <View style={[base.mb_20, base.mx_2]}>
                 <SearchBar onSearch={handleSearch} />
             </View>
-
-            <BottomSheet data={filteredData} type={TypeScreem.Transaction} />
+            <BottomSheet data={filteredTransactions} type={TypeScreem.Transaction} />
         </View>
     );
 }

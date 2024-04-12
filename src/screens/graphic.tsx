@@ -20,6 +20,9 @@ export default function Graphic() {
   const handleNavigateToBack = () => {
     navigation.navigate('Home');
   };
+  const handleNavigateToEntryExit = () => {
+    navigation.navigate('EntryExitGraphic');
+  };
 
   return (
     <View style={[styles.container, base.flex_1]}>
@@ -30,7 +33,7 @@ export default function Graphic() {
         <Text style={[styles.title]}>Gráficos</Text>
       </View>
       <View style={styles.containerBtn}>
-        <TouchableOpacity style={styles.btn}>
+        <TouchableOpacity style={styles.btn} onPress={handleNavigateToEntryExit}>
           <View style={[styles.imageContainer]}>
             <Image source={require('../assets/images/graphic01.png')} style={styles.barGraph} />
           </View>

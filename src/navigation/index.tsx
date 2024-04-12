@@ -6,7 +6,8 @@ import Home from '~/screens/home';
 import LoginScreen from '~/screens/login';
 import RegisterScreen from '~/screens/register';
 import Graphic from '~/screens/graphic';
-import Transactions from '~/screens/transactions'
+import Transactions from '~/screens/transactions';
+import EntryExitGraphic from '~/screens/entryExitGraphic';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -14,6 +15,7 @@ export type RootStackParamList = {
   Register: undefined;
   Graphic: undefined;
   Transactions: undefined;
+  EntryExitGraphic: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -45,6 +47,11 @@ export default function RootStack() {
         <Stack.Screen
           name="Transactions"
           component={Transactions}
+          options={{ headerShown: false }}
+        />
+         <Stack.Screen
+          name="EntryExitGraphic"
+          component={EntryExitGraphic}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

@@ -23,6 +23,9 @@ export default function Graphic() {
   const handleNavigateToEntryExit = () => {
     navigation.navigate('EntryExitGraphic');
   };
+  const handleNavigateToCategoryGraphic = () => {
+    navigation.navigate('CategoryGraphic');
+  };
 
   return (
     <View style={[styles.container, base.flex_1]}>
@@ -42,7 +45,7 @@ export default function Graphic() {
             <Text style={styles.subTitleButton}>Saiba quanto você recebeu e quanto você gastou durante um certo período.</Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.btn}>
+        <TouchableOpacity style={styles.btn} onPress={handleNavigateToCategoryGraphic}>
           <View style={[styles.imageContainer]}>
             <Image source={require('../assets/images/graphic02.png')} style={styles.circleGraph} />
           </View>

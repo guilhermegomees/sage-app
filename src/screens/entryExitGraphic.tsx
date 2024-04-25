@@ -113,7 +113,7 @@ export default function EntryExitGraphic() {
         <VictoryChart theme={VictoryTheme.material} domainPadding={10}>
           <VictoryBar style={{ data: { fill: '#c43a31' } }} data={data} />
         </VictoryChart>
-        <BottomSheet data={filteredTransactions} type={TypeScreem.Transaction} />
+        <BottomSheet data={filteredTransactions} type={TypeScreem.Graphics} />
       </View>
     </View>
   );

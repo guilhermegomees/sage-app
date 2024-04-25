@@ -55,9 +55,9 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
     return (
         <View style={[
             styles.panelTransactions,
-            { padding: type == TypeScreem.Transaction ? 0 : 20 },
-            { paddingHorizontal: type == TypeScreem.Transaction ? 0 : 25 },
-            { backgroundColor: type == TypeScreem.Transaction ? 'transparent' : colors.gray_800 }]}>
+            { padding: type == TypeScreem.Transaction || type == TypeScreem.Graphics ? 0 : 20 },
+            { paddingHorizontal: type == TypeScreem.Transaction || type == TypeScreem.Graphics ? 0 : 25 },
+            { backgroundColor: type == TypeScreem.Transaction || type == TypeScreem.Graphics ? 'transparent' : colors.gray_800 }]}>
             {type == TypeScreem.Card &&
                 <View style={[base.alignItemsCenter, base.mb_15, base.gap_10]}>
                     {/* TODO: Aplicar valores de 'limite' e 'limite utilizado' vindos do data */}
@@ -80,12 +80,12 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
                                 <View style={[
                                     base.flexRow,
                                     base.alignItemsCenter,
-                                    { justifyContent: type != TypeScreem.Transaction ? 'center' : 'space-between' },
-                                    { gap: type != TypeScreem.Transaction ? 12 : 0 },
-                                    { paddingHorizontal: type != TypeScreem.Transaction ? 65 : 10 }
+                                    { justifyContent: type == TypeScreem.Transaction || type == TypeScreem.Graphics ? 'space-between' : 'center' },
+                                    { gap: type == TypeScreem.Transaction || type == TypeScreem.Graphics ? 0 : 12 },
+                                    { paddingHorizontal: type == TypeScreem.Transaction || type == TypeScreem.Graphics ? 10 : 65 }
                                 ]}>
                                     <Text style={[styles.date]}>{formatDate(date)}</Text>
-                                    {type != TypeScreem.Transaction && <View style={[styles.line]} />}
+                                    {(type == TypeScreem.Account || type == TypeScreem.Card) && <View style={[styles.line]} />}
                                     {type == TypeScreem.Transaction &&
                                         <Text style={[styles.valueTransaction, {
                                             color: totalValue < 0 ? colors.red_1 : colors.green_1

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { VictoryChart, VictoryLabel, VictoryTheme, VictoryBar } from 'victory-native';
+import { VictoryChart, VictoryTheme, VictoryBar, VictoryGroup } from 'victory-native';
 import {
   Text,
   View,
@@ -26,20 +26,11 @@ export default function EntryExitGraphic() {
     navigation.navigate('Graphic');
   };
 
-  const data = [
-    { x: 'Dez 23', y: 35 },
-    { x: 'Jan 24', y: 40 },
-    { x: 'Fev 24', y: 55 },
-  ];
-
-  const [transactions, setTransactions] = useState<ITransaction[]>([]);
-  const [filteredTransactions, setFilteredTransactions] = useState<ITransaction[]>([]);
-
   const fetchTransactions = async (): Promise<void> => {
     //TODO: Trazer transações através do banco e popular o data
     const data: ITransaction[] = [
       {
-        DATE: '2024-03-04T03:00:00.000Z',
+        DATE: '2024-01-03T03:00:00.000Z',
         DESCRIPTION: 'Compra em supermercado',
         ICON: 'shopping-cart',
         ID: 1,
@@ -48,16 +39,16 @@ export default function EntryExitGraphic() {
         WALLET: 1,
       },
       {
-        DATE: '2024-03-04T03:00:00.000Z',
-        DESCRIPTION: 'Pagamento de conta de luz',
+        DATE: '2024-02-03T03:00:00.000Z',
+        DESCRIPTION: 'Pix do Panzo',
         ICON: 'bolt',
         ID: 2,
-        IS_EXPENSE: 1,
+        IS_EXPENSE: 0,
         VALUE: 80.5,
         WALLET: 1,
       },
       {
-        DATE: '2024-03-08T03:00:00.000Z',
+        DATE: '2024-03-03T03:00:00.000Z',
         DESCRIPTION: 'Jantar em restaurante',
         ICON: 'utensils',
         ID: 3,
@@ -66,7 +57,7 @@ export default function EntryExitGraphic() {
         WALLET: 1,
       },
       {
-        DATE: '2024-03-10T03:00:00.000Z',
+        DATE: '2024-12-3T03:00:00.000Z',
         DESCRIPTION: 'Compra online',
         ICON: 'shopping-bag',
         ID: 4,
@@ -75,7 +66,7 @@ export default function EntryExitGraphic() {
         WALLET: 1,
       },
       {
-        DATE: '2024-03-12T03:00:00.000Z',
+        DATE: '2024-11-2T03:00:00.000Z',
         DESCRIPTION: 'Compra em loja de roupas',
         ICON: 'tshirt',
         ID: 7,
@@ -84,7 +75,7 @@ export default function EntryExitGraphic() {
         WALLET: 1,
       },
       {
-        DATE: '2024-03-15T03:00:00.000Z',
+        DATE: '2024-10-01T03:00:00.000Z',
         DESCRIPTION: 'Assinatura de serviço online',
         ICON: 'subscription',
         ID: 8,
@@ -97,9 +88,45 @@ export default function EntryExitGraphic() {
     setTransactions(data);
     setFilteredTransactions(data);
   };
+
   useEffect(() => {
     fetchTransactions();
   }, []);
+
+  const processTransactions = (transactions: ITransaction[]) => {
+    const processedData: { x: string; red: number; green: number }[] = [];
+
+    transactions.forEach((transaction) => {
+      const date = new Date(transaction.DATE);
+      const month = date.toLocaleString('default', { month: 'short' });
+
+      const existingIndex = processedData.findIndex((item) => item.x === month);
+      if (existingIndex !== -1) {
+        if (transaction.IS_EXPENSE) {
+          processedData[existingIndex].red += transaction.VALUE;
+        } else {
+          processedData[existingIndex].green += transaction.VALUE;
+        }
+      } else {
+        processedData.push({
+          x: month,
+          red: transaction.IS_EXPENSE ? transaction.VALUE : 0,
+          green: transaction.IS_EXPENSE ? 0 : transaction.VALUE,
+        });
+      }
+    });
+
+    return processedData;
+  };
+
+  const [transactions, setTransactions] = useState<ITransaction[]>([]);
+  const [filteredTransactions, setFilteredTransactions] = useState<ITransaction[]>([]);
+  const [data, setData] = useState<{ x: string; red: number; green: number }[]>([]);
+
+  useEffect(() => {
+    const processedData = processTransactions(transactions);
+    setData(processedData);
+  }, [transactions]);
 
   return (
     <View style={[styles.container, base.flex_1]}>
@@ -111,7 +138,10 @@ export default function EntryExitGraphic() {
       </View>
       <View style={styles.chartContainer}>
         <VictoryChart theme={VictoryTheme.material} domainPadding={10}>
-          <VictoryBar style={{ data: { fill: '#c43a31' } }} data={data} />
+          <VictoryGroup offset={20}>
+            <VictoryBar style={{ data: { fill: '#FF6347' } }} data={data} x="x" y="red" />
+            <VictoryBar style={{ data: { fill: '#32CD32' } }} data={data} x="x" y="green" />
+          </VictoryGroup>
         </VictoryChart>
         <BottomSheet data={filteredTransactions} type={TypeScreem.Graphics} />
       </View>

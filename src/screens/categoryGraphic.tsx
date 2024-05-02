@@ -30,10 +30,13 @@ export default function CategoryGraphic() {
   };
 
   //TODO ajustar DATA para trazer dados da base de dados.
+  //X = ID da despesa
+  //y = Valor da despesa
+  //label = Name da despesa
   const data = [
-    { x: 1, y: 2, label: "one" },
-    { x: 2, y: 3, label: "two" },
-    { x: 3, y: 5, label: "three" }
+    { x: 1, y: 150, label: "one" },
+    { x: 2, y: 100, label: "two" },
+    { x: 3, y: 50, label: "three" }
   ];
 
   const fetchTransactions = async (): Promise<void> => {

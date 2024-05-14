@@ -31,6 +31,7 @@ export default function EntryExitGraphic() {
     const data: ITransaction[] = [
       {
         DATE: '2024-01-03T03:00:00.000Z',
+        CATEGORY: "Alimentação",
         DESCRIPTION: 'Compra em supermercado',
         ICON: 'shopping-cart',
         ID: 1,
@@ -41,6 +42,7 @@ export default function EntryExitGraphic() {
       {
         DATE: '2024-02-03T03:00:00.000Z',
         DESCRIPTION: 'Pix do Panzo',
+        CATEGORY: "Alimentação",
         ICON: 'bolt',
         ID: 2,
         IS_EXPENSE: 0,
@@ -50,6 +52,7 @@ export default function EntryExitGraphic() {
       {
         DATE: '2024-03-03T03:00:00.000Z',
         DESCRIPTION: 'Jantar em restaurante',
+        CATEGORY: "Alimentação",
         ICON: 'utensils',
         ID: 3,
         IS_EXPENSE: 1,
@@ -59,6 +62,7 @@ export default function EntryExitGraphic() {
       {
         DATE: '2024-12-3T03:00:00.000Z',
         DESCRIPTION: 'Compra online',
+        CATEGORY: "Alimentação",
         ICON: 'shopping-bag',
         ID: 4,
         IS_EXPENSE: 1,
@@ -68,6 +72,7 @@ export default function EntryExitGraphic() {
       {
         DATE: '2024-11-2T03:00:00.000Z',
         DESCRIPTION: 'Compra em loja de roupas',
+        CATEGORY: "Alimentação",
         ICON: 'tshirt',
         ID: 7,
         IS_EXPENSE: 1,
@@ -77,6 +82,7 @@ export default function EntryExitGraphic() {
       {
         DATE: '2024-10-01T03:00:00.000Z',
         DESCRIPTION: 'Assinatura de serviço online',
+        CATEGORY: "Alimentação",
         ICON: 'subscription',
         ID: 8,
         IS_EXPENSE: 1,

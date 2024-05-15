@@ -17,6 +17,7 @@ import BottomSheet from '~/components/BottomSheet';
 
 import { useNavigation } from '@react-navigation/native';
 import { VictoryPie, VictoryLabel } from 'victory-native';
+import Transactions from './transactions';
 
 type CategoryGraphicScreenNavigationProp = StackNavigationProp<any, 'CategoryGraphic'>;
 
@@ -24,6 +25,7 @@ export default function CategoryGraphic() {
   const navigation = useNavigation<CategoryGraphicScreenNavigationProp>();
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [filteredTransactions, setFilteredTransactions] = useState<{ x: string; y: number; }[]>([]);
+  const [totalExpenses, setTotalExpenses] = useState<number>(0); // Estado para armazenar o total das despesas
 
   const handleNavigateToBack = () => {
     navigation.navigate('Graphic');
@@ -92,6 +94,9 @@ export default function CategoryGraphic() {
     const groupedData = groupTransactionsByCategory(data); // Agrupa as transações por categoria
     console.log('groupedData:', groupedData); // Adicione esta linha para verificar o conteúdo de groupedData
     setFilteredTransactions(groupedData); // Define as transações agrupadas no estado
+    // Calcular o total das despesas
+    const total = calculateTotalExpenses(data);
+    setTotalExpenses(total);
   };
 
   const groupTransactionsByCategory = (data: ITransaction[]): { x: string, y: number }[] => {
@@ -109,6 +114,11 @@ export default function CategoryGraphic() {
       x: category,
       y: groupedData[category]
     }));
+  };
+
+  const calculateTotalExpenses = (data: ITransaction[]): number => {
+    // Calcular o total das despesas...
+    return data.filter(transaction => transaction.IS_EXPENSE === 1).reduce((total, transaction) => total + transaction.VALUE, 0);
   };
   
   return (
@@ -128,7 +138,8 @@ export default function CategoryGraphic() {
           colorScale={["tomato", "cyan", "gold"]}
           labelComponent={<VictoryLabel style={{ fill: colors.white_100, fontSize: 15, fontFamily: 'Outfit_600SemiBold' }} />}
         />
-        <BottomSheet data={transactions} type={TypeScreem.Graphics} />
+       <Text style={styles.totalExpenses}>R$ {totalExpenses.toFixed(2).replace('.', ',')}</Text>
+        <BottomSheet data={transactions} type={TypeScreem.Graphics}/>
       </View>
     </View>
   );
@@ -156,5 +167,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  totalExpenses: {
+    marginTop: -30,
+    fontFamily: 'Outfit_400Regular',
+    color: colors.white_100,
+    fontSize: 16,
   },
 });

@@ -2,7 +2,20 @@
 
 // React e componentes do React Native
 import React from 'react';
-import { Text, View, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Image, ImageBackground } from 'react-native';
+import {
+  Text,
+  View,
+  TextInput,
+  StyleSheet,
+  Dimensions,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  ImageBackground,
+  Button,
+  Platform,
+  TouchableWithoutFeedback,
+} from 'react-native';
 
 // Bibliotecas externas
 import { Bar } from 'react-native-progress';
@@ -21,6 +34,7 @@ export {
   React,
   Text,
   View,
+  TextInput,
   StyleSheet,
   Dimensions,
   ScrollView,
@@ -29,6 +43,9 @@ export {
   MaterialIcons,
   Image,
   ImageBackground,
+  Button,
+  Platform,
+  TouchableWithoutFeedback,
   colors,
   base,
   useNavigation,

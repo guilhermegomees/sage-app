@@ -81,10 +81,10 @@ export default function Goals() {
             </View>
           </View>
         ))}
-        <TouchableOpacity style={styles.btnNew}>
-          <Text style={[styles.textBtn, {fontSize: 16}]}>Adicionar uma nova meta</Text>
-        </TouchableOpacity>
       </ScrollView>
+      <TouchableOpacity style={styles.btnNew}>
+        <Text style={[styles.textBtn, { fontSize: 16 }]}>Adicionar uma nova meta</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -93,11 +93,12 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.gray_900,
     paddingTop: 20,
+    paddingHorizontal: 30
   },
   scrollContainer: {
     flexGrow: 1,
     alignItems: 'center',
-    gap: 20
+    gap: 20,
   },
   goalContainer: {
     flexDirection: 'column',
@@ -168,14 +169,14 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   btnNew: {
-    width: '95%',
+    width: '100%',
     backgroundColor: colors.blue_100,
     borderRadius: 15,
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 20,
-    marginBottom: 10,
+    marginBottom: 20,
   },
   blueText: {
     color: colors.blue_200,

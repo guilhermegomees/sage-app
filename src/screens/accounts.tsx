@@ -80,7 +80,6 @@ export default function Accounts() {
 
   return (
     <View style={[styles.container, base.flex_1, base.alignItemsCenter, base.pt_25, base.gap_25]}>
-      
       {/* Conta */}
       <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_8]}>
         {/* TODO: Aplicar nome da carteira vindo do data */}
@@ -89,7 +88,6 @@ export default function Accounts() {
           <FontAwesome6 name='repeat' color={colors.white} size={12} />
         </View>
       </View>
-
       {/* Valores */}
       <View style={[base.flexColumn, base.alignItemsCenter, base.justifyContentCenter, base.gap_8]}>
         {/* TODO: Aplicar valor da conta vindo do data */}
@@ -105,7 +103,6 @@ export default function Accounts() {
           </View>
         </View>
       </View>
-
       {/* Botões de ação */}
       <View style={[styles.buttonsActionsContainer]}>
         <View style={[styles.buttonAction]}>
@@ -141,7 +138,6 @@ export default function Accounts() {
           <Text style={[styles.textBtnsActions]}>Transações</Text>
         </View>
       </View>
-
       {/* Painel de transações */}
       <BottomSheet data={data} type={TypeScreem.Account} />
     </View>

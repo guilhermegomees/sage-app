@@ -1,19 +1,26 @@
 import { Text, View, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+
 import { colors } from '../css/colors';
 import { base } from '../css/base';
 
+import { ITransaction } from '~/interfaces';
 import { TypeScreem } from '~/enums';
 
 import BottomSheet from '~/components/BottomSheet';
 
+type CardsScreenNavigationProp = StackNavigationProp<any, 'Cards'>;
+
 export default function Cards() {
-  const [data, setData] = useState<any[]>([]);
+  const navigation = useNavigation<CardsScreenNavigationProp>();
+  const [transactions, setTransactions] = useState<ITransaction[]>([]);
 
   //TODO: Trazer transações do cartão através do banco e popular o data
-  const jsonData = [
-    { "DATE": "2024-03-04T03:00:00.000Z", "DESCRIPTION": "Compra em supermercado", "ICON": "shopping-cart", "ID": 1, "IS_EXPENSE": 1, "VALUE": 150.75, "WALLET": 1 },
+  const data : ITransaction[] = [
+    { "DATE": "2024-03-04T03:00:00.000Z", "DESCRIPTION": "Compra em supermercado", "ICON": "shopping-cart", "ID": 1, "IS_EXPENSE": 1, "VALUE": 151.75, "WALLET": 1 },
     { "DATE": "2024-03-04T03:00:00.000Z", "DESCRIPTION": "Pagamento de conta de luz", "ICON": "bolt", "ID": 2, "IS_EXPENSE": 1, "VALUE": 80.50, "WALLET": 1 },
     { "DATE": "2024-03-08T03:00:00.000Z", "DESCRIPTION": "Jantar em restaurante", "ICON": "utensils", "ID": 3, "IS_EXPENSE": 1, "VALUE": 65.30, "WALLET": 1 },
     { "DATE": "2024-03-10T03:00:00.000Z", "DESCRIPTION": "Compra online", "ICON": "shopping-bag", "ID": 4, "IS_EXPENSE": 1, "VALUE": 200.00, "WALLET": 1 },
@@ -24,8 +31,12 @@ export default function Cards() {
   ];
 
   useEffect(() => {
-    setData(jsonData);
+    setTransactions(data);
   }, []);
+
+  const handleNavigateToCardDatails = () => {
+    navigation.navigate('CardDatails');
+  };
   
   return (
     <View style={[styles.container, base.alignItemsCenter, base.flex_1]}>
@@ -57,7 +68,7 @@ export default function Cards() {
           <Text style={[styles.textBtnsActions]}>Transação</Text>
         </View>
         <View style={[base.alignItemsCenter, base.justifyContentCenter, base.gap_8]}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleNavigateToCardDatails}>
             <View style={[styles.buttonsActions]}>
               <Image source={require('./../assets/images/edit.png')} style={styles.iconButtonActionEdit} />
             </View>
@@ -80,7 +91,7 @@ export default function Cards() {
       </View>
 
       {/* Painel de transações */}
-      <BottomSheet data={data} type={TypeScreem.Card} />
+      <BottomSheet data={transactions} type={TypeScreem.Card} />
     </View>
   );
 }
@@ -94,7 +105,7 @@ const styles = StyleSheet.create({
     width: 288,
     height: 178,
     backgroundColor: '#E0E3E7',
-    borderRadius: 15
+    borderRadius: 20
   },
   contactless: {
     width: 28,

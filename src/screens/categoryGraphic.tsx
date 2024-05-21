@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { VictoryPie, VictoryLabel } from 'victory-native';
 import {
   Text,
   View,
@@ -6,7 +7,6 @@ import {
   TouchableOpacity,
   colors,
   base,
-  Image,
   MaterialIcons,
   StackNavigationProp
 } from '~/imports';
@@ -16,16 +16,15 @@ import { ITransaction } from '~/interfaces';
 import BottomSheet from '~/components/BottomSheet';
 
 import { useNavigation } from '@react-navigation/native';
-import { VictoryPie, VictoryLabel } from 'victory-native';
-import Transactions from './transactions';
 
 type CategoryGraphicScreenNavigationProp = StackNavigationProp<any, 'CategoryGraphic'>;
 
 export default function CategoryGraphic() {
   const navigation = useNavigation<CategoryGraphicScreenNavigationProp>();
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
-  const [filteredTransactions, setFilteredTransactions] = useState<{ x: string; y: number; }[]>([]);
-  const [totalExpenses, setTotalExpenses] = useState<number>(0); // Estado para armazenar o total das despesas
+  const [filteredTransactions, setFilteredTransactions] = useState<{ x: string; y: number; z: string }[]>([]);
+  const [totalExpenses, setTotalExpenses] = useState<number>(0);
+  const [selectedCategory, setSelectedCategory] = useState<{ category: string, total: number, description: string } | null>(null);
 
   const handleNavigateToBack = () => {
     navigation.navigate('Graphic');
@@ -36,7 +35,6 @@ export default function CategoryGraphic() {
   }, []);
 
   const fetchTransactions = async (): Promise<void> => {
-    //TODO: Trazer transações através do banco e popular o data
     const data: ITransaction[] = [
       {
         DATE: '2024-01-03T03:00:00.000Z',
@@ -51,7 +49,7 @@ export default function CategoryGraphic() {
       {
         DATE: '2024-03-03T03:00:00.000Z',
         DESCRIPTION: 'Jantar em restaurante',
-        CATEGORY: "Alimentação",
+        CATEGORY: "Alimentação2",
         ICON: 'utensils',
         ID: 3,
         IS_EXPENSE: 1,
@@ -91,15 +89,13 @@ export default function CategoryGraphic() {
     ];
   
     setTransactions(data);
-    const groupedData = groupTransactionsByCategory(data); // Agrupa as transações por categoria
-    console.log('groupedData:', groupedData); // Adicione esta linha para verificar o conteúdo de groupedData
-    setFilteredTransactions(groupedData); // Define as transações agrupadas no estado
-    // Calcular o total das despesas
+    const groupedData = groupTransactionsByCategory(data);
+    setFilteredTransactions(groupedData);
     const total = calculateTotalExpenses(data);
     setTotalExpenses(total);
   };
 
-  const groupTransactionsByCategory = (data: ITransaction[]): { x: string, y: number }[] => {
+  const groupTransactionsByCategory = (data: ITransaction[]): { x: string, y: number, z: string }[] => {
     const groupedData: { [key: string]: number } = {};
   
     data.forEach(transaction => {
@@ -111,16 +107,24 @@ export default function CategoryGraphic() {
     });
   
     return Object.keys(groupedData).map(category => ({
-      x: category,
-      y: groupedData[category]
+      x: " ",  // Gambiarra não exibir valor do grafico.
+      y: groupedData[category],
+      z: category  // Mantendo a categoria original em z
     }));
   };
 
   const calculateTotalExpenses = (data: ITransaction[]): number => {
-    // Calcular o total das despesas...
     return data.filter(transaction => transaction.IS_EXPENSE === 1).reduce((total, transaction) => total + transaction.VALUE, 0);
   };
-  
+
+  const handleSliceClick = (event: any, props: any) => {
+    const index = props.index;
+    const category = filteredTransactions[index].z;
+    const total = filteredTransactions[index].y;
+    const descriptions = transactions.filter(transaction => transaction.CATEGORY === category).map(transaction => transaction.DESCRIPTION).join(", ");
+    setSelectedCategory({ category, total, description: descriptions });
+  };
+
   return (
     <View style={[styles.container, base.flex_1]}>
       <View style={[styles.containerBack]}>
@@ -134,11 +138,40 @@ export default function CategoryGraphic() {
           width={300}
           height={300}
           innerRadius={75}
-          data={filteredTransactions} // Passamos os dados agrupados para o VictoryPie
-          colorScale={["tomato", "cyan", "gold"]}
-          labelComponent={<VictoryLabel style={{ fill: colors.white_100, fontSize: 15, fontFamily: 'Outfit_600SemiBold' }} />}
+          data={filteredTransactions}
+          colorScale={["tomato", "cyan", "gold", "silver"]}
+          events={[
+            {
+              target: "data",
+              eventHandlers: {
+                onPressIn: (event, props) => {
+                  handleSliceClick(event, props);
+                  return [];
+                }
+              }
+            }
+          ]}
+          labelComponent={<VictoryLabel textAnchor="middle" verticalAnchor="middle" />}
         />
-       <Text style={styles.totalExpenses}>R$ {totalExpenses.toFixed(2).replace('.', ',')}</Text>
+        <VictoryLabel
+          text={selectedCategory ? `Total: R$ ${selectedCategory.total.toFixed(2).replace('.', ',')}\n${selectedCategory.description}` : ""}
+          textAnchor="middle"
+          verticalAnchor="middle"
+          x={150}
+          y={150}
+          style={{ fontFamily: 'Outfit_400Regular', fontSize: 16, fill: 'white' }}
+        />
+        <Text style={styles.totalExpenses}>R$ {totalExpenses.toFixed(2).replace('.', ',')}</Text>
+        {selectedCategory && (
+          <View style={styles.selectedCategoryContainer}>
+            <Text style={styles.selectedCategoryText}>
+              Categoria: {selectedCategory.category}
+            </Text>
+            <Text style={styles.selectedCategoryText}>
+              Total: R$ {selectedCategory.total.toFixed(2).replace('.', ',')}
+            </Text>
+          </View>
+        )}
         <BottomSheet data={transactions} type={TypeScreem.Graphics}/>
       </View>
     </View>
@@ -173,5 +206,15 @@ const styles = StyleSheet.create({
     fontFamily: 'Outfit_400Regular',
     color: colors.white_100,
     fontSize: 16,
+  },
+  selectedCategoryContainer: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  selectedCategoryText: {
+    fontFamily: 'Outfit_400Regular',
+    color: colors.white_100,
+    fontSize: 16,
+    textAlign: 'center',
   },
 });

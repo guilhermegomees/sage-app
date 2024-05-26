@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { VictoryPie, VictoryLabel } from 'victory-native';
+import { VictoryPie, VictoryLabel, VictoryTooltip } from 'victory-native';
 import {
   Text,
   View,
@@ -10,6 +10,11 @@ import {
   MaterialIcons,
   StackNavigationProp
 } from '~/imports';
+
+import { FlatList } from 'react-native';
+import { EXPENSES } from '../../utils/expenses';
+import { Card, CardProps } from '../components/Card';
+import { Header, MonthsProps } from '../components/Header';
 
 import { TypeScreem } from '~/enums';
 import { ITransaction } from '~/interfaces';
@@ -30,100 +35,17 @@ export default function CategoryGraphic() {
     navigation.navigate('Graphic');
   };
 
+  const [selected, setSelected] = useState("");
+  const [month, setMonth] = useState<MonthsProps>("Janeiro");
+  const [data, setData] = useState<CardProps[]>([]);
+
+  function handleCardOnPress( id: string ){
+    setSelected(prev => prev === id ? "" :id);
+  }
+
   useEffect(() => {
-    fetchTransactions();
-  }, []);
-
-  const fetchTransactions = async (): Promise<void> => {
-    const data: ITransaction[] = [
-      {
-        DATE: '2024-01-03T03:00:00.000Z',
-        CATEGORY: "Alimentação",
-        DESCRIPTION: 'Compra em supermercado',
-        ICON: 'shopping-cart',
-        ID: 1,
-        IS_EXPENSE: 1,
-        VALUE: 150.75,
-        WALLET: 1,
-      },
-      {
-        DATE: '2024-03-03T03:00:00.000Z',
-        DESCRIPTION: 'Jantar em restaurante',
-        CATEGORY: "Alimentação2",
-        ICON: 'utensils',
-        ID: 3,
-        IS_EXPENSE: 1,
-        VALUE: 65.3,
-        WALLET: 1,
-      },
-      {
-        DATE: '2024-12-3T03:00:00.000Z',
-        DESCRIPTION: 'Compra online',
-        CATEGORY: "Compra Online",
-        ICON: 'shopping-bag',
-        ID: 4,
-        IS_EXPENSE: 1,
-        VALUE: 200.0,
-        WALLET: 1,
-      },
-      {
-        DATE: '2024-11-2T03:00:00.000Z',
-        DESCRIPTION: 'Compra em loja de roupas',
-        CATEGORY: "Vestuário",
-        ICON: 'tshirt',
-        ID: 7,
-        IS_EXPENSE: 1,
-        VALUE: 100.0,
-        WALLET: 1,
-      },
-      {
-        DATE: '2024-10-01T03:00:00.000Z',
-        DESCRIPTION: 'Assinatura de serviço online',
-        CATEGORY: "Compra Online",
-        ICON: 'subscription',
-        ID: 8,
-        IS_EXPENSE: 1,
-        VALUE: 15.99,
-        WALLET: 1,
-      },
-    ];
-  
-    setTransactions(data);
-    const groupedData = groupTransactionsByCategory(data);
-    setFilteredTransactions(groupedData);
-    const total = calculateTotalExpenses(data);
-    setTotalExpenses(total);
-  };
-
-  const groupTransactionsByCategory = (data: ITransaction[]): { x: string, y: number, z: string }[] => {
-    const groupedData: { [key: string]: number } = {};
-  
-    data.forEach(transaction => {
-      if (transaction.CATEGORY in groupedData) {
-        groupedData[transaction.CATEGORY] += transaction.VALUE;
-      } else {
-        groupedData[transaction.CATEGORY] = transaction.VALUE;
-      }
-    });
-  
-    return Object.keys(groupedData).map(category => ({
-      x: " ",  // Gambiarra não exibir valor do grafico.
-      y: groupedData[category],
-      z: category  // Mantendo a categoria original em z
-    }));
-  };
-
-  const calculateTotalExpenses = (data: ITransaction[]): number => {
-    return data.filter(transaction => transaction.IS_EXPENSE === 1).reduce((total, transaction) => total + transaction.VALUE, 0);
-  };
-
-  const handleSliceClick = (event: any, props: any) => {
-    const index = props.index;
-    const category = filteredTransactions[index].z;
-    const total = filteredTransactions[index].y;
-    const descriptions = transactions.filter(transaction => transaction.CATEGORY === category).map(transaction => transaction.DESCRIPTION).join(", ");
-    setSelectedCategory({ category, total, description: descriptions });
-  };
+    setData(EXPENSES[month])
+  }, [month]);
 
   return (
     <View style={[styles.container, base.flex_1]}>
@@ -134,45 +56,54 @@ export default function CategoryGraphic() {
         <Text style={[styles.title]}>Transação por categoria</Text>
       </View>
       <View style={styles.chartContainer}>
-        <VictoryPie
-          width={300}
-          height={300}
-          innerRadius={75}
-          data={filteredTransactions}
-          colorScale={["tomato", "cyan", "gold", "silver"]}
-          events={[
-            {
-              target: "data",
-              eventHandlers: {
-                onPressIn: (event, props) => {
-                  handleSliceClick(event, props);
-                  return [];
-                }
-              }
-            }
-          ]}
-          labelComponent={<VictoryLabel textAnchor="middle" verticalAnchor="middle" />}
-        />
-        <VictoryLabel
-          text={selectedCategory ? `Total: R$ ${selectedCategory.total.toFixed(2).replace('.', ',')}\n${selectedCategory.description}` : ""}
-          textAnchor="middle"
-          verticalAnchor="middle"
-          x={150}
-          y={150}
-          style={{ fontFamily: 'Outfit_400Regular', fontSize: 16, fill: 'white' }}
-        />
+      <Header
+        onValueChange={setMonth}
+        selectedValue={month}
+      />
+      <VictoryPie
+        data={data}
+        x="label"
+        y="value"
+        colorScale={data.map(expense => expense.color)} //Pegar escala de cor de cada item
+        innerRadius={90} //Adicionar um Circulo no meio
+        //  animate={{
+        //    easing: "back"
+        // }}
+        style={{
+          labels: {
+            fill: '#fff' 
+          }, //Cor da Label
+          data: {
+            fillOpacity: ({ datum }) => (datum.id === selected || selected === "") ? 1 : 0.5,
+            stroke: ({ datum }) => (datum.id === selected || selected === "") ? datum.color : 'none',
+            strokeOpacity: 0.5,
+          } //Selecionar cada fatia no grafico
+        }}
+        labelComponent={
+          <VictoryTooltip //ToolTip é a nuvem de Informações
+            renderInPortal={false}
+            flyoutStyle={{
+              stroke: 0,
+              fill: ({ datum }) => datum.color
+            }}
+          />
+        }
+      />
         <Text style={styles.totalExpenses}>R$ {totalExpenses.toFixed(2).replace('.', ',')}</Text>
-        {selectedCategory && (
-          <View style={styles.selectedCategoryContainer}>
-            <Text style={styles.selectedCategoryText}>
-              Categoria: {selectedCategory.category}
-            </Text>
-            <Text style={styles.selectedCategoryText}>
-              Total: R$ {selectedCategory.total.toFixed(2).replace('.', ',')}
-            </Text>
-          </View>
+    
+        <FlatList
+        data={EXPENSES[month]}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+        <Card
+            style={[styles.card]}
+            data={item}
+            selected={false}
+            onPress={() => handleCardOnPress(item.id)}
+          />
         )}
-        <BottomSheet data={transactions} type={TypeScreem.Graphics}/>
+        showsVerticalScrollIndicator={false}
+      />
       </View>
     </View>
   );
@@ -198,8 +129,7 @@ const styles = StyleSheet.create({
   },
   chartContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'center'
   },
   totalExpenses: {
     marginTop: -30,
@@ -207,14 +137,8 @@ const styles = StyleSheet.create({
     color: colors.white_100,
     fontSize: 16,
   },
-  selectedCategoryContainer: {
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  selectedCategoryText: {
-    fontFamily: 'Outfit_400Regular',
-    color: colors.white_100,
-    fontSize: 16,
-    textAlign: 'center',
-  },
+  card: {
+    backgroundColor: '#1D222C',
+    borderRadius: 25,
+  }
 });

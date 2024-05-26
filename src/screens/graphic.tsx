@@ -23,6 +23,9 @@ export default function Graphic() {
   const handleNavigateToEntryExit = () => {
     navigation.navigate('EntryExitGraphic');
   };
+  const handleNavigateTeste = () => {
+    navigation.navigate('GraphicTeste');
+  };
   const handleNavigateToCategoryGraphic = () => {
     navigation.navigate('CategoryGraphic');
   };
@@ -43,6 +46,15 @@ export default function Graphic() {
           <View style={styles.textContainer}>
             <Text style={styles.titleButton}>Entradas e saídas</Text>
             <Text style={styles.subTitleButton}>Saiba quanto você recebeu e quanto você gastou durante um certo período.</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.btn} onPress={handleNavigateTeste}>
+          <View style={[styles.imageContainer]}>
+            <Image source={require('../assets/images/graphic02.png')} style={styles.circleGraph} />
+          </View>
+          <View style={styles.textContainer}>
+            <Text style={styles.titleButton}>Transações por categoria Teste</Text>
+            <Text style={styles.subTitleButton}>Confira o total gasto em cada categoria e identifique onde está concentrando mais despesas.</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity style={styles.btn} onPress={handleNavigateToCategoryGraphic}>

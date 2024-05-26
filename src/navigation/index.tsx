@@ -10,6 +10,7 @@ import Transactions from '~/screens/transactions';
 import CardDatails from '~/screens/cardDatails';
 import EntryExitGraphic from '~/screens/entryExitGraphic';
 import CategoryGraphic from '~/screens/categoryGraphic';
+import GraphicTeste from '~/screens/graphicTeste';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -20,6 +21,7 @@ export type RootStackParamList = {
   CardDatails: undefined;
   EntryExitGraphic: undefined;
   CategoryGraphic: undefined;
+  GraphicTeste: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -66,6 +68,11 @@ export default function RootStack() {
         <Stack.Screen
           name="CategoryGraphic"
           component={CategoryGraphic}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="GraphicTeste"
+          component={GraphicTeste}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

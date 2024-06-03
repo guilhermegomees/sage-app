@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FlatList } from 'react-native';
 
-import { EXPENSES } from '../../utils/expenses';
+import { EXPENSES } from '../../utils/transactions';
 
 import { Card, CardProps } from '../components/Card';
 import { Header, MonthsProps } from '../components/Header';

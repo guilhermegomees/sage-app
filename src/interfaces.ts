@@ -8,3 +8,11 @@ export interface ITransaction {
     VALUE: number;
     WALLET: number;
 }
+
+export type IRevenue = {
+  id: string;
+  label: string;
+  value: number;
+  color: string;
+  date: string;
+};

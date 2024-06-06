@@ -59,23 +59,18 @@ export default function CardDatails() {
           </View>
         </View>
         {/* Inputs */}
-        <View style={[base.mt_30, base.gap_20]}>
-          <View style={[base.gap_15]}>
-            <Text style={[styles.inputTitle]}>Nome do cartão</Text>
-            <View style={[styles.input]}>
-              <TextInput
-                style={styles.inputText}
-                placeholder="Nome do cartão"
-                placeholderTextColor="#F8F1F1"
-                onChangeText={(name) => setcardName(name)}
-                value={cardName}
-              />
-            </View>
+        <View style={[base.mt_30, base.gap_25]}>
+          <View style={[styles.input]}>
+            <TextInput
+              style={styles.inputText}
+              placeholder="Nome do cartão"
+              placeholderTextColor="#F8F1F1"
+              onChangeText={(name) => setcardName(name)}
+              value={cardName}
+              maxLength={25}
+            />
           </View>
-          <View style={[base.gap_15]}>
-            <Text style={[styles.inputTitle]}>Dia do vencimento</Text>
-            <DayPicker />
-          </View>
+          <DayPicker />
         </View>
         {/* Slider */}
         <View style={[styles.sliderContainer]}>
@@ -156,7 +151,7 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: colors.gray_800,
-    borderRadius: 15,
+    borderRadius: 12,
     height: 50,
     paddingHorizontal: 18,
     flexDirection: 'row',
@@ -164,14 +159,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between'
   },
   inputText: {
-    fontFamily: 'Outfit_400Regular',
-    color: colors.white,
-    fontSize: 15,
-  },
-  inputTitle: {
     fontFamily: 'Outfit_500Medium',
     color: colors.white,
-    fontSize: 16,
+    fontSize: 15,
   },
   backgroundImage: {
     position: 'absolute',
@@ -182,7 +172,7 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   sliderContainer: {
-    marginTop: 50
+    marginTop: 30
   },
   buttonContainer: {
     marginTop: 50,

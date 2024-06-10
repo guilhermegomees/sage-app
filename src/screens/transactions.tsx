@@ -31,18 +31,14 @@ export default function Transactions() {
     const fetchTransactions = async (): Promise<void> => {
         //TODO: Trazer transações através do banco e popular o data
         const data: ITransaction[] = [
-            { "DATE": "2024-03-04T03:00:00.000Z", "DESCRIPTION": "Compra em supermercado", "ICON": "shopping-cart", "ID": 1, "IS_EXPENSE": 1, "VALUE": 150.75, "WALLET": 1 },
-            { "DATE": "2024-03-04T03:00:00.000Z", "DESCRIPTION": "Pagamento de conta de luz", "ICON": "bolt", "ID": 2, "IS_EXPENSE": 1, "VALUE": 80.50, "WALLET": 1 },
-            { "DATE": "2024-03-08T03:00:00.000Z", "DESCRIPTION": "Jantar em restaurante", "ICON": "utensils", "ID": 3, "IS_EXPENSE": 1, "VALUE": 65.30, "WALLET": 1 },
-            { "DATE": "2024-03-10T03:00:00.000Z", "DESCRIPTION": "Compra online", "ICON": "shopping-bag", "ID": 4, "IS_EXPENSE": 1, "VALUE": 200.00, "WALLET": 1 },
-            { "DATE": "2024-03-12T03:00:00.000Z", "DESCRIPTION": "Pagamento de fatura", "ICON": "credit-card", "ID": 5, "IS_EXPENSE": 0, "VALUE": 600.00, "WALLET": 1 },
-            { "DATE": "2024-03-12T03:00:00.000Z", "DESCRIPTION": "Reembolso de compra", "ICON": "money-check-alt", "ID": 6, "IS_EXPENSE": 0, "VALUE": 50.00, "WALLET": 1 },
-            { "DATE": "2024-03-12T03:00:00.000Z", "DESCRIPTION": "Compra em loja de roupas", "ICON": "tshirt", "ID": 7, "IS_EXPENSE": 1, "VALUE": 100.00, "WALLET": 1 },
-            { "DATE": "2024-03-15T03:00:00.000Z", "DESCRIPTION": "Assinatura de serviço online", "ICON": "subscription", "ID": 8, "IS_EXPENSE": 1, "VALUE": 15.99, "WALLET": 1 },
-            { "DATE": "2024-03-12T03:00:00.000Z", "DESCRIPTION": "Pagamento de fatura", "ICON": "credit-card", "ID": 9, "IS_EXPENSE": 0, "VALUE": 600.00, "WALLET": 1 },
-            { "DATE": "2024-03-12T03:00:00.000Z", "DESCRIPTION": "Reembolso de compra", "ICON": "money-check-alt", "ID": 10, "IS_EXPENSE": 0, "VALUE": 50.00, "WALLET": 1 },
-            { "DATE": "2024-03-12T03:00:00.000Z", "DESCRIPTION": "Compra em loja de roupas", "ICON": "tshirt", "ID":11, "IS_EXPENSE": 1, "VALUE": 100.00, "WALLET": 1 },
-            { "DATE": "2024-03-15T03:00:00.000Z", "DESCRIPTION": "Assinatura de serviço online", "ICON": "subscription", "ID": 12, "IS_EXPENSE": 1, "VALUE": 15.99, "WALLET": 1 }
+            { id: 1, date: "2024-03-04T03:00:00.000Z", description: "Compra em supermercado", icon: "shopping-cart", is_expense: 1, value: 151.75, wallet: 1 },
+            { id: 2, date: "2024-03-04T03:00:00.000Z", description: "Pagamento de conta de luz", icon: "bolt", is_expense: 1, value: 80.50, wallet: 1 },
+            { id: 3, date: "2024-03-08T03:00:00.000Z", description: "Jantar em restaurante", icon: "utensils", is_expense: 1, value: 65.30, wallet: 1 },
+            { id: 4, date: "2024-03-10T03:00:00.000Z", description: "Compra online", icon: "shopping-bag", is_expense: 1, value: 200.00, wallet: 1 },
+            { id: 5, date: "2024-03-12T03:00:00.000Z", description: "Pagamento de fatura", icon: "credit-card", is_expense: 1, value: 600.00, wallet: 1 },
+            { id: 6, date: "2024-03-12T03:00:00.000Z", description: "Reembolso de compra", icon: "money-check-alt", is_expense: 0, value: 50.00, wallet: 1 },
+            { id: 7, date: "2024-03-12T03:00:00.000Z", description: "Compra em loja de roupas", icon: "tshirt", is_expense: 1, value: 120.00, wallet: 1 },
+            { id: 8, date: "2024-03-15T03:00:00.000Z", description: "Assinatura de serviço online", icon: "subscription", is_expense: 1, value: 15.99, wallet: 1 }
         ];
 
         setTransactions(data);
@@ -55,7 +51,7 @@ export default function Transactions() {
 
     const handleSearch = (text: string) => {
         const filtered: ITransaction[] = transactions.filter((transaction: ITransaction) =>
-            transaction.DESCRIPTION.toLowerCase().startsWith(text.toLowerCase())
+            transaction.description.toLowerCase().startsWith(text.toLowerCase())
         );
         setFilteredTransactions(filtered);
     };

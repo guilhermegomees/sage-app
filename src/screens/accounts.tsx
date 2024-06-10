@@ -15,6 +15,7 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import BottomSheet from '~/components/BottomSheet';
 
 import { api } from '~/server/api'
+import { ITransaction } from '~/interfaces';
 
 // Formatar valores com duas casas decimais
 function formatValue(value: number): string {
@@ -40,14 +41,14 @@ type AccountsScreenNavigationProp = StackNavigationProp<any, 'Accounts'>;
 export default function Accounts() {
   const navigation = useNavigation<AccountsScreenNavigationProp>();
 
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<ITransaction[]>([]);
   const userId = 2; // TODO: Trazer id com base no usuário logado
   const wallet = 2; // TODO: Trazer id da wallet com base na carteira selecionada
 
   const fetchData = async (): Promise<any> => {
     try {
       const response = await api.get(`/transaction?userId=${userId}`);
-      const formattedData = response.data.data.filter((item: any) => item.WALLET === wallet);
+      const formattedData = response.data.data.filter((item: ITransaction) => item.wallet === wallet);
       setData(formattedData);
     } catch (error) {
       console.log(error);
@@ -63,10 +64,10 @@ export default function Accounts() {
   let totalIncome = 0;
 
   for (const item of data) {
-    if (item.IS_EXPENSE === 1) {
-      totalExpenses += item.VALUE;
+    if (item.is_expense === 1) {
+      totalExpenses += item.value;
     } else {
-      totalIncome += item.VALUE;
+      totalIncome += item.value;
     }
   }
 

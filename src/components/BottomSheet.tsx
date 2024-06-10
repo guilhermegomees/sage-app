@@ -44,7 +44,7 @@ function formatDate(dateStr: string): any {
 const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
     // Agrupar transações por data
     const groupedTransactions: Record<string, ITransaction[]> = data.reduce((acc, transaction) => {
-        const date = new Date(transaction.DATE).toLocaleDateString();
+        const date = new Date(transaction.date).toLocaleDateString();
         if (!acc[date]) {
             acc[date] = [];
         }
@@ -72,7 +72,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
                     {Object.entries(groupedTransactions).map(([date, transactionsForDate]) => {
                         // Calcula o valor total das transações para a data
                         const totalValue = transactionsForDate.reduce((acc, transaction) => {
-                            return acc + (transaction.IS_EXPENSE ? -transaction.VALUE : transaction.VALUE);
+                            return acc + (transaction.is_expense ? -transaction.value : transaction.value);
                         }, 0);
 
                         return (
@@ -97,20 +97,20 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
                                 <View>
                                     <View style={[styles.containerTrasactions]}>
                                         {transactionsForDate.map((transaction, index) => (
-                                            <View key={transaction.ID} style={[base.alignItemsCenter]}>
+                                            <View key={transaction.id} style={[base.alignItemsCenter]}>
                                                 <View style={[base.p_10, base.flexRow, base.flexSpaceBetween, base.alignItemsCenter, base.w_100]}>
                                                     <View style={[base.flexRow, base.alignItemsCenter, base.gap_9]}>
                                                         <View style={[styles.containerIconTransactions, {
-                                                            backgroundColor: transaction.IS_EXPENSE ? colors.red_1 : colors.green_1
+                                                            backgroundColor: transaction.is_expense ? colors.red_1 : colors.green_1
                                                         }]}>
                                                             {/* TODO: Aplicar icon vindo do data */}
                                                             <FontAwesome6 name='car' color={colors.gray_900} size={15} />
                                                         </View>
-                                                        <Text style={[styles.textTransaction]}>{transaction.DESCRIPTION}</Text>
+                                                        <Text style={[styles.textTransaction]}>{transaction.description}</Text>
                                                     </View>
                                                     <Text style={[styles.valueTransaction, {
-                                                        color: transaction.IS_EXPENSE ? colors.red_1 : colors.green_1
-                                                    }]}>{formatValue(transaction.VALUE, transaction.IS_EXPENSE)}</Text>
+                                                        color: transaction.is_expense ? colors.red_1 : colors.green_1
+                                                    }]}>{formatValue(transaction.value, transaction.is_expense)}</Text>
                                                 </View>
                                                 {index !== transactionsForDate.length - 1 && <View style={[styles.divisor]} />}
                                             </View>

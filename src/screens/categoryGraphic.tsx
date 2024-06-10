@@ -60,6 +60,7 @@ export default function CategoryGraphic() {
         onValueChange={setMonth}
         selectedValue={month}
       />
+      <View style={[styles.graphic]}>
       <VictoryPie
         data={data}
         x="label"
@@ -67,8 +68,9 @@ export default function CategoryGraphic() {
         colorScale={data.map(expense => expense.color)} //Pegar escala de cor de cada item
         innerRadius={90} //Adicionar um Circulo no meio
         //  animate={{
-        //    easing: "back"
-        // }}
+        //      easing: "back",
+        //      duration: 2
+        //  }}
         style={{
           labels: {
             fill: '#fff' 
@@ -89,6 +91,7 @@ export default function CategoryGraphic() {
           />
         }
       />
+      </View>
         <Text style={styles.totalExpenses}>R$ {totalExpenses.toFixed(2).replace('.', ',')}</Text>
     
         <FlatList
@@ -129,16 +132,21 @@ const styles = StyleSheet.create({
   },
   chartContainer: {
     flex: 1,
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   totalExpenses: {
     marginTop: -30,
     fontFamily: 'Outfit_400Regular',
     color: colors.white_100,
     fontSize: 16,
+    textAlign: 'center'
   },
   card: {
     backgroundColor: '#1D222C',
-    borderRadius: 25,
+    borderRadius: 15,
+    height: 50
+  },
+  graphic: {
+    alignItems: "center"
   }
 });

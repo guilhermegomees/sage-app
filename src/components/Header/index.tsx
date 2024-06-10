@@ -1,5 +1,5 @@
 import React from "react";
-import { Picker } from '@react-native-picker/picker';
+import { Button, View, StyleSheet } from 'react-native';
 
 import { Container, Title } from './styles';
 
@@ -16,28 +16,27 @@ type Props = {
 export function Header({ selectedValue, onValueChange }: Props) {
   return (
     <Container>
-      <Picker
-        selectedValue={selectedValue}
-        onValueChange={(itemValue: MonthsProps) => onValueChange(itemValue)}
-        dropdownIconColor={colors.white_100}
-        style={{
-          backgroundColor: colors.gray_800,
-          color: colors.white_100,
-          flex: 1,
-          borderWidth: 1,
-          borderRadius: 10
-        }}
-      >
+      <View style={styles.buttonContainer}>
         {
           MONTHS.map(item => (
-            <Picker.Item
+            <Button
               key={item.label}
-              label={item.label}
-              value={item.label}
+              title={item.label}
+              color={selectedValue === item.label ? colors.blue_100 : colors.gray_900}
+              onPress={() => onValueChange(item.label as MonthsProps)}
             />
           ))
         }
-      </Picker>
+      </View>
     </Container>
   );
 }
+
+const styles = StyleSheet.create({
+  buttonContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+    
+  },
+});

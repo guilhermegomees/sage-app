@@ -47,4 +47,5 @@ const styles = StyleSheet.create({
     color: '#F03838', 
     fontFamily: 'Outfit_400Regular'
   },
+
 });

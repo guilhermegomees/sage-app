@@ -48,15 +48,6 @@ export default function Graphic() {
             <Text style={styles.subTitleButton}>Saiba quanto você recebeu e quanto você gastou durante um certo período.</Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.btn} onPress={handleNavigateTeste}>
-          <View style={[styles.imageContainer]}>
-            <Image source={require('../assets/images/graphic02.png')} style={styles.circleGraph} />
-          </View>
-          <View style={styles.textContainer}>
-            <Text style={styles.titleButton}>Transações por categoria Teste</Text>
-            <Text style={styles.subTitleButton}>Confira o total gasto em cada categoria e identifique onde está concentrando mais despesas.</Text>
-          </View>
-        </TouchableOpacity>
         <TouchableOpacity style={styles.btn} onPress={handleNavigateToCategoryGraphic}>
           <View style={[styles.imageContainer]}>
             <Image source={require('../assets/images/graphic02.png')} style={styles.circleGraph} />

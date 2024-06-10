@@ -20,8 +20,8 @@ export default function Graphic() {
   const handleNavigateToBack = () => {
     navigation.navigate('Home');
   };
-  const handleNavigateToEntryExit = () => {
-    navigation.navigate('EntryExitGraphic');
+  const handleNavigateMonthlyBalance = () => {
+    navigation.navigate('MonthlyBalance');
   };
   const handleNavigateTeste = () => {
     navigation.navigate('GraphicTeste');
@@ -39,12 +39,12 @@ export default function Graphic() {
         <Text style={[styles.title]}>Gráficos</Text>
       </View>
       <View style={styles.containerBtn}>
-        <TouchableOpacity style={styles.btn} onPress={handleNavigateToEntryExit}>
+        <TouchableOpacity style={styles.btn} onPress={handleNavigateMonthlyBalance}>
           <View style={[styles.imageContainer]}>
             <Image source={require('../assets/images/graphic01.png')} style={styles.barGraph} />
           </View>
           <View style={styles.textContainer}>
-            <Text style={styles.titleButton}>Entradas e saídas</Text>
+            <Text style={styles.titleButton}>Balanço mensal</Text>
             <Text style={styles.subTitleButton}>Saiba quanto você recebeu e quanto você gastou durante um certo período.</Text>
           </View>
         </TouchableOpacity>

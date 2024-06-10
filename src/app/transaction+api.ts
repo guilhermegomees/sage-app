@@ -1,6 +1,7 @@
 import { ExpoRequest, ExpoResponse } from "expo-router/server"
 
 import connection from '~/db/connection';
+import { ITransaction } from "~/interfaces";
 
 export async function GET(request : ExpoRequest): Promise<ExpoResponse> {
     return new Promise((resolve, reject) => {
@@ -31,7 +32,18 @@ export async function GET(request : ExpoRequest): Promise<ExpoResponse> {
                 reject(ExpoResponse.json({ error: 'Erro ao executar a consulta' }));
                 return;
             }
-            resolve(ExpoResponse.json({ data: results }));
+
+            const transactions: ITransaction[] = results.map((row: any) => ({
+                id: row.ID,
+                description: row.DESCRIPTION,
+                value: row.VALUE,
+                date: row.DATE,
+                is_expense: row.IS_EXPENSE,
+                icon: row.ICON,
+                wallet: row.WALLET,
+            }));
+            
+            resolve(ExpoResponse.json({ data: transactions }));
         });
     });
 }

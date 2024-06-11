@@ -1,20 +1,24 @@
 import React from 'react';
-import { Dimensions, ScrollView, StyleSheet, Text, View } from 'react-native';
-
-import { TypeScreem } from '~/enums';
-
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-
-import base from '~/css/base';
-import colors from '~/css/colors';
-
-import { ITransaction } from '~/interfaces';
+import {
+    FontAwesome5,
+    colors,
+    base,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
+    TypeScreem,
+    ITransaction,
+    Image
+} from '~/imports';
 
 interface BottomSheetProps {
     data: ITransaction[];
     type: TypeScreem;
 }
+
+// Array com os nomes dos meses
+const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
 function formatValue(value: number, isExpense: number): string {
     let valueStr = value.toString();
@@ -31,23 +35,47 @@ function formatValue(value: number, isExpense: number): string {
     return minus + 'R$ ' + valueStr;
 }
 
-function formatDate(dateStr: string): any {
-    const date = dateStr.split('/');
+// TODO: Refatorar
+function formatDate(dateStr: string, type: TypeScreem): any {
+    let date;
 
-    const day = date[1].length == 1 ? '0'+date[1] : date[1];
-    const month = date[0].length == 1 ? '0'+date[0] : date[0];
-    const year = date[2];
+    if (type == TypeScreem.Graphics) {
+        const transactionDate = new Date(dateStr);
+        const month = transactionDate.getMonth();
+        const monthName = monthNames[month];
+        const year = transactionDate.getFullYear();
+        date = `${monthName}. ${year}`;
+    } else {
+        const transactionDate = dateStr.split('/');
+        const day = transactionDate[1].length == 1 ? '0' + transactionDate[1] : transactionDate[1];
+        const month = transactionDate[0].length == 1 ? '0' + transactionDate[0] : transactionDate[0];
+        const year = transactionDate[2];
+        date = `${day}/${month}/${year}`;
+    }
     
-    return (`${day}/${month}/${year}`);
+    return date;
 }
 
 const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
     // Agrupar transações por data
     const groupedTransactions: Record<string, ITransaction[]> = data.reduce((acc, transaction) => {
-        const date = new Date(transaction.date).toLocaleDateString();
+        let date: string;
+
+        if (type == TypeScreem.Graphics) {
+            // Agrupar por mês
+            const transactionDate = new Date(transaction.date);
+            const month = transactionDate.getMonth() + 1; // Meses são baseados em zero em JavaScript
+            const year = transactionDate.getFullYear();
+            date = `${year}-${month < 10 ? '0' : ''}${month}`; // Formato YYYY-MM
+        } else {
+            // Agrupar por dia
+            date = new Date(transaction.date).toLocaleDateString();
+        }
+
         if (!acc[date]) {
             acc[date] = [];
         }
+
         acc[date].push(transaction);
         return acc;
     }, {} as Record<string, ITransaction[]>);
@@ -72,7 +100,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
                     {Object.entries(groupedTransactions).map(([date, transactionsForDate]) => {
                         // Calcula o valor total das transações para a data
                         const totalValue = transactionsForDate.reduce((acc, transaction) => {
-                            return acc + (transaction.is_expense ? -transaction.value : transaction.value);
+                            return acc + (transaction.isExpense ? -transaction.value : transaction.value);
                         }, 0);
 
                         return (
@@ -84,9 +112,9 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
                                     { gap: type == TypeScreem.Transaction || type == TypeScreem.Graphics ? 0 : 12 },
                                     { paddingHorizontal: type == TypeScreem.Transaction || type == TypeScreem.Graphics ? 10 : 65 }
                                 ]}>
-                                    <Text style={[styles.date]}>{formatDate(date)}</Text>
+                                    <Text style={[styles.date]}>{formatDate(date, type)}</Text>
                                     {(type == TypeScreem.Account || type == TypeScreem.Card) && <View style={[styles.line]} />}
-                                    {type == TypeScreem.Transaction &&
+                                    {(type == TypeScreem.Transaction || type == TypeScreem.Graphics) &&
                                         <Text style={[styles.valueTransaction, {
                                             color: totalValue < 0 ? colors.red_1 : colors.green_1
                                         }]}>
@@ -101,16 +129,16 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
                                                 <View style={[base.p_10, base.flexRow, base.flexSpaceBetween, base.alignItemsCenter, base.w_100]}>
                                                     <View style={[base.flexRow, base.alignItemsCenter, base.gap_9]}>
                                                         <View style={[styles.containerIconTransactions, {
-                                                            backgroundColor: transaction.is_expense ? colors.red_1 : colors.green_1
+                                                            backgroundColor: transaction.isExpense ? colors.red_1 : colors.green_1
                                                         }]}>
-                                                            {/* TODO: Aplicar icon vindo do data */}
-                                                            <FontAwesome6 name='car' color={colors.gray_900} size={15} />
+
+                                                            <FontAwesome5 name={transaction.icon ?? 'star'} color={colors.gray_900} size={15} />
                                                         </View>
                                                         <Text style={[styles.textTransaction]}>{transaction.description}</Text>
                                                     </View>
                                                     <Text style={[styles.valueTransaction, {
-                                                        color: transaction.is_expense ? colors.red_1 : colors.green_1
-                                                    }]}>{formatValue(transaction.value, transaction.is_expense)}</Text>
+                                                        color: transaction.isExpense ? colors.red_1 : colors.green_1
+                                                    }]}>{formatValue(transaction.value, transaction.isExpense)}</Text>
                                                 </View>
                                                 {index !== transactionsForDate.length - 1 && <View style={[styles.divisor]} />}
                                             </View>
@@ -125,8 +153,13 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
             <View style={[base.justifyContentCenter, base.alignItemsCenter, base.flex_1]}>
                 {Object.keys(groupedTransactions).length === 0 && (
                     <View style={[base.justifyContentCenter, base.alignItemsCenter, base.gap_15]}>
-                        <FontAwesome5 name="exclamation-triangle" size={40} color={'#F7D358'} />
-                        <Text style={styles.noTransactionsMessage}>Parece que você ainda não fez nenhuma transação ou nenhuma transação foi encontrada!</Text>
+                        {/* <FontAwesome5 name="box-open" size={80} color={colors.white_200} /> */}
+                        <Image source={require('./../assets/images/bankrupt.png')} tintColor={colors.white_200} style={{width: 90, height: 90}}/>
+                        <Text style={styles.noTransactionsMessage}>
+                            {type == TypeScreem.Graphics 
+                                ? 'Sem transações por aqui!'
+                                : 'Parece que você ainda não fez nenhuma transação ou nenhuma transação foi encontrada!'}
+                        </Text>
                     </View>
                 )}
             </View>
@@ -238,7 +271,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Outfit_500Medium',
         textAlign: 'center',
         color: colors.white_100,
-        fontSize: 16,
+        fontSize: 18,
     },
     cardValuesLimit: {
         fontFamily: 'Outfit_600SemiBold',

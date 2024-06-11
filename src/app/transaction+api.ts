@@ -38,7 +38,7 @@ export async function GET(request : ExpoRequest): Promise<ExpoResponse> {
                 description: row.DESCRIPTION,
                 value: row.VALUE,
                 date: row.DATE,
-                is_expense: row.IS_EXPENSE,
+                isExpense: row.IS_EXPENSE,
                 icon: row.ICON,
                 wallet: row.WALLET,
             }));

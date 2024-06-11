@@ -16,17 +16,12 @@ import {
   MaterialIcons,
   useNavigation,
   StackNavigationProp,
+  TypeScreem,
 } from '~/imports';
 
 import PeriodSelector from '~/components/PeriodSelector';
-
-interface Transaction {
-  id: string;
-  label: string;
-  value: number;
-  date: string;
-  isExpense: boolean;
-}
+import { ITransaction } from '~/interfaces';
+import BottomSheet from '~/components/BottomSheet';
 
 interface DataItem {
   month: number; // Mês (1 para Janeiro, 2 para Fevereiro, etc.)
@@ -46,7 +41,7 @@ function getMonthAndYearFromDate(date: string): [number, number] {
   return [month, year];
 }
 
-function mapDataToDataItem(transactions: Transaction[]): DataItem[] {
+function mapDataToDataItem(transactions: ITransaction[]): DataItem[] {
   return transactions.map(item => {
     const [month, year] = getMonthAndYearFromDate(item.date);
 
@@ -117,21 +112,25 @@ function filterMonthlyTotalsByPeriod(monthlyTotals: DataItem[], currentPeriod: s
 
   // Filtrar os monthlyTotals para incluir apenas os meses dentro do período
   const filteredItems = monthlyTotals.filter(item => item.month >= periodStartMonth && item.month <= periodEndMonth && item.year == periodYear);
-
+  
   // Verificar se algum mês está faltando e adicionar um objeto DataItem com valores de receita e despesa como zero
-  for (let month of monthsInRange) {
-    const found = filteredItems.some(item => item.month === month);
-    if (!found) {
-      const emptyItem = createEmptyDataItem(month, periodYear);
-      filteredItems.push(emptyItem);
+  if (filteredItems.length > 0) {
+    for (let month of monthsInRange) {
+      const found = filteredItems.some(item => item.month === month);
+      if (!found) {
+        const emptyItem = createEmptyDataItem(month, periodYear);
+        filteredItems.push(emptyItem);
+      }
     }
   }
 
   // TODO: Refatorar
   const result = filteredItems.sort((a, b) => a.month - b.month);
-  result.splice(0, 0, createEmptyDataItem(0, periodYear));
-  result.splice(2, 0, createEmptyDataItem(0, periodYear));
-  result.splice(4, 0, createEmptyDataItem(0, periodYear));
+  if (filteredItems.length > 0) {
+    result.splice(0, 0, createEmptyDataItem(0, periodYear));
+    result.splice(2, 0, createEmptyDataItem(0, periodYear));
+    result.splice(4, 0, createEmptyDataItem(0, periodYear));
+  }
 
   return result;
 }
@@ -170,6 +169,17 @@ function getPeriodFormated(period: string): string {
   return `${getPeriodFromMonth(startDate)} - ${getPeriodFromMonth(endDate)}`;
 }
 
+function filterTransactionsByPeriod(transactions: ITransaction[], currentPeriod: string) {
+  const [periodStartMonth, periodEndMonth] = getMonthFromPeriod(currentPeriod);
+  const periodYear = getYearFromPeriod(currentPeriod);
+
+  // Filtrar as transações para incluir apenas os meses dentro do período
+  return transactions.filter(transaction => {
+    const date = new Date(transaction.date);
+    return date.getMonth() + 1 >= periodStartMonth && date.getMonth() + 1 <= periodEndMonth && date.getFullYear() == periodYear;
+  });
+}
+
 type EntryExitGraphicScreenNavigationProp = StackNavigationProp<any, 'EntryExitGraphic'>;
 
 export default function EntryExitGraphic() {
@@ -180,20 +190,21 @@ export default function EntryExitGraphic() {
   };
 
   // Dados de receita e despesa
-  const transactions : Transaction[] = [
-    { id: "1", label: "Salário", value: 3000, date: '2024-01-03T03:00:00.000Z', isExpense: false },
-    { id: "2", label: "Pix", value: 550, date: '2024-01-03T03:00:00.000Z', isExpense: false },
-    { id: "12", label: "Pix", value: 400, date: '2024-01-03T03:00:00.000Z', isExpense: true },
-    { id: "3", label: "Salário", value: 3000, date: '2024-02-03T03:00:00.000Z', isExpense: false },
-    { id: "4", label: "Pix", value: 800, date: '2024-02-03T03:00:00.000Z', isExpense: false },
-    { id: "13", label: "Pix", value: 400, date: '2024-02-03T03:00:00.000Z', isExpense: true },
-    { id: "5", label: "Salário", value: 3000, date: '2024-03-03T03:00:00.000Z', isExpense: false },
-    { id: "6", label: "Pix", value: 1500, date: '2024-03-03T03:00:00.000Z', isExpense: false },
-    { id: "7", label: "Pix", value: 1500, date: '2024-03-03T03:00:00.000Z', isExpense: true },
-    { id: "8", label: "Pix", value: 2000, date: '2024-04-03T03:00:00.000Z', isExpense: false },
-    { id: "9", label: "Pix", value: 1500, date: '2024-04-03T03:00:00.000Z', isExpense: true },
-    { id: "10", label: "Pix", value: 2000, date: '2024-06-03T03:00:00.000Z', isExpense: false },
-    { id: "11", label: "Pix", value: 1500, date: '2024-06-03T03:00:00.000Z', isExpense: true }
+  const transactions : ITransaction[] = [
+    { id: 1, description: "Salário", value: 3000, date: '2024-01-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
+    { id: 2, description: "Pix", value: 550, date: '2024-01-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
+    { id: 12, description: "Pix", value: 400, date: '2024-01-03T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1 },
+    { id: 14, description: "Pix", value: 3200, date: '2024-01-04T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1 },
+    { id: 3, description: "Salário", value: 3000, date: '2024-02-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
+    { id: 4, description: "Pix", value: 800, date: '2024-02-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
+    { id: 13, description: "Pix", value: 400, date: '2024-02-03T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1 },
+    { id: 5, description: "Salário", value: 3000, date: '2024-03-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
+    { id: 6, description: "Pix", value: 1500, date: '2024-03-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
+    { id: 7, description: "Pix", value: 1500, date: '2024-03-03T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1 },
+    { id: 8, description: "Pix", value: 2000, date: '2024-04-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
+    { id: 9, description: "Pix", value: 1500, date: '2024-04-03T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1 },
+    { id: 10, description: "Pix", value: 2000, date: '2024-06-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
+    { id: 11, description: "Pix", value: 1500, date: '2024-06-03T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1 }
   ];
 
   // TODO: Definir periodo inicial de acordo com mês atual
@@ -241,6 +252,8 @@ export default function EntryExitGraphic() {
   // Filtrar dados por período
   const filteredData = filterMonthlyTotalsByPeriod(monthlyTotals, currentPeriod);
 
+  const filteredTransactions = filterTransactionsByPeriod(transactions, currentPeriod);
+
   // TODO: Refatorar
   const customTickFormat = (monthIndex : number) => {
     const [startMonth, endMonth] = getMonthFromPeriod(currentPeriod);
@@ -273,8 +286,8 @@ export default function EntryExitGraphic() {
         onPrevPeriod={handlePrevPeriod}
         onNextPeriod={handleNextPeriod}
       />
-      <View style={styles.chartContainer}>
-        <VictoryChart theme={VictoryTheme.material} domainPadding={50} padding={{ top: 10, bottom: 80, left: 80, right: 30 }}>
+      <View style={[styles.chartContainer]}>
+        <VictoryChart theme={VictoryTheme.material} domainPadding={40} padding={{ top: 5, bottom: 80, left: 80, right: 20 }}>
           <VictoryAxis
             tickValues={[1, 3, 5]}
             tickCount={3}
@@ -288,24 +301,26 @@ export default function EntryExitGraphic() {
           />
           <VictoryAxis
             dependentAxis
+            tickValues={filteredData.length > 0 ? undefined : [0, 1000, 2000, 3000, 4000]}
             tickFormat={(value) => `R$ ${value.toLocaleString('pt-BR')}`}
+            offsetX={75}
             style={{
-              axis: { stroke: colors.gray_800 },
+              axis: { stroke: 'none' },
               grid: { stroke: colors.gray_800, strokeWidth: 2, strokeDasharray: 1 },
               ticks: { stroke: 'transparent', size: 2 },
               tickLabels: { fontSize: 12, padding: 5, fill: colors.subTitle },
             }}
           />
-          <VictoryGroup offset={40}>
+          <VictoryGroup offset={35}>
             <VictoryBar
-              barWidth={40}
+              barWidth={35}
               style={{ data: { fill: '#32CD32' } }}
               data={filteredData}
               x="period"
               y="revenue"
             />
             <VictoryBar
-              barWidth={40}
+              barWidth={35}
               style={{ data: { fill: '#FF6347' } }}
               data={filteredData}
               x="period"
@@ -314,6 +329,7 @@ export default function EntryExitGraphic() {
           </VictoryGroup>
         </VictoryChart>
       </View>
+      <BottomSheet data={filteredTransactions} type={TypeScreem.Graphics} />
     </View>
   );
 }
@@ -339,6 +355,5 @@ const styles = StyleSheet.create({
   chartContainer: {
     flex: 1,
     alignItems: 'center',
-    marginTop: 10
   },
 });

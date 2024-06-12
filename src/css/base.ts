@@ -607,6 +607,9 @@ export const base = StyleSheet.create({
   flexRow: {
     flexDirection: 'row',
   },
+  flexRowReverse: {
+    flexDirection: 'row-reverse',
+  },
   flexColumn: {
     flexDirection: 'column',
   },

@@ -8,6 +8,7 @@ export const colors = {
     white : '#FFFFFF',
     white_100 : '#F8F1F1',
     white_200 : '#F3F5F8',
+    white_250 : '#C7C9D6',
     white_300 : '#B2ADAD',
     orange_300 : '#EE8B60',
     blue_100   : '#105DFB',

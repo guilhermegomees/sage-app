@@ -154,7 +154,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
                 {Object.keys(groupedTransactions).length === 0 && (
                     <View style={[base.justifyContentCenter, base.alignItemsCenter, base.gap_15]}>
                         {/* <FontAwesome5 name="box-open" size={80} color={colors.white_200} /> */}
-                        <Image source={require('./../assets/images/bankrupt.png')} tintColor={colors.white_200} style={{width: 90, height: 90}}/>
+                        <Image source={require('./../assets/images/bankrupt.png')} tintColor={colors.white_200} style={{width: 70, height: 70}}/>
                         <Text style={styles.noTransactionsMessage}>
                             {type == TypeScreem.Graphics 
                                 ? 'Sem transações por aqui!'
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Outfit_500Medium',
         textAlign: 'center',
         color: colors.white_100,
-        fontSize: 18,
+        fontSize: 16,
     },
     cardValuesLimit: {
         fontFamily: 'Outfit_600SemiBold',

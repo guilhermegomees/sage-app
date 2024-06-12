@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { MaterialIcons } from '@expo/vector-icons';
 import {
   View,
   Text,
@@ -7,83 +6,70 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  ImageBackground,
   ScrollView,
-  Keyboard,
-} from 'react-native';
+  StackNavigationProp,
+  base,
+  colors,
+  MaterialIcons,
+  useNavigation
+} from '~/imports';
 
-import { useNavigation } from '@react-navigation/native';
-
-import { colors } from '../css/colors';
-import { base } from '../css/base';
-
-import TabNavigator from '../navigation/tabs';
+type LoginScreenNavigationProp = StackNavigationProp<any, 'Login'>;
 
 const LoginScreen = () => {
-  const navigation = useNavigation();
-  const [showPassword, setShowPassword] = useState(false); // Estado para controlar a visibilidade da senha
+  const navigation = useNavigation<LoginScreenNavigationProp>();
+  const [showPassword, setShowPassword] = useState(false); // Controlar a visibilidade da senha
 
   const handleLogin = () => {
-    // Lógica de login
-    // Navegar para a tela TabNavigator
-    //navigation.navigate('TabNavigator')
+    navigation.navigate('Home');
   };
 
   const handleRegister = () => {
-    // Lógica de registro
+    navigation.navigate('Register');
   };
 
-  const handleGoogleLogin = () => {
-    // Lógica de login com o Google
-  };
-
+  // Alternar entre mostrar e ocultar a senha
   const toggleShowPassword = () => {
-    // Função para alternar entre mostrar e ocultar a senha
     setShowPassword(!showPassword);
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-      <View>
-        <Image source={require('../assets/images/logo.png')} style={styles.imageLogo} />
-        <Text style={styles.logo}>SAGE</Text>
+      <View style={[base.flex_1]}>
+        <Image source={require('../assets/images/logo.png')} style={styles.logo} />
+        <Text style={styles.nameCompany}>Sage</Text>
         <View style={styles.halfContainer}>
-          <Text style={styles.subLogo}>Bem vindo(a) de volta</Text>
-          <View style={[styles.inputView, { flexDirection: 'row-reverse' }]}>
-            <MaterialIcons name="email" size={20} color="white" style={styles.icon} />
-            <TextInput style={styles.inputText} placeholder="E-mail" placeholderTextColor="#F8F1F1" />
-          </View>
-          <View style={[styles.inputView, { flexDirection: 'row' }]}>
-            <TextInput
-              style={styles.inputText}
-              placeholder="Senha"
-              placeholderTextColor="#F8F1F1"
-              secureTextEntry={!showPassword}
-            />
-            <TouchableOpacity onPress={toggleShowPassword}>
-              <MaterialIcons
-                name={showPassword ? 'visibility-off' : 'visibility'}
-                size={20}
-                color="white"
-                style={styles.icon}
+          <Text style={styles.title}>Bem-vindo(a) de volta</Text>
+          <View style={styles.inputsContainer}>
+            <View style={[styles.input, base.flexRowReverse]}>
+              <MaterialIcons name="email" size={20} color={colors.white_250} />
+              <TextInput style={styles.inputText} placeholder="E-mail" placeholderTextColor={colors.white_250} />
+            </View>
+            <View style={[styles.input, base.flexRow]}>
+              <TextInput
+                style={styles.inputText}
+                placeholder="Senha"
+                placeholderTextColor={colors.white_250}
+                secureTextEntry={!showPassword}
               />
+              <TouchableOpacity onPress={toggleShowPassword}>
+                <MaterialIcons
+                  name={showPassword ? 'visibility-off' : 'visibility'}
+                  size={20}
+                  color={colors.white_250}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <TouchableOpacity style={styles.loginBtn} onPress={handleLogin}>
+            <Text style={styles.loginBtnText}>Entrar</Text>
+          </TouchableOpacity>
+          <View style={[base.flexRow, base.gap_4, base.mb_10]}>
+            <Text style={styles.signUpText}>Sem Conta?</Text>
+            <TouchableOpacity onPress={handleRegister}>
+              <Text style={styles.signUpTextLink}>Registre Aqui</Text>
             </TouchableOpacity>
           </View>
-
-          <TouchableOpacity style={styles.loginBtn} onPress={handleLogin}>
-            <Text style={styles.loginText}>Login</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleRegister}>
-            <Text style={styles.signupText}>Sem Conta? Registrar Aqui</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.loginGoogleBtn} onPress={handleGoogleLogin}>
-            <Image source={require('../assets/images/google.png')} style={styles.image} />
-            <Text style={styles.googleText}>Continue com Google</Text>
-          </TouchableOpacity>
-          <ImageBackground
-            source={require('../assets/images/backgroundLogin.png')}
-            style={styles.backgroundImage}
-          />
         </View>
       </View>
     </ScrollView>
@@ -96,93 +82,79 @@ const styles = StyleSheet.create({
     backgroundColor: colors.gray_900,
   },
   logo: {
-    fontWeight: 'bold',
-    fontSize: 50,
-    color: colors.white_100,
+    width: 40,
+    height: 40,
+    marginRight: 20,
+    marginTop: 15,
     marginBottom: 40,
-    textAlign: 'center',
-    marginTop: 90
+    alignSelf: 'flex-end',
   },
-  subLogo: {
-    fontWeight: 'bold',
+  nameCompany: {
+    fontFamily: 'Outfit_400Regular',
+    fontSize: 45,
+    height: 60,
+    color: colors.white_100,
+    textAlign: 'center',
+    marginBottom: 90
+  },
+  halfContainer: {
+    flex: 1,
+    alignItems: 'center',
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50,
+    backgroundColor: colors.gray_800,
+    paddingHorizontal: 30,
+  },
+  title: {
+    fontFamily: 'Outfit_600SemiBold',
     fontSize: 25,
     color: colors.white_100,
-    marginTop: -100,
+    marginTop: 40,
+    marginBottom: 40,
+    height: 33
   },
-  inputView: {
-    width: '80%',
+  inputsContainer: {
+    gap: 25,
+    marginBottom: 50
+  },
+  input: {
+    width: '100%',
     backgroundColor: colors.gray_900,
     borderRadius: 15,
     height: 50,
-    marginBottom: 20,
-    flexDirection: 'row', // Alterado para flex direction row
-    alignItems: 'center', // Alinha os itens verticalmente
-    marginTop: 10,
+    alignItems: 'center',
+    paddingHorizontal: 15
   },
   inputText: {
+    fontFamily: 'Outfit_500Medium',
     height: 50,
     color: colors.white,
-    flex: 1, // Ocupa o restante do espaço disponível
-    marginLeft: 10, // Adiciona um espaçamento entre o ícone e o texto
+    flex: 1
   },
   loginBtn: {
-    width: '80%',
+    width: '100%',
     backgroundColor: colors.blue_100,
     borderRadius: 15,
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20,
-    marginBottom: 10,
+    marginBottom: 20
   },
-  loginGoogleBtn: {
-    width: '55%',
-    backgroundColor: colors.white,
-    borderRadius: 25,
-    height: 50,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 30,
-    marginBottom: 10,
-    paddingHorizontal: 20,
+  loginBtnText: {
+    fontFamily: 'Outfit_500Medium',
+    fontSize: 20,
+    color: colors.white_100,
   },
-  loginText: {
-    color: colors.white,
+  signUpText: {
+    fontFamily: 'Outfit_500Medium',
+    fontSize: 15,
+    color: colors.white_100,
   },
-  signupText: {
-    color: colors.white,
-  },
-  googleText: {},
-  image: {
-    width: 30,
-    height: 30,
-  },
-  halfContainer: {
-    width: '100%',
-    height: '69%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderRadius: 50,
-    backgroundColor: colors.gray_800,
-  },
-  backgroundImage: {
-    position: 'absolute',
-    width: '100%',
-    height: '75%',
-    bottom: -80,
-    zIndex: -1,
-  },
-  icon: {
-    marginRight: 10,
-  },
-  imageLogo: {
-    marginTop: 50,
-    width: 45,
-    height: 45,
-    marginRight: 20,
-    alignSelf: 'flex-end',
+  signUpTextLink: {
+    fontFamily: 'Outfit_500Medium',
+    fontSize: 15,
+    color: colors.blue_50,
+    textDecorationLine: 'underline'
   },
 });
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, View, StyleSheet } from 'react-native';
+import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
 
 import { Container, Title } from './styles';
 
@@ -19,12 +19,21 @@ export function Header({ selectedValue, onValueChange }: Props) {
       <View style={styles.buttonContainer}>
         {
           MONTHS.map(item => (
-            <Button
+            <TouchableOpacity
               key={item.label}
-              title={item.label}
-              color={selectedValue === item.label ? colors.blue_100 : colors.gray_900}
+              style={[
+                styles.button,
+                selectedValue === item.label && styles.selectedButton
+              ]}
               onPress={() => onValueChange(item.label as MonthsProps)}
-            />
+            >
+              <Text style={[
+                styles.buttonText,
+                selectedValue === item.label && styles.selectedButtonText
+              ]}>
+                {item.label}
+              </Text>
+            </TouchableOpacity>
           ))
         }
       </View>
@@ -36,7 +45,25 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    marginVertical: 10,
+  },
+  button: {
+    backgroundColor: colors.gray_900,
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 25,
+    margin: 5,
+  },
+  selectedButton: {
+    backgroundColor: colors.blue_100,
+  },
+  buttonText: {
+    color: colors.white,
+    fontSize: 16,
+  },
+  selectedButtonText: {
+    color: colors.white,
   },
 });

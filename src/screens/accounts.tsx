@@ -64,7 +64,7 @@ export default function Accounts() {
   let totalIncome = 0;
 
   for (const item of data) {
-    if (item.is_expense === 1) {
+    if (item.isExpense === 1) {
       totalExpenses += item.value;
     } else {
       totalIncome += item.value;

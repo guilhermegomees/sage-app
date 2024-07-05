@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, SafeAreaView, Dimensions, LayoutChangeEvent, ScrollView, Image } from 'react-native';
+import { StyleSheet, View, Text, SafeAreaView, Image } from 'react-native';
 
 import { base } from "../css/base";
 import { colors } from '../css/colors'
@@ -6,7 +6,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 import React from 'react';
 
-import Tabs from '~/navigation/tabs';
+import Tabs from '~/navigation/TopNavigation';
 
 export default function Home() {
   return (

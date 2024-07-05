@@ -2,26 +2,26 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 
-import Home from '~/screens/home';
-import LoginScreen from '~/screens/login';
-import RegisterScreen from '~/screens/register';
-import Graphic from '~/screens/graphic';
-import Transactions from '~/screens/transactions';
-import CardDatails from '~/screens/cardDatails';
-import MonthlyBalance from '~/screens/monthlyBalance';
-import CategoryGraphic from '~/screens/categoryGraphic';
-import GraphicTeste from '~/screens/graphicTeste';
+import Home from '~/screens/Home';
+import LoginScreen from '~/screens/Login';
+import RegisterScreen from '~/screens/Register';
+import ChartList from '~/screens/ChartList';
+import Transactions from '~/screens/Transactions';
+import CardDatails from '~/screens/CardDatails';
+import MonthlyBalance from '~/screens/MonthlyBalance';
+import CategoryGraphic from '~/screens/CategoryGraphic';
+import MainTabNavigator from '~/navigation/MainTabNavigator';
 
 export type RootStackParamList = {
   Home: undefined;
+  Main: undefined;
   Login: undefined;
   Register: undefined;
-  Graphic: undefined;
+  ChartList: undefined;
   Transactions: undefined;
   CardDatails: undefined;
   MonthlyBalance: undefined;
   CategoryGraphic: undefined;
-  GraphicTeste: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -29,7 +29,12 @@ const Stack = createStackNavigator<RootStackParamList>();
 export default function RootStack() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
+      <Stack.Navigator initialRouteName="Main">
+        <Stack.Screen
+          name="Main"
+          component={MainTabNavigator}
+          options={{ headerShown: false }}
+        />
         <Stack.Screen
           name="Home"
           component={Home}
@@ -46,8 +51,8 @@ export default function RootStack() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="Graphic"
-          component={Graphic}
+          name="ChartList"
+          component={ChartList}
           options={{ headerShown: false }}
         />
         <Stack.Screen
@@ -68,11 +73,6 @@ export default function RootStack() {
         <Stack.Screen
           name="CategoryGraphic"
           component={CategoryGraphic}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="GraphicTeste"
-          component={GraphicTeste}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

@@ -23,9 +23,7 @@ export default function Graphic() {
   const handleNavigateMonthlyBalance = () => {
     navigation.navigate('MonthlyBalance');
   };
-  const handleNavigateTeste = () => {
-    navigation.navigate('GraphicTeste');
-  };
+
   const handleNavigateToCategoryGraphic = () => {
     navigation.navigate('CategoryGraphic');
   };

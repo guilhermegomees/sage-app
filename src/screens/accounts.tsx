@@ -42,21 +42,38 @@ export default function Accounts() {
   const navigation = useNavigation<AccountsScreenNavigationProp>();
 
   const [data, setData] = useState<ITransaction[]>([]);
-  const userId = 2; // TODO: Trazer id com base no usuário logado
-  const wallet = 2; // TODO: Trazer id da wallet com base na carteira selecionada
+  // const userId = 2; // TODO: Trazer id com base no usuário logado
+  // const wallet = 2; // TODO: Trazer id da wallet com base na carteira selecionada
 
-  const fetchData = async (): Promise<any> => {
-    try {
-      const response = await api.get(`/transaction?userId=${userId}`);
-      const formattedData = response.data.data.filter((item: ITransaction) => item.wallet === wallet);
-      setData(formattedData);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const fetchData = async (): Promise<any> => {
+  //   try {
+  //     const response = await api.get(`/transaction?userId=${userId}`);
+  //     const formattedData = response.data.data.filter((item: ITransaction) => item.wallet === wallet);
+  //     setData(formattedData);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  const transactions: ITransaction[] = [
+    { id: 1, description: "Salário", value: 3000, date: '2024-01-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
+    { id: 2, description: "Pix", value: 550, date: '2024-01-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
+    { id: 12, description: "Pix", value: 400, date: '2024-01-03T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1 },
+    { id: 14, description: "Pix", value: 3200, date: '2024-01-04T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1 },
+    { id: 3, description: "Salário", value: 3000, date: '2024-02-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
+    { id: 4, description: "Pix", value: 800, date: '2024-02-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
+    { id: 13, description: "Pix", value: 400, date: '2024-02-03T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1 },
+    { id: 5, description: "Salário", value: 3000, date: '2024-03-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
+    { id: 6, description: "Pix", value: 1500, date: '2024-03-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
+    { id: 7, description: "Pix", value: 1500, date: '2024-03-03T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1 },
+    { id: 8, description: "Pix", value: 2000, date: '2024-04-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
+    { id: 9, description: "Pix", value: 1500, date: '2024-04-03T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1 },
+    { id: 10, description: "Pix", value: 2000, date: '2024-06-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
+    { id: 11, description: "Pix", value: 1500, date: '2024-06-03T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1 }
+  ];
 
   useEffect(() => {
-    fetchData();
+    setData(transactions);
   }, []);
 
   // Calcular o total de entradas e saídas para a wallet específica

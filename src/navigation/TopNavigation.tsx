@@ -1,9 +1,9 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
-import TBar from './tbar';
-import Accounts from '../screens/accounts';
-import Goals from '../screens/goals';
-import Cards from '../screens/cards';
+import TBar from '../components/TBar';
+import Accounts from '../screens/Accounts';
+import Goals from '../screens/Goals';
+import Cards from '../screens/Cards';
 
 import React from 'react';
 

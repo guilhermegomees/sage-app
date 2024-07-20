@@ -10,9 +10,9 @@ export interface ITransaction {
 }
 
 export type IRevenue = {
-  id: string;
-  label: string;
-  value: number;
-  color: string;
-  date: string;
+  	id: string;
+  	label: string;
+  	value: number;
+  	color: string;
+  	date: string;
 };

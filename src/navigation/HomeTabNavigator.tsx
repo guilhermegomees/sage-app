@@ -10,16 +10,16 @@ import React from 'react';
 const Tab = createMaterialTopTabNavigator();
 
 export default function Tabs() {
-  return (
-    <Tab.Navigator
-      tabBar={(props) => <HomeTabNavigator {...props} />}
-      screenOptions={{
-        swipeEnabled: false, // Desativa a navegação por gestos (arrastar)
-      }}
-    >
-      <Tab.Screen name="Accounts" component={Accounts} options={{ tabBarLabel: 'Contas' }} />
-      <Tab.Screen name="Goals" component={Goals} options={{ tabBarLabel: 'Metas' }} />
-      <Tab.Screen name="Cards" component={Cards} options={{ tabBarLabel: 'Cartões' }} />
-    </Tab.Navigator>
-  );
+    return (
+        <Tab.Navigator
+            tabBar={(props) => <HomeTabNavigator {...props} />}
+            screenOptions={{
+                swipeEnabled: false, // Desativa a navegação por gestos (arrastar)
+            }}
+        >
+            <Tab.Screen name="Accounts" component={Accounts} options={{ tabBarLabel: 'Contas' }} />
+            <Tab.Screen name="Goals" component={Goals} options={{ tabBarLabel: 'Metas' }} />
+            <Tab.Screen name="Cards" component={Cards} options={{ tabBarLabel: 'Cartões' }} />
+        </Tab.Navigator>
+    );
 }

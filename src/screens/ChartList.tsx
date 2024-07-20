@@ -1,15 +1,15 @@
 import React from 'react';
 import {
-  Text,
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  colors,
-  base,
-  Image,
-  MaterialIcons,
-  useNavigation,
-  StackNavigationProp
+    Text,
+    View,
+    StyleSheet,
+    TouchableOpacity,
+    colors,
+    base,
+    Image,
+    MaterialIcons,
+    useNavigation,
+    StackNavigationProp
 } from '~/imports';
 
 type GraphicScreenNavigationProp = StackNavigationProp<any, 'Graphic'>;
@@ -17,30 +17,30 @@ type GraphicScreenNavigationProp = StackNavigationProp<any, 'Graphic'>;
 import Tabs from '~/navigation/ChartsTabNavigator';
 
 export default function Graphic() {
-  const navigation = useNavigation<GraphicScreenNavigationProp>();
+    const navigation = useNavigation<GraphicScreenNavigationProp>();
 
-  // const handleNavigateToBack = () => {
-  //   navigation.navigate('MainTabNavigator');
-  // };
+    // const handleNavigateToBack = () => {
+    //   navigation.navigate('MainTabNavigator');
+    // };
 
-  const handleNavigateMonthlyBalance = () => {
-    navigation.navigate('MonthlyBalance');
-  };
+    const handleNavigateMonthlyBalance = () => {
+        navigation.navigate('MonthlyBalance');
+    };
 
-  const handleNavigateToCategoryGraphic = () => {
-    navigation.navigate('CategoryGraphic');
-  };
+    const handleNavigateToCategoryGraphic = () => {
+        navigation.navigate('CategoryGraphic');
+    };
 
-  return (
-    <View style={[styles.container, base.flex_1]}>
-      <View style={[styles.containerBack]}>
-        {/* <TouchableOpacity onPress={handleNavigateToBack}>
+    return (
+        <View style={[styles.container, base.flex_1]}>
+            <View style={[styles.containerBack]}>
+                {/* <TouchableOpacity onPress={handleNavigateToBack}>
           <MaterialIcons name="chevron-left" size={30} color={colors.gray_50} />
         </TouchableOpacity> */}
-        <Text style={[styles.title]}>Gráficos</Text>
-      </View>
-      <Tabs />
-      {/* <View style={styles.containerBtn}>
+                <Text style={[styles.title]}>Gráficos</Text>
+            </View>
+            <Tabs />
+            {/* <View style={styles.containerBtn}>
         <TouchableOpacity style={styles.btn} onPress={handleNavigateMonthlyBalance}>
           <View style={[styles.imageContainer]}>
             <Image source={require('../assets/images/graphic01.png')} style={styles.barGraph} />
@@ -60,74 +60,74 @@ export default function Graphic() {
           </View>
         </TouchableOpacity>
       </View> */}
-    </View>
-  );
+        </View>
+    );
 }
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.gray_900,
-    paddingHorizontal: 20
-  },
-  containerBtn:{
-    backgroundColor: colors.gray_900,
-    justifyContent: 'space-between',
-    gap: 23
-  },
-  containerBack: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 30,
-    marginBottom: 25,
-  },
-  btn: {
-    flexDirection: 'row', // Modificado para alinhar elementos horizontalmente
-    justifyContent: 'space-between', // Espaça os elementos dentro do botão
-    alignItems: 'center', // Centraliza os itens verticalmente
-    backgroundColor: colors.gray_800,
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingLeft: 18,
-    paddingRight: 15,
-    gap: 23
-  },
-  imageContainer: {
-    width: 50,
-    height: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  textContainer: {
-    flex: 1, // Faz com que o contêiner do texto ocupe o espaço máximo antes da imagem
-    gap: 8,
-    marginVertical: 5
-  },
-  barGraph: {
-    width: 47,
-    height: 37,
-  },
-  circleGraph: {
-    width: 50,
-    height: 58,
-  },
-  titleButton: {
-    fontFamily: 'Outfit_600SemiBold',
-    color: colors.gray_50,
-    fontSize: 16,
-  },
-  subTitleButton: {
-    fontFamily: 'Outfit_400Regular',
-    color: colors.blue_400,
-    fontSize: 12,
-    marginTop: 4,
-  },
-  title: {
-    fontFamily: 'Outfit_600SemiBold',
-    color: colors.gray_50,
-    fontSize: 20,
-    marginLeft: 10,
-  },
-  arrow: {
-    color: colors.gray_50,
-    fontSize: 35,
-  },
+    container: {
+        backgroundColor: colors.gray_900,
+        paddingHorizontal: 20
+    },
+    containerBtn: {
+        backgroundColor: colors.gray_900,
+        justifyContent: 'space-between',
+        gap: 23
+    },
+    containerBack: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 30,
+        marginBottom: 25,
+    },
+    btn: {
+        flexDirection: 'row', // Modificado para alinhar elementos horizontalmente
+        justifyContent: 'space-between', // Espaça os elementos dentro do botão
+        alignItems: 'center', // Centraliza os itens verticalmente
+        backgroundColor: colors.gray_800,
+        borderRadius: 10,
+        paddingVertical: 10,
+        paddingLeft: 18,
+        paddingRight: 15,
+        gap: 23
+    },
+    imageContainer: {
+        width: 50,
+        height: 60,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    textContainer: {
+        flex: 1, // Faz com que o contêiner do texto ocupe o espaço máximo antes da imagem
+        gap: 8,
+        marginVertical: 5
+    },
+    barGraph: {
+        width: 47,
+        height: 37,
+    },
+    circleGraph: {
+        width: 50,
+        height: 58,
+    },
+    titleButton: {
+        fontFamily: 'Outfit_600SemiBold',
+        color: colors.gray_50,
+        fontSize: 16,
+    },
+    subTitleButton: {
+        fontFamily: 'Outfit_400Regular',
+        color: colors.blue_400,
+        fontSize: 12,
+        marginTop: 4,
+    },
+    title: {
+        fontFamily: 'Outfit_600SemiBold',
+        color: colors.gray_50,
+        fontSize: 20,
+        marginLeft: 10,
+    },
+    arrow: {
+        color: colors.gray_50,
+        fontSize: 35,
+    },
 });

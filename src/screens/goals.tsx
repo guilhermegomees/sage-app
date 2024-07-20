@@ -19,21 +19,21 @@ export default function Goals() {
       name: 'Meta 1',
       currentValue: 1200,
       goalValue: 1200,
-      icon: <MaterialIcons name="check-circle" size={35} color={colors.blue_100} />,
+      icon: <MaterialIcons name="check-circle" size={35} color={colors.blue_600} />,
     },
     {
       id: 2,
       name: 'Meta 2',
       currentValue: 14506.32,
       goalValue: 76200,
-      icon: <MaterialIcons name="check-circle" size={35} color={colors.blue_100} />,
+      icon: <MaterialIcons name="check-circle" size={35} color={colors.blue_600} />,
     },
     {
       id: 3,
       name: 'Meta 2',
       currentValue: 1222,
       goalValue: 1520,
-      icon: <MaterialIcons name="check-circle" size={35} color={colors.blue_100} />,
+      icon: <MaterialIcons name="check-circle" size={35} color={colors.blue_600} />,
     },
     // Adicione mais metas conforme necessário
   ];
@@ -127,22 +127,22 @@ const styles = StyleSheet.create({
   },
   text: {
     fontFamily: 'Outfit_600SemiBold',
-    color: colors.white_100,
+    color: colors.gray_50,
     fontSize: 16,
   },
   textBtn: {
     fontFamily: 'Outfit_500Medium',
-    color: colors.white_100,
+    color: colors.gray_50,
     fontSize: 14,
   },
   textValue: {
     fontFamily: 'Outfit_600SemiBold',
-    color: colors.white_100,
+    color: colors.gray_50,
     fontSize: 20,
   },
   textValue2: {
     fontFamily: 'Outfit_600SemiBold',
-    color: colors.white_100,
+    color: colors.gray_50,
     fontSize: 12,
     textAlign: 'center',
     textAlignVertical: 'center',
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   },
   Btn: {
     width: '45%',
-    backgroundColor: colors.blue_100,
+    backgroundColor: colors.blue_600,
     borderRadius: 10,
     height: 35,
     alignItems: 'center',
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   },
   btnDelete: {
     width: '45%',
-    backgroundColor: colors.yellow_100,
+    backgroundColor: colors.orange_300,
     borderRadius: 10,
     height: 35,
     alignItems: 'center',
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   },
   btnNew: {
     width: '100%',
-    backgroundColor: colors.blue_100,
+    backgroundColor: colors.blue_600,
     borderRadius: 15,
     height: 40,
     alignItems: 'center',
@@ -179,6 +179,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   blueText: {
-    color: colors.blue_200,
+    color: colors.blue_300,
   }
 });

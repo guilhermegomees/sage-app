@@ -37,7 +37,7 @@ export default function CardDatails() {
         {/* Seta para voltar */}
         <View style={[styles.containerBack]}>
           <TouchableOpacity onPress={handleNavigateToBack}>
-            <MaterialIcons name="chevron-left" size={30} color={colors.white_100} />
+            <MaterialIcons name="chevron-left" size={30} color={colors.gray_50} />
           </TouchableOpacity>
           <Text style={[styles.title]}>Detalhes</Text>
         </View>
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: 'Outfit_600SemiBold',
-    color: colors.white_100,
+    color: colors.gray_50,
     fontSize: 20,
     marginLeft: 10,
   },
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     borderRadius: 13
   },
   btnCardRegister: {
-    backgroundColor: colors.blue_100
+    backgroundColor: colors.blue_600
   },
   btnCancel: {
     backgroundColor: colors.orange_300
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   btnText: {
     fontFamily: 'Outfit_500Medium',
     fontSize: 18,
-    color: colors.white_100,
+    color: colors.gray_50,
     textAlign: 'center',
     height: 22
   }

@@ -33,7 +33,7 @@ export default function CategoryGraphic() {
   const [data, setData] = useState<CardProps[]>([]);
 
   const handleNavigateToBack = () => {
-    navigation.navigate('Graphic');
+    navigation.navigate('ChartList');
   };
 
   function handleCardOnPress(id: string) {
@@ -49,12 +49,12 @@ export default function CategoryGraphic() {
 
   return (
     <View style={[styles.container, base.flex_1]}>
-      <View style={[styles.containerBack]}>
+      {/* <View style={[styles.containerBack]}>
         <TouchableOpacity onPress={handleNavigateToBack}>
-          <MaterialIcons name="chevron-left" size={30} color={colors.white_100} />
+          <MaterialIcons name="chevron-left" size={30} color={colors.gray_50} />
         </TouchableOpacity>
         <Text style={[styles.title]}>Transação por categoria</Text>
-      </View>
+      </View> */}
       <View style={styles.chartContainer}>
         <Header
           onValueChange={setMonth}
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: 'Outfit_600SemiBold',
-    color: colors.white_100,
+    color: colors.gray_50,
     fontSize: 20,
     marginLeft: 10,
   },
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   totalExpenses: {
     marginTop: -30,
     fontFamily: 'Outfit_400Regular',
-    color: colors.white_100,
+    color: colors.gray_50,
     fontSize: 16,
     textAlign: 'center'
   },

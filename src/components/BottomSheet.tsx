@@ -56,7 +56,7 @@ function formatDate(dateStr: string, type: TypeScreem): any {
     return date;
 }
 
-const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
+const MainTabNavigator: React.FC<BottomSheetProps> = ({ data, type }) => {
     // Agrupar transações por data
     const groupedTransactions: Record<string, ITransaction[]> = data.reduce((acc, transaction) => {
         let date: string;
@@ -116,7 +116,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
                                     {(type == TypeScreem.Account || type == TypeScreem.Card) && <View style={[styles.line]} />}
                                     {(type == TypeScreem.Transaction || type == TypeScreem.Graphics) &&
                                         <Text style={[styles.valueTransaction, {
-                                            color: totalValue < 0 ? colors.red_1 : colors.green_1
+                                            color: totalValue < 0 ? colors.red_500 : colors.green_500
                                         }]}>
                                             {formatValue(Math.abs(totalValue), totalValue < 0 ? 1 : 0)}
                                         </Text>
@@ -129,7 +129,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
                                                 <View style={[base.p_10, base.flexRow, base.flexSpaceBetween, base.alignItemsCenter, base.w_100]}>
                                                     <View style={[base.flexRow, base.alignItemsCenter, base.gap_9]}>
                                                         <View style={[styles.containerIconTransactions, {
-                                                            backgroundColor: transaction.isExpense ? colors.red_1 : colors.green_1
+                                                            backgroundColor: transaction.isExpense ? colors.red_500 : colors.green_500
                                                         }]}>
 
                                                             <FontAwesome5 name={transaction.icon ?? 'star'} color={colors.gray_900} size={15} />
@@ -137,7 +137,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
                                                         <Text style={[styles.textTransaction]}>{transaction.description}</Text>
                                                     </View>
                                                     <Text style={[styles.valueTransaction, {
-                                                        color: transaction.isExpense ? colors.red_1 : colors.green_1
+                                                        color: transaction.isExpense ? colors.red_500 : colors.green_500
                                                     }]}>{formatValue(transaction.value, transaction.isExpense)}</Text>
                                                 </View>
                                                 {index !== transactionsForDate.length - 1 && <View style={[styles.divisor]} />}
@@ -153,8 +153,8 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
             <View style={[base.justifyContentCenter, base.alignItemsCenter, base.flex_1]}>
                 {Object.keys(groupedTransactions).length === 0 && (
                     <View style={[base.justifyContentCenter, base.alignItemsCenter, base.gap_15]}>
-                        {/* <FontAwesome5 name="box-open" size={80} color={colors.white_200} /> */}
-                        <Image source={require('./../assets/images/bankrupt.png')} tintColor={colors.white_200} style={{width: 70, height: 70}}/>
+                        {/* <FontAwesome5 name="box-open" size={80} color={colors.gray_100} /> */}
+                        <Image source={require('./../assets/images/bankrupt.png')} tintColor={colors.gray_100} style={{width: 70, height: 70}}/>
                         <Text style={styles.noTransactionsMessage}>
                             {type == TypeScreem.Graphics 
                                 ? 'Sem transações por aqui!'
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
         backgroundColor: colors.gray_900
     },
     textAccount: {
-        color: colors.white_300,
+        color: colors.gray_400,
         fontSize: 16,
         fontWeight: '500',
         lineHeight: 22
@@ -184,18 +184,18 @@ const styles = StyleSheet.create({
         height: 14
     },
     textValue: {
-        color: colors.white_200,
+        color: colors.gray_100,
         fontSize: 40,
         fontWeight: '500'
     },
     textValueEntrance: {
-        color: colors.green_1,
+        color: colors.green_500,
         fontSize: 14,
         fontWeight: '500',
         lineHeight: 22
     },
     textValueOutPut: {
-        color: colors.red_1,
+        color: colors.red_500,
         fontSize: 14,
         fontWeight: '500',
         lineHeight: 22
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     textBtnsActions: {
-        color: colors.white_300,
+        color: colors.gray_400,
         fontSize: 14,
         fontWeight: '500',
         lineHeight: 22
@@ -224,17 +224,17 @@ const styles = StyleSheet.create({
         fontFamily: 'Outfit_600SemiBold',
         fontSize: 18,
         marginBottom: 20,
-        color: colors.white_100
+        color: colors.gray_50
     },
     date: {
         fontFamily: 'Outfit_500Medium',
         fontSize: 13,
-        color: colors.white_100,
+        color: colors.gray_50,
     },
     line: {
         width: '100%',
         height: 3,
-        backgroundColor: colors.gray_3,
+        backgroundColor: colors.gray_850,
         borderRadius: 100
     },
     containerIconTransactions: {
@@ -246,13 +246,13 @@ const styles = StyleSheet.create({
     },
     containerTrasactions: {
         borderRadius: 15,
-        backgroundColor: colors.gray_3,
+        backgroundColor: colors.gray_850,
         marginTop: 10
     },
     textTransaction: {
         fontFamily: 'Outfit_600SemiBold',
         fontSize: 12,
-        color: colors.white_100
+        color: colors.gray_50
     },
     valueTransaction: {
         fontFamily: 'Outfit_500Medium',
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
     divisor: {
         width: 324,
         height: 1,
-        backgroundColor: colors.gray_4
+        backgroundColor: colors.gray_700
     },
     iconButtonAction: {
         width: 30,
@@ -270,19 +270,19 @@ const styles = StyleSheet.create({
     noTransactionsMessage: {
         fontFamily: 'Outfit_500Medium',
         textAlign: 'center',
-        color: colors.white_100,
+        color: colors.gray_50,
         fontSize: 16,
     },
     cardValuesLimit: {
         fontFamily: 'Outfit_600SemiBold',
-        color: colors.white_100,
+        color: colors.gray_50,
         fontSize: 18
     },
     cardValueDifference: {
         fontFamily: 'Outfit_600SemiBold',
-        color: colors.blue_50,
+        color: colors.blue_300,
         fontSize: 12
     }
 })
 
-export default BottomSheet;
+export default MainTabNavigator;

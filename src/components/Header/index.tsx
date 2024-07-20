@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     margin: 5,
   },
   selectedButton: {
-    backgroundColor: colors.blue_100,
+    backgroundColor: colors.blue_600,
   },
   buttonText: {
     color: colors.white,

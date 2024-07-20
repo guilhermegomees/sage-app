@@ -18,11 +18,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
     
     return (
         <View style={[styles.searchSection, {backgroundColor: colors.gray_800}]}>
-            <Ionicons name="search" size={18} color={colors.gray_200} />
+            <Ionicons name="search" size={18} color={colors.gray_300} />
             <TextInput
-                style={[styles.input, { color: colors.gray_200 }]}
+                style={[styles.input, { color: colors.gray_300 }]}
                 placeholder="Pesquisa"
-                placeholderTextColor={colors.gray_200}
+                placeholderTextColor={colors.gray_300}
                 value={searchText}
                 onChangeText={handleSearch}
             />

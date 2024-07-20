@@ -6,23 +6,23 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 import React from 'react';
 
-import Tabs from '~/navigation/TopNavigation';
+import Tabs from '~/navigation/HomeTabNavigator';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function Home() {
   return (
     <SafeAreaView style={[styles.container, base.flex_1]}>
       <View style={[base.flex_1]}>
-        <View style={[base.flexRow, base.flexSpaceBetween, base.alignItemsCenter, base.pb_25, base.px_30]}>
-          <View style={[base.flexRow, base.alignItemsCenter, base.gap_12]}>
-            <FontAwesome name='user-circle' color={colors.white} size={52} />
-            {/* TODO: Aplicar foto do usuário */}
+        <View style={[base.flexRow, base.flexSpaceBetween, base.alignItemsCenter, base.pb_15, base.px_30]}>
+          <View style={[base.flexRow, base.alignItemsCenter, base.gap_12,]}>
+            <Image source={require('./../assets/images/user-circle.png')} style={styles.iconUser} />
             <View style={[base.gap_4]}>
               <Text style={styles.text}>[Nome]</Text>
-              <Text style={styles.text}>[Email]</Text>
             </View>
           </View>
-          <View style={[styles.containerUser]}>
-            <Image source={require('./../assets/images/user-circle.png')} style={styles.iconUser} />
+          <View style={[base.flexRow, base.gap_20]}>
+            <MaterialIcons name='visibility' size={28} color={colors.gray_50} />
+            <MaterialIcons name='add' size={28} color={colors.gray_50} />
           </View>
         </View>
         <Tabs />
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontFamily: 'Outfit_500Medium',
-    color: colors.white_100,
+    color: colors.gray_50,
     fontSize: 14,
     lineHeight: 20,
   },
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     alignItems: 'center' 
   },
   iconUser: {
-    width: 27,
-    height: 27
+    width: 40,
+    height: 40
   }
 })

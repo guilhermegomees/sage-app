@@ -42,25 +42,25 @@ const RegisterScreen = () => {
           <Text style={styles.title}>Seja bem-vindo(a)</Text>
           <View style={styles.inputsContainer}>
             <View style={[styles.input, base.flexRowReverse]}>
-              <MaterialIcons name="person" size={20} color={colors.white_250} />
-              <TextInput style={styles.inputText} placeholder="Nome" placeholderTextColor={colors.white_250} />
+              <MaterialIcons name="person" size={20} color={colors.gray_200} />
+              <TextInput style={styles.inputText} placeholder="Nome" placeholderTextColor={colors.gray_200} />
             </View>
             <View style={[styles.input, base.flexRowReverse]}>
-              <MaterialIcons name="email" size={20} color={colors.white_250} />
-              <TextInput style={styles.inputText} placeholder="E-mail" placeholderTextColor={colors.white_250} />
+              <MaterialIcons name="email" size={20} color={colors.gray_200} />
+              <TextInput style={styles.inputText} placeholder="E-mail" placeholderTextColor={colors.gray_200} />
             </View>
             <View style={[styles.input, base.flexRow]}>
               <TextInput
                 style={styles.inputText}
                 placeholder="Senha"
-                placeholderTextColor={colors.white_250}
+                placeholderTextColor={colors.gray_200}
                 secureTextEntry={!showPassword}
               />
               <TouchableOpacity onPress={toggleShowPassword}>
                 <MaterialIcons
                   name={showPassword ? 'visibility-off' : 'visibility'}
                   size={20}
-                  color={colors.white_250}
+                  color={colors.gray_200}
                 />
               </TouchableOpacity>
             </View>
@@ -68,14 +68,14 @@ const RegisterScreen = () => {
               <TextInput
                 style={styles.inputText}
                 placeholder="Confirmar senha"
-                placeholderTextColor={colors.white_250}
+                placeholderTextColor={colors.gray_200}
                 secureTextEntry={!showPassword}
               />
               <TouchableOpacity onPress={toggleShowPassword}>
                 <MaterialIcons
                   name={showPassword ? 'visibility-off' : 'visibility'}
                   size={20}
-                  color={colors.white_250}
+                  color={colors.gray_200}
                 />
               </TouchableOpacity>
             </View>
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Outfit_400Regular',
     fontSize: 45,
     height: 60,
-    color: colors.white_100,
+    color: colors.gray_50,
     textAlign: 'center',
     marginBottom: 50
   },
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: 'Outfit_600SemiBold',
     fontSize: 25,
-    color: colors.white_100,
+    color: colors.gray_50,
     marginTop: 40,
     marginBottom: 40,
     height: 33
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   },
   loginBtn: {
     width: '100%',
-    backgroundColor: colors.blue_100,
+    backgroundColor: colors.blue_600,
     borderRadius: 15,
     height: 50,
     alignItems: 'center',
@@ -162,17 +162,17 @@ const styles = StyleSheet.create({
   loginBtnText: {
     fontFamily: 'Outfit_500Medium',
     fontSize: 20,
-    color: colors.white_100,
+    color: colors.gray_50,
   },
   signUpText: {
     fontFamily: 'Outfit_500Medium',
     fontSize: 15,
-    color: colors.white_100,
+    color: colors.gray_50,
   },
   signUpTextLink: {
     fontFamily: 'Outfit_500Medium',
     fontSize: 15,
-    color: colors.blue_50,
+    color: colors.blue_300,
     textDecorationLine: 'underline'
   },
 });

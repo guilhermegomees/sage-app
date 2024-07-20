@@ -14,12 +14,15 @@ import {
 
 type GraphicScreenNavigationProp = StackNavigationProp<any, 'Graphic'>;
 
+import Tabs from '~/navigation/ChartsTabNavigator';
+
 export default function Graphic() {
   const navigation = useNavigation<GraphicScreenNavigationProp>();
 
-  const handleNavigateToBack = () => {
-    navigation.navigate('Home');
-  };
+  // const handleNavigateToBack = () => {
+  //   navigation.navigate('MainTabNavigator');
+  // };
+
   const handleNavigateMonthlyBalance = () => {
     navigation.navigate('MonthlyBalance');
   };
@@ -31,19 +34,20 @@ export default function Graphic() {
   return (
     <View style={[styles.container, base.flex_1]}>
       <View style={[styles.containerBack]}>
-        <TouchableOpacity onPress={handleNavigateToBack}>
-          <MaterialIcons name="chevron-left" size={30} color={colors.white_100} />
-        </TouchableOpacity>
+        {/* <TouchableOpacity onPress={handleNavigateToBack}>
+          <MaterialIcons name="chevron-left" size={30} color={colors.gray_50} />
+        </TouchableOpacity> */}
         <Text style={[styles.title]}>Gráficos</Text>
       </View>
-      <View style={styles.containerBtn}>
+      <Tabs />
+      {/* <View style={styles.containerBtn}>
         <TouchableOpacity style={styles.btn} onPress={handleNavigateMonthlyBalance}>
           <View style={[styles.imageContainer]}>
             <Image source={require('../assets/images/graphic01.png')} style={styles.barGraph} />
           </View>
           <View style={styles.textContainer}>
             <Text style={styles.titleButton}>Balanço mensal</Text>
-            <Text style={styles.subTitleButton}>Saiba quanto você recebeu e quanto você gastou durante um certo período.</Text>
+            <Text style={styles.blue_400Button}>Saiba quanto você recebeu e quanto você gastou durante um certo período.</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity style={styles.btn} onPress={handleNavigateToCategoryGraphic}>
@@ -52,10 +56,10 @@ export default function Graphic() {
           </View>
           <View style={styles.textContainer}>
             <Text style={styles.titleButton}>Transações por categoria</Text>
-            <Text style={styles.subTitleButton}>Confira o total gasto em cada categoria e identifique onde está concentrando mais despesas.</Text>
+            <Text style={styles.blue_400Button}>Confira o total gasto em cada categoria e identifique onde está concentrando mais despesas.</Text>
           </View>
         </TouchableOpacity>
-      </View>
+      </View> */}
     </View>
   );
 }
@@ -107,23 +111,23 @@ const styles = StyleSheet.create({
   },
   titleButton: {
     fontFamily: 'Outfit_600SemiBold',
-    color: colors.white_100,
+    color: colors.gray_50,
     fontSize: 16,
   },
   subTitleButton: {
     fontFamily: 'Outfit_400Regular',
-    color: colors.subTitle,
+    color: colors.blue_400,
     fontSize: 12,
     marginTop: 4,
   },
   title: {
     fontFamily: 'Outfit_600SemiBold',
-    color: colors.white_100,
+    color: colors.gray_50,
     fontSize: 20,
     marginLeft: 10,
   },
   arrow: {
-    color: colors.white_100,
+    color: colors.gray_50,
     fontSize: 35,
   },
 });

@@ -186,7 +186,7 @@ export default function EntryExitGraphic() {
   const navigation = useNavigation<EntryExitGraphicScreenNavigationProp>();
 
   const handleNavigateToBack = () => {
-    navigation.navigate('Graphic');
+    navigation.navigate('ChartList');
   };
 
   // Dados de receita e despesa
@@ -275,19 +275,19 @@ export default function EntryExitGraphic() {
   
   return (
     <View style={[styles.container, base.flex_1]}>
-      <View style={[styles.containerBack]}>
+      {/* <View style={[styles.containerBack]}>
         <TouchableOpacity onPress={handleNavigateToBack}>
-          <MaterialIcons name="chevron-left" size={30} color={colors.white_100} />
+          <MaterialIcons name="chevron-left" size={30} color={colors.gray_50} />
         </TouchableOpacity>
         <Text style={[styles.title]}>Balanço mensal</Text>
-      </View>
+      </View> */}
       <PeriodSelector
         currentPeriod={getPeriodFormated(currentPeriod)}
         onPrevPeriod={handlePrevPeriod}
         onNextPeriod={handleNextPeriod}
       />
       <View style={[styles.chartContainer]}>
-        <VictoryChart theme={VictoryTheme.material} domainPadding={40} padding={{ top: 5, bottom: 80, left: 80, right: 20 }}>
+        <VictoryChart theme={VictoryTheme.material} domainPadding={40} padding={{ top: 0, bottom: 100, left: 80, right: 20 }}>
           <VictoryAxis
             tickValues={[1, 3, 5]}
             tickCount={3}
@@ -296,7 +296,7 @@ export default function EntryExitGraphic() {
               axis: { stroke: colors.gray_800 },
               grid: { stroke: 'none' },
               ticks: { stroke: 'none', size: 2 },
-              tickLabels: { fontSize: 12, padding: 10, fill: colors.subTitle }
+              tickLabels: { fontSize: 12, padding: 10, fill: colors.blue_400 }
             }}
           />
           <VictoryAxis
@@ -308,7 +308,7 @@ export default function EntryExitGraphic() {
               axis: { stroke: 'none' },
               grid: { stroke: colors.gray_800, strokeWidth: 2, strokeDasharray: 1 },
               ticks: { stroke: 'transparent', size: 2 },
-              tickLabels: { fontSize: 12, padding: 5, fill: colors.subTitle },
+              tickLabels: { fontSize: 12, padding: 5, fill: colors.blue_400 },
             }}
           />
           <VictoryGroup offset={35}>
@@ -337,7 +337,7 @@ export default function EntryExitGraphic() {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.gray_900,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     flex: 1,
   },
   containerBack: {
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: 'Outfit_600SemiBold',
-    color: colors.white_100,
+    color: colors.gray_50,
     fontSize: 20,
     marginLeft: 10,
   },

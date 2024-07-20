@@ -23,7 +23,7 @@ const DayPicker: React.FC = () => {
 
     return (
         <Dropdown
-            style={[styles.dropdown, isFocus && { borderColor: colors.white_300 }]}
+            style={[styles.dropdown, isFocus && { borderColor: colors.gray_400 }]}
             placeholderStyle={styles.placeholderStyle}
             selectedTextStyle={styles.selectedTextStyle}
             iconStyle={styles.iconStyle}
@@ -43,7 +43,7 @@ const DayPicker: React.FC = () => {
             renderRightIcon={() => (
                 <MaterialIcons
                     name="calendar-month"
-                    color={colors.white_200}
+                    color={colors.gray_100}
                     size={20} 
                 />
             )}
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         paddingHorizontal: 18,
         marginBottom: 10,
-        color: colors.white_200
+        color: colors.gray_100
     },
     label: {
         position: 'absolute',
@@ -81,12 +81,12 @@ const styles = StyleSheet.create({
     },
     placeholderStyle: {
         fontFamily: 'Outfit_500Medium',
-        color: colors.white_200,
+        color: colors.gray_100,
         fontSize: 16,
     },
     selectedTextStyle: {
         fontFamily: 'Outfit_500Medium',
-        color: colors.white_200,
+        color: colors.gray_100,
         fontSize: 16,
     },
     iconStyle: {
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
         height: 20,
     },
     itemText: {
-        color: colors.white_200,
+        color: colors.gray_100,
         fontSize: 16,
     },
     dayOption: {

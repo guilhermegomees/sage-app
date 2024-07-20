@@ -13,11 +13,11 @@ const PeriodSelector: React.FC<PeriodSelectorProps> = ({ currentPeriod , onPrevP
     return (
         <View style={styles.periodSelector}>
             <TouchableHighlight style={styles.arrow} onPress={onPrevPeriod} disabled={!currentPeriod} underlayColor={colors.gray_800}>
-                <MaterialIcons name="chevron-left" size={28} color={colors.white_100} />
+                <MaterialIcons name="chevron-left" size={28} color={colors.gray_50} />
             </TouchableHighlight>
             <Text style={styles.currentPeriod}>{currentPeriod}</Text>
             <TouchableHighlight style={styles.arrow} onPress={onNextPeriod} underlayColor={colors.gray_800}>
-                <MaterialIcons name="chevron-right" size={28} color={colors.white_100} />
+                <MaterialIcons name="chevron-right" size={28} color={colors.gray_50} />
             </TouchableHighlight>
         </View>
     );
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     },
     currentPeriod: {
         fontFamily: 'Outfit_500Medium',
-        color: colors.white_100,
+        color: colors.gray_50,
         fontSize: 16,
     },
 });

@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   },
   textBtnsActions: {
     fontFamily: 'Outfit_500Medium',
-    color: colors.white_300,
+    color: colors.gray_400,
     fontSize: 14,
     lineHeight: 22
   },
@@ -163,13 +163,13 @@ const styles = StyleSheet.create({
     height: 22
   },
   dueDate: {
-    color: colors.white_100,
+    color: colors.gray_50,
     fontWeight: '500',
     fontSize: 20,
     lineHeight: 24
   },
   dueMonth: {
-    color: colors.white_300,
+    color: colors.gray_400,
     fontWeight: '400',
     fontSize: 11,
     lineHeight: 12

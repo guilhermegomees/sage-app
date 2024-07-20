@@ -38,7 +38,10 @@ export default function Transactions() {
             { id: 5, date: "2024-03-12T03:00:00.000Z", description: "Pagamento de fatura", icon: "credit-card", isExpense: 1, value: 600.00, wallet: 1 },
             { id: 6, date: "2024-03-12T03:00:00.000Z", description: "Reembolso de compra", icon: "money-check-alt", isExpense: 0, value: 50.00, wallet: 1 },
             { id: 7, date: "2024-03-12T03:00:00.000Z", description: "Compra em loja de roupas", icon: "tshirt", isExpense: 1, value: 120.00, wallet: 1 },
-            { id: 8, date: "2024-03-15T03:00:00.000Z", description: "Assinatura de serviço online", icon: "star", isExpense: 1, value: 15.99, wallet: 1 }
+            { id: 8, date: "2024-03-15T03:00:00.000Z", description: "Assinatura de serviço online", icon: "star", isExpense: 1, value: 15.99, wallet: 1 },
+            { id: 9, date: "2024-03-12T03:00:00.000Z", description: "Reembolso de compra", icon: "money-check-alt", isExpense: 0, value: 50.00, wallet: 1 },
+            { id: 10, date: "2024-03-12T03:00:00.000Z", description: "Compra em loja de roupas", icon: "tshirt", isExpense: 1, value: 120.00, wallet: 1 },
+            { id: 11, date: "2024-03-15T03:00:00.000Z", description: "Assinatura de serviço online", icon: "star", isExpense: 1, value: 15.99, wallet: 1 }
         ];
 
         setTransactions(data);
@@ -58,18 +61,18 @@ export default function Transactions() {
 
     return (
         <View style={[styles.container]}>
-            <View style={[styles.containerBack]}>
+            {/* <View style={[styles.containerBack]}>
                 <View style={[base.flexRow, base.gap_8]}>
                     <TouchableOpacity onPress={handleNavigateToBack}>
-                        <MaterialIcons name="chevron-left" size={30} color={colors.white_100} />
+                        <MaterialIcons name="chevron-left" size={30} color={colors.gray_50} />
                     </TouchableOpacity>
                     <Text style={[styles.titleTransactions]}>Transações</Text>
                 </View>
                 <TouchableOpacity style={[styles.buttonAdd]}>
                     <Text style={[styles.textButtonAdd]}>Adicionar</Text>
                 </TouchableOpacity>
-            </View>
-            <View style={[base.mb_20, base.mx_2]}>
+            </View> */}
+            <View style={[base.mb_20, base.mt_25, base.mx_2]}>
                 <SearchBar onSearch={handleSearch} />
             </View>
             <BottomSheet data={filteredTransactions} type={TypeScreem.Transaction} />
@@ -92,17 +95,17 @@ const styles = StyleSheet.create({
     },
     titleTransactions: {
         fontFamily: 'Outfit_600SemiBold',
-        color: colors.white_100,
+        color: colors.gray_50,
         fontSize: 20,
         marginTop: 2
     },
     buttonAdd: {
         borderRadius: 10,
-        backgroundColor: colors.blue_100,
+        backgroundColor: colors.blue_600,
         padding: 7
     },
     textButtonAdd : {
         fontFamily: 'Outfit_500Medium',
-        color: colors.white_100
+        color: colors.gray_50
     }
 })

@@ -1,6 +1,6 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
-import TBar from '../components/TBar';
+import HomeTabNavigator from '../components/HomeTabNavigator';
 import Accounts from '../screens/Accounts';
 import Goals from '../screens/Goals';
 import Cards from '../screens/Cards';
@@ -12,7 +12,7 @@ const Tab = createMaterialTopTabNavigator();
 export default function Tabs() {
   return (
     <Tab.Navigator
-      tabBar={(props) => <TBar {...props} />}
+      tabBar={(props) => <HomeTabNavigator {...props} />}
       screenOptions={{
         swipeEnabled: false, // Desativa a navegação por gestos (arrastar)
       }}

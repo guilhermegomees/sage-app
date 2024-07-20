@@ -58,8 +58,8 @@ const SliderComponent: React.FC = () => {
                 onValueChange={onValueChange}
                 theme={{
                     maximumTrackTintColor: colors.gray_400,
-                    minimumTrackTintColor: colors.blue_100,
-                    bubbleBackgroundColor: colors.blue_100
+                    minimumTrackTintColor: colors.blue_600,
+                    bubbleBackgroundColor: colors.blue_600
                 }}
             />
             <TextInput

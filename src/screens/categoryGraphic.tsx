@@ -1,25 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { VictoryPie, VictoryLabel, VictoryTooltip } from 'victory-native';
-import {
-	Text,
-	View,
-	StyleSheet,
-	TouchableOpacity,
-	colors,
-	base,
-	MaterialIcons,
-	StackNavigationProp
-} from '~/imports';
-
+import { VictoryPie, VictoryTooltip } from 'victory-native';
+import { Text, View, StyleSheet, colors, base, StackNavigationProp } from '~/imports';
 import { FlatList } from 'react-native';
 import { EXPENSES } from '../../utils/transactions';
 import { Card, CardProps } from '../components/Card';
 import { Header, MonthsProps } from '../components/Header';
-
-import { TypeScreem } from '~/enums';
-import { ITransaction } from '~/interfaces';
-import BottomSheet from '~/components/BottomSheet';
-
 import { useNavigation } from '@react-navigation/native';
 
 type CategoryGraphicScreenNavigationProp = StackNavigationProp<any, 'CategoryGraphic'>;

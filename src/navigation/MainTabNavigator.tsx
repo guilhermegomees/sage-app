@@ -2,14 +2,16 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StyleSheet, Image, colors, View, Text, base } from '~/imports';
 
+// Screens
 import Home from '~/screens/Home';
 import Transactions from '~/screens/Transactions';
+import NewTransaction from '~/screens/NewTransaction';
 import ChartList from '~/screens/ChartList';
-import Cards from '~/screens/Cards';
+import CardsStack from './CardsStackNavigator';
 
 const Tab = createBottomTabNavigator();
 
-export default function MainTabNavigator() {
+export default function MainTabNavigator(){
     return (
         <Tab.Navigator 
             initialRouteName="Home"
@@ -36,7 +38,7 @@ export default function MainTabNavigator() {
                                 style={[{ width: 22, height: 22 }]}
                                 tintColor={focused ? colors.gray_150 : colors.gray_500 }
                             />
-                            <Text style={[styles.text, { color: focused ? colors.gray_150 : colors.gray_500  }]}>Início</Text>
+                            <Text style={[styles.text, { color: focused ? colors.gray_150 : colors.gray_500 }]}>Início</Text>
                         </View>
                     },
                 }}
@@ -52,31 +54,29 @@ export default function MainTabNavigator() {
                                 style={[{ width: 20, height: 20 }]}
                                 tintColor={focused ? colors.gray_150 : colors.gray_500 }
                             />
-                            <Text style={[styles.text, { color: focused ? colors.gray_150 : colors.gray_500  }]}>Transações</Text>
+                            <Text style={[styles.text, { color: focused ? colors.gray_150 : colors.gray_500 }]}>Transações</Text>
                         </View>
                     },
                 }}
             />
             <Tab.Screen
                 name="New"
-                component={Cards}
+                component={NewTransaction}
                 options={{
-                    tabBarIcon: ({ focused }) => {
-                        return <>
-                            <View style={[styles.containerBtnPlus, { backgroundColor: focused ? '#F37C4A' : '#EE8B60' }]}>
-                                <Image
-                                    source={require('./../assets/images/tabBar/plus.png')}
-                                    style={[{ width: 26, height: 26 }]}
-                                    tintColor={'#FFFFFF'}
-                                />
-                            </View>
-                        </>
-                    },
+                    tabBarIcon: ({ focused }) => (
+                        <View style={[styles.containerBtnPlus, { backgroundColor: focused ? colors.orange_500 : colors.orange_300 }]}>
+                            <Image
+                                source={require('./../assets/images/tabBar/plus.png')}
+                                style={{ width: 26, height: 26 }}
+                                tintColor={colors.white}
+                            />
+                        </View>
+                    ),
                 }}
             />
             <Tab.Screen
-                name="Card"
-                component={Cards}
+                name="CardsStack"
+                component={CardsStack}
                 options={{
                     tabBarIcon: ({ focused }) => {
                         return <View style={[base.alignItemsCenter, base.justifyContentCenter, base.gap_3]}>
@@ -85,7 +85,7 @@ export default function MainTabNavigator() {
                                 style={[{ width: 23, height: 18 }]}
                                 tintColor={focused ? colors.gray_150 : colors.gray_500 }
                             />
-                            <Text style={[styles.text, { color: focused ? colors.gray_150 : colors.gray_500  }]}>Cartões</Text>
+                            <Text style={[styles.text, { color: focused ? colors.gray_150 : colors.gray_500 }]}>Cartões</Text>
                         </View>
                     },
                 }}
@@ -101,7 +101,7 @@ export default function MainTabNavigator() {
                                 style={[{ width: 22, height: 22 }]}
                                 tintColor={focused ? colors.gray_150 : colors.gray_500 }
                             />
-                            <Text style={[styles.text, { color: focused? colors.gray_150 : colors.gray_500  }]}>Graficos</Text>
+                            <Text style={[styles.text, { color: focused? colors.gray_150 : colors.gray_500 }]}>Gráficos</Text>
                         </View>
                     },
                 }}

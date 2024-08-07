@@ -35,12 +35,11 @@ export default function Cards() {
     }, []);
 
     const handleNavigateToCardDatails = () => {
-        navigation.navigate('CardDatails');
+        navigation.navigate('CardDetails');
     };
 
     return (
         <View style={[styles.container, base.alignItemsCenter, base.flex_1]}>
-
             {/* Card */}
             <View style={[styles.card]}>
                 <View style={[base.p_13, base.flexColumn, base.flexSpaceBetween, base.flex_1]}>
@@ -56,7 +55,6 @@ export default function Cards() {
                     </View>
                 </View>
             </View>
-
             {/* Botões de ação */}
             <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_25, base.my_25]}>
                 <View style={[base.alignItemsCenter, base.justifyContentCenter, base.gap_8]}>
@@ -79,8 +77,8 @@ export default function Cards() {
                     <TouchableOpacity>
                         <View style={[styles.buttonsActions]}>
                             <View style={[base.flexColumn, base.alignItemsCenter]}>
-                                {/* TODO: Aplicar data de vencimento definida no cartão e 
-                implementar função para mostrar um mês em diante depois do dia definido */}
+                                {/* TODO: Aplicar data de vencimento definida no cartão e implementar
+                                função para mostrar um mês em diante depois do dia definido */}
                                 <Text style={[styles.dueDate]}>10</Text>
                                 <Text style={[styles.dueMonth]}>Abr</Text>
                             </View>
@@ -89,7 +87,6 @@ export default function Cards() {
                     <Text style={[styles.textBtnsActions]}>Vencimento</Text>
                 </View>
             </View>
-
             {/* Painel de transações */}
             <BottomSheet data={transactions} type={TypeScreem.Card} />
         </View>

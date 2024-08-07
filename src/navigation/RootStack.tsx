@@ -7,7 +7,7 @@ import LoginScreen from '~/screens/Login';
 import RegisterScreen from '~/screens/Register';
 import ChartList from '~/screens/ChartList';
 import Transactions from '~/screens/Transactions';
-import CardDatails from '~/screens/CardDatails';
+import CardDetails from '~/screens/CardDetails';
 import MonthlyBalance from '~/screens/MonthlyBalance';
 import CategoryGraphic from '~/screens/CategoryGraphic';
 import MainTabNavigator from '~/navigation/MainTabNavigator';
@@ -19,7 +19,7 @@ export type RootStackParamList = {
     Register: undefined;
     ChartList: undefined;
     Transactions: undefined;
-    CardDatails: undefined;
+    CardDetails: undefined;
     MonthlyBalance: undefined;
     CategoryGraphic: undefined;
 };
@@ -61,8 +61,8 @@ export default function RootStack() {
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
-                    name="CardDatails"
-                    component={CardDatails}
+                    name="CardDetails"
+                    component={CardDetails}
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen

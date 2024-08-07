@@ -1,9 +1,7 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-
 import ChartsTabNavigator from '../components/ChartsTabNavigator';
 import MonthlyBalance from '../screens/MonthlyBalance';
 import CategoryGraphic from '../screens/CategoryGraphic';
-
 import React from 'react';
 
 const Tab = createMaterialTopTabNavigator();

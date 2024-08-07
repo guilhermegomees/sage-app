@@ -19,7 +19,7 @@ export default function Tabs() {
         >
             <Tab.Screen name="Accounts" component={Accounts} options={{ tabBarLabel: 'Contas' }} />
             <Tab.Screen name="Goals" component={Goals} options={{ tabBarLabel: 'Metas' }} />
-            <Tab.Screen name="Cards" component={Cards} options={{ tabBarLabel: 'Cartões' }} />
+            {/* <Tab.Screen name="Cards" component={Cards} options={{ tabBarLabel: 'Cartões' }} /> */}
         </Tab.Navigator>
     );
 }

@@ -4,7 +4,7 @@ import { colors } from "../css/colors";
 
 const TabBarHome: React.FC<any> = ({ state, descriptors, navigation }: any) => {
     return (
-        <View style={[styles.container, base.px_30]}>
+        <View style={[styles.container]}>
             <View style={[base.flexRow, base.flexSpaceBetween, base.py_5, base.px_5, base.rounded_95, base.w_100, { height: 58, backgroundColor: colors.gray_800 }]}>
                 {state.routes.map((route: any, index: number) => {
                     const { options } = descriptors[route.key];
@@ -51,12 +51,13 @@ const TabBarHome: React.FC<any> = ({ state, descriptors, navigation }: any) => {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: colors.gray_900,
-        height: 58
+        height: 58,
+        paddingHorizontal: 80
     },
     label: {
         fontFamily: 'Outfit_500Medium',
         fontSize: 16,
-        paddingHorizontal: 20,
+        paddingHorizontal: 30,
         color: colors.gray_50
     }
 })

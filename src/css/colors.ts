@@ -18,6 +18,7 @@ export const colors = {
     blue_300 : '#8AC7FF',
     green_500 : '#2DD148',
     red_500 : '#F03838',
+    orange_500 : '#F37C4A',
     orange_300 : '#EE8B60',
 }
 

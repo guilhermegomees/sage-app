@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import {
     Text,
     View,
@@ -11,12 +12,7 @@ import {
     MaterialIcons,
     useNavigation,
     StackNavigationProp,
-    Platform,
 } from '~/imports';
-
-import { ScrollView, KeyboardAvoidingView } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-
 import DayPicker from '~/components/DayPicker';
 import Slider from '~/components/Slider';
 
@@ -28,7 +24,7 @@ export default function CardDatails() {
     const [cardName, setcardName] = useState(defaultCardName);
 
     const handleNavigateToBack = () => {
-        navigation.navigate('Home');
+        navigation.goBack();
     };
 
     return (

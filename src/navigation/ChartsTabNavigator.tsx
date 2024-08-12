@@ -6,7 +6,7 @@ import React from 'react';
 
 const Tab = createMaterialTopTabNavigator();
 
-export default function Tabs() {
+export default function ChartsTab() {
     return (
         <Tab.Navigator
             tabBar={(props) => <ChartsTabNavigator {...props} />}

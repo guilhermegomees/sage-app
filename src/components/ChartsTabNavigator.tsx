@@ -74,8 +74,10 @@ export function ChartsTabNavigator({ state, descriptors, navigation }: CustomTab
 
 const styles = StyleSheet.create({
     container: {
+        backgroundColor: colors.gray_900,
         justifyContent: 'center',
         alignItems: 'center',
+        paddingTop: 15
     },
     content: {
         marginBottom: Platform.OS === 'ios' ? 20 : 6,

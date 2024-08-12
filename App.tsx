@@ -1,7 +1,6 @@
-import { StatusBar } from 'react-native';
+import { StatusBar, View, Image, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import RootStack from '~/navigation/RootStack';
 import colors from '~/css/colors';
-
 import {
   useFonts,
   Outfit_600SemiBold,

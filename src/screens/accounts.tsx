@@ -2,20 +2,15 @@ import { Text, View, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { colors } from '../css/colors';
 import { base } from '../css/base';
 import React, { useEffect, useState } from 'react';
-
 import { TypeScreem } from '~/enums';
-
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-
-// Icons
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-
 import BottomSheet from '~/components/BottomSheet';
-
 import { api } from '~/server/api'
 import { ITransaction } from '~/interfaces';
+import Header from '~/components/Header';
 
 // Formatar valores com duas casas decimais
 function formatValue(value: number): string {
@@ -88,83 +83,82 @@ export default function Accounts() {
         }
     }
 
-    const handleNavigateToGraphic = () => {
-        navigation.navigate('Graphic');
-    };
-
-    const handleNavigateToTransactions = () => {
-        navigation.navigate('Transactions');
+    const handleNavigateToNewTransaction = () => {
+        navigation.navigate('NewTransaction');
     };
 
     return (
-        <View style={[styles.container, base.flex_1, base.alignItemsCenter, base.pt_25, base.gap_10]}>
-            {/* Conta */}
-            <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_8]}>
-                {/* TODO: Aplicar nome da carteira vindo do data */}
-                <Text style={[styles.textWallet]}>[Wallet]</Text>
-                <View style={[styles.containerRetweet, base.alignItemsCenter, base.justifyContentCenter]}>
-                    <FontAwesome6 name='repeat' color={colors.white} size={12} />
-                </View>
-            </View>
-            {/* Valores */}
-            <View style={[base.flexColumn, base.alignItemsCenter, base.justifyContentCenter, base.gap_8, base.mb_10]}>
-                {/* TODO: Aplicar valor da conta vindo do data */}
-                <Text style={[styles.textValue]}>{formatValue(totalIncome - totalExpenses)}</Text>
-                <View style={[base.alignItemsCenter, base.justifyContentCenter, base.flexRow, base.gap_15]}>
-                    <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_5]}>
-                        <FontAwesome name='caret-up' color={colors.green_500} size={20} />
-                        <Text style={[styles.textValueEntrance]}>{formatValue(totalIncome)}</Text>
-                    </View>
-                    <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_5]}>
-                        <FontAwesome name='caret-down' color={colors.red_500} size={20} />
-                        <Text style={[styles.textValueOutPut]}>{formatValue(totalExpenses)}</Text>
+        <>
+            <Header />
+            <View style={[styles.container, base.flex_1, base.alignItemsCenter, base.pt_10, base.gap_10]}>
+                {/* Conta */}
+                <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_8]}>
+                    {/* TODO: Aplicar nome da carteira vindo do data */}
+                    <Text style={[styles.textWallet]}>[Wallet]</Text>
+                    <View style={[styles.containerRetweet, base.alignItemsCenter, base.justifyContentCenter]}>
+                        <FontAwesome6 name='repeat' color={colors.white} size={12} />
                     </View>
                 </View>
-            </View>
-            {/* Botões de ação */}
-            <View style={[styles.buttonsActionsContainer]}>
-                <View style={[styles.buttonAction]}>
-                    <TouchableOpacity>
-                        <View style={[styles.button]}>
-                            <Image source={require('./../assets/images/dolar.png')} style={styles.iconButtonAction} />
+                {/* Valores */}
+                <View style={[base.flexColumn, base.alignItemsCenter, base.justifyContentCenter, base.gap_8, base.mb_10]}>
+                    {/* TODO: Aplicar valor da conta vindo do data */}
+                    <Text style={[styles.textValue]}>{formatValue(totalIncome - totalExpenses)}</Text>
+                    <View style={[base.alignItemsCenter, base.justifyContentCenter, base.flexRow, base.gap_15]}>
+                        <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_5]}>
+                            <FontAwesome name='caret-up' color={colors.green_500} size={20} />
+                            <Text style={[styles.textValueEntrance]}>{formatValue(totalIncome)}</Text>
                         </View>
-                    </TouchableOpacity>
-                    <Text style={[styles.textBtnsActions]}>Registrar</Text>
+                        <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_5]}>
+                            <FontAwesome name='caret-down' color={colors.red_500} size={20} />
+                            <Text style={[styles.textValueOutPut]}>{formatValue(totalExpenses)}</Text>
+                        </View>
+                    </View>
                 </View>
-                <View style={[styles.buttonAction]}>
-                    <TouchableOpacity>
-                        <View style={[styles.button]}>
-                            <Image source={require('./../assets/images/balance.png')} style={[styles.iconBalanceButtonAction]} />
-                        </View>
-                    </TouchableOpacity>
-                    <Text style={[styles.textBtnsActions]}>Balancear</Text>
+                {/* Botões de ação */}
+                <View style={[styles.buttonsActionsContainer]}>
+                    <View style={[styles.buttonAction]}>
+                        <TouchableOpacity onPress={handleNavigateToNewTransaction}>
+                            <View style={[styles.button]}>
+                                <Image source={require('./../assets/images/dolar.png')} style={styles.iconButtonAction} />
+                            </View>
+                        </TouchableOpacity>
+                        <Text style={[styles.textBtnsActions]}>Registrar</Text>
+                    </View>
+                    <View style={[styles.buttonAction]}>
+                        <TouchableOpacity>
+                            <View style={[styles.button]}>
+                                <Image source={require('./../assets/images/balance.png')} style={[styles.iconBalanceButtonAction]} />
+                            </View>
+                        </TouchableOpacity>
+                        <Text style={[styles.textBtnsActions]}>Balancear</Text>
+                    </View>
+                    {/* <View style={[styles.buttonAction]}>
+                        <TouchableOpacity onPress={handleNavigateToGraphic}>
+                            <View style={[styles.button]}>
+                            <Image source={require('./../assets/images/chart-pie.png')} style={[styles.iconButtonAction]} />
+                            </View>
+                        </TouchableOpacity>
+                        <Text style={[styles.textBtnsActions]}>Gráfico</Text>
+                    </View> */}
+                    {/* <View style={[styles.buttonAction]}>
+                        <TouchableOpacity onPress={handleNavigateToTransactions}>
+                            <View style={[styles.button]}>
+                                <Image source={require('./../assets/images/money-transactions.png')} style={styles.iconButtonAction} />
+                            </View>
+                        </TouchableOpacity>
+                        <Text style={[styles.textBtnsActions]}>Transações</Text>
+                    </View> */}
                 </View>
-                {/* <View style={[styles.buttonAction]}>
-                    <TouchableOpacity onPress={handleNavigateToGraphic}>
-                        <View style={[styles.button]}>
-                        <Image source={require('./../assets/images/chart-pie.png')} style={[styles.iconButtonAction]} />
-                        </View>
-                    </TouchableOpacity>
-                    <Text style={[styles.textBtnsActions]}>Gráfico</Text>
-                </View> */}
-                {/* <View style={[styles.buttonAction]}>
-                    <TouchableOpacity onPress={handleNavigateToTransactions}>
-                        <View style={[styles.button]}>
-                            <Image source={require('./../assets/images/money-transactions.png')} style={styles.iconButtonAction} />
-                        </View>
-                    </TouchableOpacity>
-                    <Text style={[styles.textBtnsActions]}>Transações</Text>
-                </View> */}
+                {/* Painel de transações */}
+                <BottomSheet data={data} type={TypeScreem.Account} />
             </View>
-            {/* Painel de transações */}
-            <BottomSheet data={data} type={TypeScreem.Account} />
-        </View>
+        </>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: colors.gray_900
+        backgroundColor: colors.gray_900,
     },
     textWallet: {
         fontFamily: 'Outfit_500Medium',

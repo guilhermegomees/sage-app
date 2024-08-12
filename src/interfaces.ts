@@ -9,10 +9,11 @@ export interface ITransaction {
     wallet: number;
 }
 
-export type IRevenue = {
-  	id: string;
-  	label: string;
-  	value: number;
-  	color: string;
-  	date: string;
-};
+export interface IGoal {
+    id: number;
+    name: string;
+    currentValue: number;
+    goalValue: number;
+    icon: any;
+    isCompleted: boolean;
+}

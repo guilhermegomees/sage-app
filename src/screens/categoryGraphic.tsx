@@ -4,7 +4,7 @@ import { Text, View, StyleSheet, colors, base, StackNavigationProp } from '~/imp
 import { FlatList } from 'react-native';
 import { EXPENSES } from '../../utils/transactions';
 import { Card, CardProps } from '../components/Card';
-import { Header, MonthsProps } from '../components/Header';
+import { Header, MonthsProps } from '../components/Header/index';
 import { useNavigation } from '@react-navigation/native';
 
 type CategoryGraphicScreenNavigationProp = StackNavigationProp<any, 'CategoryGraphic'>;

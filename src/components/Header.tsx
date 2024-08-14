@@ -1,11 +1,27 @@
 // src/components/Header.tsx
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Image, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { MaterialIcons } from '~/imports';
+import { MaterialIcons, useNavigation } from '~/imports';
 import colors from '~/css/colors';
 import { base } from '~/imports';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { HeaderContext } from '~/context/HeaderContext';
+
+type HeaderScreenNavigationProp = StackNavigationProp<any, 'Header'>;
 
 export default function Header() {
+    const navigation = useNavigation<HeaderScreenNavigationProp>();
+
+    const { showValues, setShowValues } = useContext(HeaderContext);
+
+    const handleNavigateToNewTransaction = () => {
+        navigation.navigate('NewTransaction');
+    };
+
+    const toggleShowValues = () => {
+        setShowValues(!showValues);
+    }
+
     return (
         <View style={[base.flexRow, base.flexSpaceBetween, base.alignItemsCenter, base.px_30, styles.container]}>
             <View style={[base.flexRow, base.alignItemsCenter, base.gap_12,]}>
@@ -15,8 +31,13 @@ export default function Header() {
                 </View>
             </View>
             <View style={[base.flexRow, base.gap_20]}>
-                <MaterialIcons name='visibility' size={28} color={colors.gray_50} />
-                <TouchableOpacity >
+                <TouchableOpacity onPress={toggleShowValues}>
+                    <MaterialIcons
+                        name={showValues ? 'visibility' : 'visibility-off'}
+                        size={28}
+                        color={colors.gray_50} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleNavigateToNewTransaction}>
                     <MaterialIcons name='add' size={28} color={colors.gray_50} />
                 </TouchableOpacity>
             </View>

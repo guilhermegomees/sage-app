@@ -1,7 +1,7 @@
 import { Text, View, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { colors } from '../css/colors';
 import { base } from '../css/base';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { TypeScreem } from '~/enums';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -11,6 +11,7 @@ import BottomSheet from '~/components/BottomSheet';
 import { api } from '~/server/api'
 import { ITransaction } from '~/interfaces';
 import Header from '~/components/Header';
+import { HeaderContext } from '~/context/HeaderContext';
 
 // Formatar valores com duas casas decimais
 function formatValue(value: number): string {
@@ -36,6 +37,8 @@ type AccountsScreenNavigationProp = StackNavigationProp<any, 'Accounts'>;
 export default function Accounts() {
     const navigation = useNavigation<AccountsScreenNavigationProp>();
 
+    const { showValues } = useContext(HeaderContext);
+    
     const [data, setData] = useState<ITransaction[]>([]);
     // const userId = 2; // TODO: Trazer id com base no usuário logado
     // const wallet = 2; // TODO: Trazer id da wallet com base na carteira selecionada
@@ -71,7 +74,7 @@ export default function Accounts() {
         setData(transactions);
     }, []);
 
-    // Calcular o total de entradas e saídas para a wallet específica
+    // TODO: Calcular o total de entradas e saídas para a wallet específica
     let totalExpenses = 0;
     let totalIncome = 0;
 
@@ -102,15 +105,15 @@ export default function Accounts() {
                 {/* Valores */}
                 <View style={[base.flexColumn, base.alignItemsCenter, base.justifyContentCenter, base.gap_8, base.mb_10]}>
                     {/* TODO: Aplicar valor da conta vindo do data */}
-                    <Text style={[styles.textValue]}>{formatValue(totalIncome - totalExpenses)}</Text>
+                    <Text style={[styles.textValue, !showValues && styles.hideValues]}> {formatValue(totalIncome - totalExpenses)} </Text>
                     <View style={[base.alignItemsCenter, base.justifyContentCenter, base.flexRow, base.gap_15]}>
                         <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_5]}>
                             <FontAwesome name='caret-up' color={colors.green_500} size={20} />
-                            <Text style={[styles.textValueEntrance]}>{formatValue(totalIncome)}</Text>
+                            <Text style={[styles.textValueEntrance, !showValues && styles.hideValues, styles.shortText]}>{formatValue(totalIncome)}</Text>
                         </View>
                         <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_5]}>
                             <FontAwesome name='caret-down' color={colors.red_500} size={20} />
-                            <Text style={[styles.textValueOutPut]}>{formatValue(totalExpenses)}</Text>
+                            <Text style={[styles.textValueOutPut, !showValues && styles.hideValues, styles.shortText]}>{formatValue(totalExpenses)}</Text>
                         </View>
                     </View>
                 </View>
@@ -132,22 +135,6 @@ export default function Accounts() {
                         </TouchableOpacity>
                         <Text style={[styles.textBtnsActions]}>Balancear</Text>
                     </View>
-                    {/* <View style={[styles.buttonAction]}>
-                        <TouchableOpacity onPress={handleNavigateToGraphic}>
-                            <View style={[styles.button]}>
-                            <Image source={require('./../assets/images/chart-pie.png')} style={[styles.iconButtonAction]} />
-                            </View>
-                        </TouchableOpacity>
-                        <Text style={[styles.textBtnsActions]}>Gráfico</Text>
-                    </View> */}
-                    {/* <View style={[styles.buttonAction]}>
-                        <TouchableOpacity onPress={handleNavigateToTransactions}>
-                            <View style={[styles.button]}>
-                                <Image source={require('./../assets/images/money-transactions.png')} style={styles.iconButtonAction} />
-                            </View>
-                        </TouchableOpacity>
-                        <Text style={[styles.textBtnsActions]}>Transações</Text>
-                    </View> */}
                 </View>
                 {/* Painel de transações */}
                 <BottomSheet data={data} type={TypeScreem.Account} />
@@ -280,5 +267,16 @@ const styles = StyleSheet.create({
     iconBalanceButtonAction: {
         width: 28,
         height: 26
+    },
+    shortText: {
+        textShadowRadius: 20,
+    },
+    hideValues: {
+        textShadowColor: colors.gray_900,
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 40,
+        backgroundColor: colors.gray_500,
+        borderRadius: 5,
+        color: 'transparent'
     }
 })

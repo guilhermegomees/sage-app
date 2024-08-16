@@ -96,7 +96,10 @@ const MainTabNavigator: React.FC<BottomSheetProps> = ({ data, type }) => {
             }
             {type == TypeScreem.Account && <Text style={[styles.latestTransactions]}>Últimas transações</Text>}
             {Object.keys(groupedTransactions).length > 0 && (
-                <ScrollView showsVerticalScrollIndicator={false}>
+                <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={{paddingBottom: 60}}
+                >
                     {Object.entries(groupedTransactions).map(([date, transactionsForDate]) => {
                         // Calcula o valor total das transações para a data
                         const totalValue = transactionsForDate.reduce((acc, transaction) => {
@@ -150,19 +153,21 @@ const MainTabNavigator: React.FC<BottomSheetProps> = ({ data, type }) => {
                     })}
                 </ScrollView>
             )}
-            <View style={[base.justifyContentCenter, base.alignItemsCenter, base.flex_1]}>
-                {Object.keys(groupedTransactions).length === 0 && (
+            {Object.keys(groupedTransactions).length === 0 && (
+                <View style={[
+                    base.justifyContentCenter, base.alignItemsCenter, base.flex_1,
+                    { paddingBottom: type == TypeScreem.Graphics ? 70 : 0 },
+                ]}>
                     <View style={[base.justifyContentCenter, base.alignItemsCenter, base.gap_15]}>
-                        {/* <FontAwesome5 name="box-open" size={80} color={colors.gray_100} /> */}
-                        <Image source={require('./../assets/images/bankrupt.png')} tintColor={colors.gray_100} style={{width: 70, height: 70}}/>
+                        <Image source={require('./../assets/images/bankrupt.png')} tintColor={colors.gray_100} style={{width: 65, height: 65}}/>
                         <Text style={styles.noTransactionsMessage}>
                             {type == TypeScreem.Graphics 
                                 ? 'Sem transações por aqui!'
                                 : 'Parece que você ainda não fez nenhuma transação ou nenhuma transação foi encontrada!'}
                         </Text>
                     </View>
-                )}
-            </View>
+                </View>
+            )}
         </View>
     );
 };

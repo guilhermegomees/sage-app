@@ -275,19 +275,13 @@ export default function EntryExitGraphic() {
 
     return (
         <View style={[styles.container, base.flex_1]}>
-            {/* <View style={[styles.containerBack]}>
-                <TouchableOpacity onPress={handleNavigateToBack}>
-                    <MaterialIcons name="chevron-left" size={30} color={colors.gray_50} />
-                </TouchableOpacity>
-                <Text style={[styles.title]}>Balanço mensal</Text>
-            </View> */}
             <PeriodSelector
                 currentPeriod={getPeriodFormated(currentPeriod)}
                 onPrevPeriod={handlePrevPeriod}
                 onNextPeriod={handleNextPeriod}
             />
             <View style={[styles.chartContainer]}>
-                <VictoryChart theme={VictoryTheme.material} domainPadding={40} padding={{ top: 0, bottom: 100, left: 80, right: 20 }}>
+                <VictoryChart theme={VictoryTheme.material} domainPadding={40} height={290} padding={{ top: 0, bottom: 40, left: 80, right: 20 }}>
                     <VictoryAxis
                         tickValues={[1, 3, 5]}
                         tickCount={3}
@@ -340,20 +334,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         flex: 1,
     },
-    containerBack: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 30,
-        marginBottom: 15,
-    },
-    title: {
-        fontFamily: 'Outfit_600SemiBold',
-        color: colors.gray_50,
-        fontSize: 20,
-        marginLeft: 10,
-    },
     chartContainer: {
-        flex: 1,
         alignItems: 'center',
     },
 });

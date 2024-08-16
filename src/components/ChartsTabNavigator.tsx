@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
         paddingTop: 15
     },
     content: {
-        marginBottom: Platform.OS === 'ios' ? 20 : 6,
+        marginBottom: Platform.OS === 'ios' ? 14 : 3,
         justifyContent: 'center',
         alignItems: 'center',
         bottom: 0,

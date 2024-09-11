@@ -25,9 +25,8 @@ export default function Header() {
     return (
         <View style={[base.flexRow, base.flexSpaceBetween, base.alignItemsCenter, base.px_30, styles.container]}>
             <View style={[base.flexRow, base.alignItemsCenter, base.gap_12,]}>
-                <Image source={require('./../assets/images/user-circle.png')} style={styles.iconUser} />
                 <View style={[base.gap_4]}>
-                    <Text style={styles.text}>[Nome]</Text>
+                    <Text style={styles.text}>Olá [Nome]</Text>
                 </View>
             </View>
             <View style={[base.flexRow, base.gap_20]}>
@@ -53,7 +52,7 @@ const styles = StyleSheet.create({
     text: {
         fontFamily: 'Outfit_500Medium',
         color: colors.gray_50,
-        fontSize: 14,
+        fontSize: 16,
         lineHeight: 20,
     },
     iconUser: {

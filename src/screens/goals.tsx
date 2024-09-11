@@ -12,7 +12,6 @@ import {
     MaterialIcons,
     colors,
     base,
-    TouchableWithoutFeedback
 } from '../imports';
 import { Modal } from 'react-native';
 

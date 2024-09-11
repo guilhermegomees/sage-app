@@ -1,22 +1,24 @@
 import React from "react";
-import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
-
-import { Container, Title } from './styles';
-
-import { MONTHS } from '../../../utils/months';
+import { TouchableOpacity, View, Text, StyleSheet, ScrollView } from 'react-native';
+import { MONTHS } from '../../utils/months';
 import { base, colors } from "~/imports";
 
-export type MonthsProps = "Janeiro" | "Fevereiro" | "Março";
+export type MonthsProps = "Janeiro" | "Fevereiro" | "Março" | "Abril" | "Maio" | "Junho" | "Julho" | "Agosto" | "Setembro" | "Outubro" | "Novembro" | "Dezembro";
 
 type Props = {
 	selectedValue: MonthsProps;
 	onValueChange: (value: MonthsProps) => void;
 }
 
-export function Header({ selectedValue, onValueChange }: Props) {
+export function MonthSelector({ selectedValue, onValueChange }: Props) {
 	return (
-		<Container>
-			<View style={styles.buttonContainer}>
+		<View style={[styles.container]}>
+			<ScrollView
+				contentContainerStyle={styles.scrollContainer}
+				showsVerticalScrollIndicator={false}
+				showsHorizontalScrollIndicator={false}
+				horizontal={true}
+			>
 				{
 					MONTHS.map(item => (
 						<TouchableOpacity
@@ -36,13 +38,21 @@ export function Header({ selectedValue, onValueChange }: Props) {
 						</TouchableOpacity>
 					))
 				}
-			</View>
-		</Container>
+			</ScrollView>
+		</View>
 	);
 }
 
 const styles = StyleSheet.create({
-	buttonContainer: {
+	container: {
+		width: '100%',
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		marginBottom: 16,
+		overflow: 'hidden',
+	},
+	scrollContainer: {
 		flexDirection: 'row',
 		flexWrap: 'wrap',
 		justifyContent: 'center',

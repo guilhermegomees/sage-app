@@ -11,49 +11,30 @@ import {
     ITransaction,
     Image
 } from '~/imports';
+import { monthsList } from '~/utils/monthsList';
 
 interface BottomSheetProps {
     data: ITransaction[];
     type: TypeScreem;
 }
 
-// Array com os nomes dos meses
-const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+const monthNames = monthsList.map(month => month.substring(0, 3));
 
 function formatValue(value: number, isExpense: number): string {
-    let valueStr = value.toString();
+    const valueStr = value.toString().replace('.', ',');
     const minus = isExpense ? '- ' : '';
-
-    // existe ponto decimal
-    if(value.toString().includes('.')){
-        const regex = /^\d+\.\d$/;
-        regex.test(valueStr) ? valueStr = valueStr.replace('.', ',') + '0' : valueStr = valueStr.replace('.', ',');
-    } else {
-        valueStr = valueStr;
-    }
-
-    return minus + 'R$ ' + valueStr;
+    return `${minus}R$ ${valueStr}`;
 }
 
-// TODO: Refatorar
 function formatDate(dateStr: string, type: TypeScreem): any {
-    let date;
-
     if (type == TypeScreem.Graphics) {
-        const transactionDate = new Date(dateStr);
-        const month = transactionDate.getMonth();
-        const monthName = monthNames[month];
-        const year = transactionDate.getFullYear();
-        date = `${monthName}. ${year}`;
-    } else {
-        const transactionDate = dateStr.split('/');
-        const day = transactionDate[1].length == 1 ? '0' + transactionDate[1] : transactionDate[1];
-        const month = transactionDate[0].length == 1 ? '0' + transactionDate[0] : transactionDate[0];
-        const year = transactionDate[2];
-        date = `${day}/${month}/${year}`;
-    }
-    
-    return date;
+        const [year, month] = dateStr.split('-').map(Number);
+        const monthName = monthNames[month - 1];
+        return `${monthName}. ${year}`;
+    } 
+
+    const [month, day, year] = dateStr.split('/').map(part => part.padStart(2, '0'));
+    return `${day}/${month}/${year}`;
 }
 
 const MainTabNavigator: React.FC<BottomSheetProps> = ({ data, type }) => {
@@ -64,7 +45,7 @@ const MainTabNavigator: React.FC<BottomSheetProps> = ({ data, type }) => {
         if (type == TypeScreem.Graphics) {
             // Agrupar por mês
             const transactionDate = new Date(transaction.date);
-            const month = transactionDate.getMonth() + 1; // Meses são baseados em zero em JavaScript
+            const month = transactionDate.getMonth() + 1;
             const year = transactionDate.getFullYear();
             date = `${year}-${month < 10 ? '0' : ''}${month}`; // Formato YYYY-MM
         } else {

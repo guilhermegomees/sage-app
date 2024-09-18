@@ -103,24 +103,31 @@ function filterTransactionsByPeriod(transactions: ITransaction[], [startMonth, e
 export default function MonthlyBalance() {
     // Dados de receitas e despesas
     const transactions: ITransaction[] = [
-        { id: 1, description: "Salário", value: 3000, date: '2024-01-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
-        { id: 2, description: "Pix", value: 550, date: '2024-01-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
-        { id: 12, description: "Pix", value: 400, date: '2024-01-03T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1 },
-        { id: 14, description: "Pix", value: 3200, date: '2024-01-04T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1 },
-        { id: 3, description: "Salário", value: 3000, date: '2024-02-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
-        { id: 4, description: "Pix", value: 800, date: '2024-02-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
-        { id: 13, description: "Pix", value: 400, date: '2024-02-03T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1 },
-        { id: 5, description: "Salário", value: 3000, date: '2024-03-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
-        { id: 6, description: "Pix", value: 1500, date: '2024-03-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
-        { id: 7, description: "Pix", value: 1500, date: '2024-03-03T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1 },
-        { id: 8, description: "Pix", value: 2000, date: '2024-04-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
-        { id: 9, description: "Pix", value: 1500, date: '2024-04-03T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1 },
-        { id: 10, description: "Pix 1", value: 2000, date: '2024-06-03T03:00:00.000Z', isExpense: 0, icon: 'star', wallet: 1 },
-        { id: 11, description: "Pix 1", value: 1500, date: '2024-06-03T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1 },
-        { id: 15, description: "Pix 1", value: 15000, date: '2024-07-03T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1 },
-        { id: 16, description: "Pix 1", value: 15001, date: '2024-08-03T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1 },
-        { id: 17, description: "Pix 1", value: 15002, date: '2024-09-03T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1 },
-        { id: 18, description: "Pix 1", value: 15003, date: '2024-10-03T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1 },
+        { id: 1, description: "Salário", value: 5000, date: '2024-09-01T03:00:00.000Z', isExpense: 0, icon: 'briefcase', wallet: 1 },
+        { id: 2, description: "Pagamento de aluguel", value: 1200, date: '2024-09-03T03:00:00.000Z', isExpense: 1, icon: 'home', wallet: 1 },
+        { id: 3, description: "Supermercado", value: 450, date: '2024-09-03T03:00:00.000Z', isExpense: 1, icon: 'shopping-cart', wallet: 1 },
+        { id: 4, description: "Pix - Reembolso", value: 150, date: '2024-09-05T03:00:00.000Z', isExpense: 0, icon: 'dollar-sign', wallet: 1 },
+        { id: 5, description: "Restaurante", value: 200, date: '2024-09-05T03:00:00.000Z', isExpense: 1, icon: 'utensils', wallet: 1 },
+        { id: 6, description: "Conta de luz", value: 180, date: '2024-09-08T03:00:00.000Z', isExpense: 1, icon: 'bolt', wallet: 1 },
+        { id: 7, description: "Academia", value: 100, date: '2024-09-08T03:00:00.000Z', isExpense: 1, icon: 'dumbbell', wallet: 1 },
+        { id: 8, description: "Pix - Transferência poupança", value: 500, date: '2024-09-10T03:00:00.000Z', isExpense: 1, icon: 'piggy-bank', wallet: 2 },
+        { id: 9, description: "Bônus anual", value: 1500, date: '2024-09-10T03:00:00.000Z', isExpense: 0, icon: 'gift', wallet: 1 },
+        { id: 10, description: "Manutenção do carro", value: 400, date: '2024-09-12T03:00:00.000Z', isExpense: 1, icon: 'wrench', wallet: 1 },
+        { id: 11, description: "Jantar especial", value: 250, date: '2024-09-12T03:00:00.000Z', isExpense: 1, icon: 'wine-glass', wallet: 1 },
+        { id: 12, description: "Consultoria freelance", value: 800, date: '2024-09-15T03:00:00.000Z', isExpense: 0, icon: 'laptop', wallet: 2 },
+        { id: 13, description: "Doação para caridade", value: 100, date: '2024-09-15T03:00:00.000Z', isExpense: 1, icon: 'heart', wallet: 1 },
+        { id: 14, description: "Salário", value: 5000, date: '2024-08-01T03:00:00.000Z', isExpense: 0, icon: 'briefcase', wallet: 1 },
+        { id: 15, description: "Pagamento de aluguel", value: 1200, date: '2024-08-03T03:00:00.000Z', isExpense: 1, icon: 'home', wallet: 1 },
+        { id: 16, description: "Compras online", value: 600, date: '2024-08-05T03:00:00.000Z', isExpense: 1, icon: 'shopping-cart', wallet: 1 },
+        { id: 17, description: "Academia", value: 100, date: '2024-08-08T03:00:00.000Z', isExpense: 1, icon: 'dumbbell', wallet: 1 },
+        { id: 18, description: "Supermercado", value: 400, date: '2024-08-08T03:00:00.000Z', isExpense: 1, icon: 'shopping-cart', wallet: 1 },
+        { id: 19, description: "Cinema", value: 80, date: '2024-08-10T03:00:00.000Z', isExpense: 1, icon: 'film', wallet: 1 },
+        { id: 20, description: "Pix - Empréstimo amigo", value: 500, date: '2024-08-12T03:00:00.000Z', isExpense: 1, icon: 'users', wallet: 1 },
+        { id: 21, description: "Salário", value: 5000, date: '2024-07-01T03:00:00.000Z', isExpense: 0, icon: 'briefcase', wallet: 1 },
+        { id: 22, description: "Supermercado", value: 350, date: '2024-07-03T03:00:00.000Z', isExpense: 1, icon: 'shopping-cart', wallet: 1 },
+        { id: 23, description: "Academia", value: 100, date: '2024-07-08T03:00:00.000Z', isExpense: 1, icon: 'dumbbell', wallet: 1 },
+        { id: 24, description: "Restaurante", value: 180, date: '2024-07-08T03:00:00.000Z', isExpense: 1, icon: 'utensils', wallet: 1 },
+        { id: 25, description: "Conta de celular", value: 90, date: '2024-07-12T03:00:00.000Z', isExpense: 1, icon: 'phone', wallet: 1 },
     ];
 
     // Iniciar o currentPeriod de acordo com o trimestre atual
@@ -172,6 +179,12 @@ export default function MonthlyBalance() {
         };
 
         const key = `${startMonth}-${endMonth}`;
+
+        // Verifica se o key existe em quarters
+        if (!quarters[key]) {
+            return '';
+        }
+
         const [index1, index2, index3] = quarters[key];
         const index = monthIndex === 1 ? index1 : monthIndex === 3 ? index2 : index3;
 

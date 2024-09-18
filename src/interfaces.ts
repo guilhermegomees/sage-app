@@ -3,7 +3,7 @@ export interface ITransaction {
     description: string;
     date: string;
     category?: ICategory;
-    icon: string;
+    icon?: string;
     isExpense: number;
     value: number;
     wallet: number;

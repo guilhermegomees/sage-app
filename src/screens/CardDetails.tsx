@@ -1,35 +1,72 @@
-import { useState } from 'react';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import React, { useRef, useState } from 'react';
+import Input from '~/components/Input';
+import { Dropdown } from 'react-native-element-dropdown';
 import {
     Text,
     View,
-    TextInput,
     StyleSheet,
     TouchableOpacity,
     colors,
     base,
     Image,
     MaterialIcons,
+    FontAwesome5,
     useNavigation,
     StackNavigationProp,
+    Dimensions,
 } from '~/imports';
-import DayPicker from '~/components/DayPicker';
-import Slider from '~/components/Slider';
+import Overlay from '~/components/Overlay';
+
+const { width, height } = Dimensions.get('window');
 
 type CardDatailsScreenNavigationProp = StackNavigationProp<any, 'CardDatails'>;
 
 export default function CardDatails() {
     const navigation = useNavigation<CardDatailsScreenNavigationProp>();
-    const defaultCardName = "Cartão 1"; // TODO: Trazer nome do cartão do banco de dados
-    const [cardName, setcardName] = useState(defaultCardName);
+    const [cardName, setCardName] = useState("Cartão 1"); // TODO: Trazer nome do cartão do banco de dados
+    const [limit, setLimit] = useState<number>();
+    const [closingDay, setClosingDay] = useState<{ label: string; value: number }>({ label: '1', value: 1 });
+    const [expirationDay, setExpirationDay] = useState<{ label: string; value: number }>({ label: '5', value: 5 });
+    const [overlay, setOverley] = useState(false);
+    const closingRef = useRef<any>(null);
+    const expirationRef = useRef<any>(null);
+
+    const days = Array.from({ length: 31 }, (_, index) => ({
+        label: `${index + 1}`,
+        value: index + 1,
+    }));
 
     const handleNavigateToBack = () => {
         navigation.goBack();
     };
 
+    // formatar valor do input
+    const formatValueInput = (value: any) => {
+        if (!value) return;
+
+        const parsedValue = parseFloat(value.toString().replace(/[^0-9]/g, ''));
+        return `R$ ${!isNaN(parsedValue) ? parsedValue.toLocaleString('pt-BR') : ''}`;
+    };
+
+    const renderItem = (item: { label: string; value: number }) => {
+        return (
+            <View style={[styles.dayOption]}>
+                <Text style={styles.itemText}>{item.label}</Text>
+            </View>
+        );
+    };
+
+    const expandClosingDropdown = () => {
+        closingRef.current?.open();
+    };
+
+    const expandExpirationDropdown = () => {
+        expirationRef.current?.open();
+    };
+
     return (
-        <KeyboardAwareScrollView style={[styles.container, base.flex_1]}>
-            <View style={[base.px_30]}>
+        <View style={[styles.container, base.flex_1]}>
+            <View style={[base.px_30, base.alignItemsCenter]}>
                 {/* Seta para voltar */}
                 <View style={[styles.containerBack]}>
                     <TouchableOpacity onPress={handleNavigateToBack}>
@@ -55,38 +92,95 @@ export default function CardDatails() {
                     </View>
                 </View>
                 {/* Inputs */}
-                <View style={[base.mt_30, base.gap_25]}>
-                    <View style={[styles.input]}>
-                        <TextInput
-                            style={styles.inputText}
-                            placeholder="Nome do cartão"
-                            placeholderTextColor="#F8F1F1"
-                            onChangeText={(name) => setcardName(name)}
-                            value={cardName}
-                            maxLength={25}
+                <View style={[base.mt_30, base.gap_15, base.w_100]}>
+                    <Input 
+                        style={styles.input}
+                        placeholder="Nome do cartão"
+                        placeholderTextColor="#F8F1F1"
+                        onChangeText={(name: string) => setCardName(name)}
+                        value={cardName}
+                        maxLength={25}
+                        overlay={(value: boolean) => setOverley(value)}
+                    />
+                    <Input
+                        style={styles.input}
+                        keyboardType="numeric"
+                        placeholder="Limite do cartão"
+                        placeholderTextColor="#F8F1F1"
+                        onChangeText={(limit: number) => setLimit(limit)}
+                        value={formatValueInput(limit)}
+                        maxLength={14}
+                        overlay={(value: boolean) => setOverley(value)}
+                    />
+                    <TouchableOpacity style={styles.dropdown} activeOpacity={1} onPress={expandClosingDropdown}>
+                        <Text style={[styles.inputText]}>Dia do fechamento</Text>
+                        <Dropdown
+                            ref={closingRef}
+                            style={[base.h_100, {width: 50}]}
+                            selectedTextStyle={styles.selectedTextStyle}
+                            placeholderStyle={styles.placeholderStyle}
+                            containerStyle={styles.dropdownContainer}
+                            showsVerticalScrollIndicator={false}
+                            maxHeight={190}
+                            value={closingDay}
+                            data={days}
+                            valueField="value"
+                            labelField="label"
+                            placeholder={''}
+                            onChange={item => setClosingDay(item)}
+                            renderRightIcon={() => (
+                                <FontAwesome5
+                                    name="calendar-day"
+                                    color={colors.gray_100}
+                                    size={20}
+                                />
+                            )}
+                            renderItem={renderItem}
                         />
-                    </View>
-                    <DayPicker />
-                </View>
-                {/* Slider */}
-                <View style={[styles.sliderContainer]}>
-                    <Slider />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.dropdown} activeOpacity={1} onPress={expandExpirationDropdown}>
+                        <Text style={[styles.inputText]}>Dia do vencimento</Text>
+                        <Dropdown
+                            ref={expirationRef}
+                            style={[base.h_100, { width: 50 }]}
+                            selectedTextStyle={styles.selectedTextStyle}
+                            placeholderStyle={styles.placeholderStyle}
+                            containerStyle={styles.dropdownContainer}
+                            showsVerticalScrollIndicator={false}
+                            maxHeight={190}
+                            value={expirationDay}
+                            data={days}
+                            valueField="value"
+                            labelField="label"
+                            placeholder={''}
+                            onChange={item => setExpirationDay(item)}
+                            renderRightIcon={() => (
+                                <FontAwesome5
+                                    name="calendar-check"
+                                    color={colors.gray_100}
+                                    size={20}
+                                />
+                            )}
+                            renderItem={renderItem}
+                        />
+                    </TouchableOpacity>
                 </View>
                 {/* Botões */}
                 <View style={[styles.buttonContainer]}>
                     <TouchableOpacity style={[styles.button, styles.btnCardRegister]}>
-                        <Text style={[styles.btnText]}>Registrar cartão</Text>
+                        <Text style={[styles.btnText]}>Salvar</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.button, styles.btnCancel]}>
                         <Text style={[styles.btnText]}>Cancelar</Text>
                     </TouchableOpacity>
                 </View>
             </View>
-            <Image
+            {/* <Image
                 source={require('../assets/images/imgFooter.png')}
                 style={styles.backgroundImage}
-            />
-        </KeyboardAwareScrollView>
+            /> */}
+            {overlay && <Overlay style={[styles.overlay]} />}
+        </View>
     );
 }
 
@@ -97,6 +191,8 @@ const styles = StyleSheet.create({
     containerBack: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'flex-start',
+        width: '100%',
         marginTop: 30,
         marginBottom: 25,
     },
@@ -152,12 +248,21 @@ const styles = StyleSheet.create({
         paddingHorizontal: 18,
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        fontFamily: 'Outfit_500Medium',
+        color: colors.white,
+        fontSize: 15,
     },
     inputText: {
         fontFamily: 'Outfit_500Medium',
         color: colors.white,
         fontSize: 15,
+    },
+    inputTextSlider: {
+        fontFamily: 'Outfit_400Regular',
+        fontSize: 16,
+        color: colors.white,
+        width: 80,
     },
     backgroundImage: {
         position: 'absolute',
@@ -167,11 +272,8 @@ const styles = StyleSheet.create({
         zIndex: -1,
         opacity: 0.4,
     },
-    sliderContainer: {
-        marginTop: 30
-    },
     buttonContainer: {
-        marginTop: 50,
+        marginTop: 40,
         flexDirection: 'row',
         justifyContent: 'center',
         gap: 15
@@ -194,5 +296,48 @@ const styles = StyleSheet.create({
         color: colors.gray_50,
         textAlign: 'center',
         height: 22
-    }
+    },
+    overlay: {
+        width,
+        height
+    },
+    dropdown: {
+        height: 50,
+        borderColor: colors.gray_800,
+        backgroundColor: colors.gray_800,
+        borderWidth: 1,
+        borderRadius: 12,
+        paddingHorizontal: 20,
+        color: colors.gray_100,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+    },
+    dropdownContainer: {
+        borderWidth: 0,
+        elevation: 0,
+        shadowOpacity: 0,
+        borderRadius: 12,
+        overflow: 'hidden',
+        backgroundColor: colors.gray_800
+    },
+    placeholderStyle: {
+        fontFamily: 'Outfit_500Medium',
+        color: colors.gray_100,
+        fontSize: 16,
+    },
+    selectedTextStyle: {
+        fontFamily: 'Outfit_500Medium',
+        color: colors.gray_100,
+        fontSize: 16,
+    },
+    itemText: {
+        color: colors.gray_100,
+        fontSize: 16,
+        textAlign: 'center'
+    },
+    dayOption: {
+        padding: 12,
+        backgroundColor: colors.gray_800,
+    },
 })

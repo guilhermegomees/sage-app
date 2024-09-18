@@ -1,21 +1,22 @@
-// src/components/Header.tsx
-import React, { useContext } from 'react';
-import { View, Image, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { MaterialIcons, useNavigation } from '~/imports';
+import React, { useContext, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Button, TextInput, Dimensions } from 'react-native';
+import { MaterialIcons } from '~/imports';
 import colors from '~/css/colors';
 import { base } from '~/imports';
-import { StackNavigationProp } from '@react-navigation/stack';
 import { HeaderContext } from '~/context/HeaderContext';
+import Modal from "react-native-modal";
+import Input from './Input';
+import Overlay from './Overlay';
+import NewTransaction from '~/screens/NewTransaction';
 
-type HeaderScreenNavigationProp = StackNavigationProp<any, 'Header'>;
+const { width, height } = Dimensions.get('window');
 
 export default function Header() {
-    const navigation = useNavigation<HeaderScreenNavigationProp>();
-
     const { showValues, setShowValues } = useContext(HeaderContext);
+    const [isModalVisible, setModalVisible] = useState<boolean>(false);
 
-    const handleNavigateToNewTransaction = () => {
-        navigation.navigate('NewTransaction');
+    const toggleModal = () => {
+        setModalVisible(!isModalVisible);
     };
 
     const toggleShowValues = () => {
@@ -23,24 +24,27 @@ export default function Header() {
     }
 
     return (
-        <View style={[base.flexRow, base.flexSpaceBetween, base.alignItemsCenter, base.px_30, styles.container]}>
-            <View style={[base.flexRow, base.alignItemsCenter, base.gap_12,]}>
-                <View style={[base.gap_4]}>
-                    <Text style={styles.text}>Olá [Nome]</Text>
+        <>
+            <View style={[base.flexRow, base.flexSpaceBetween, base.alignItemsCenter, base.px_30, styles.container]}>
+                <View style={[base.flexRow, base.alignItemsCenter, base.gap_12]}>
+                    <View style={[base.gap_4]}>
+                        <Text style={styles.text}>Olá [Nome]</Text>
+                    </View>
+                </View>
+                <View style={[base.flexRow, base.gap_20]}>
+                    <TouchableOpacity onPress={toggleShowValues}>
+                        <MaterialIcons
+                            name={showValues ? 'visibility' : 'visibility-off'}
+                            size={28}
+                            color={colors.gray_50} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={toggleModal}>
+                        <MaterialIcons name='add' size={28} color={colors.gray_50} />
+                    </TouchableOpacity>
                 </View>
             </View>
-            <View style={[base.flexRow, base.gap_20]}>
-                <TouchableOpacity onPress={toggleShowValues}>
-                    <MaterialIcons
-                        name={showValues ? 'visibility' : 'visibility-off'}
-                        size={28}
-                        color={colors.gray_50} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={handleNavigateToNewTransaction}>
-                    <MaterialIcons name='add' size={28} color={colors.gray_50} />
-                </TouchableOpacity>
-            </View>
-        </View>
+            <NewTransaction isModalVisible={isModalVisible} onClose={toggleModal} />
+        </>
     );
 }
 
@@ -53,10 +57,65 @@ const styles = StyleSheet.create({
         fontFamily: 'Outfit_500Medium',
         color: colors.gray_50,
         fontSize: 16,
-        lineHeight: 20,
     },
     iconUser: {
         width: 40,
         height: 40,
+    },
+    containerModal: {
+        justifyContent: 'flex-end',
+        margin: 0,
+    },
+    modal: {
+        backgroundColor: colors.gray_875,
+        flex: 0.94,
+        borderRadius: 15,
+        padding: 20
+    },
+    containerBack: {
+        height: 30,
+        backgroundColor: colors.gray_925,
+        borderRadius: 20
+    },
+    containerBtnActions: {
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    cancel: {
+        fontFamily: 'Outfit_500Medium',
+        color: colors.orange_300,
+        fontSize: 16
+    },
+    save: {
+        fontFamily: 'Outfit_500Medium',
+        color: colors.blue_400,
+        fontSize: 16
+    },
+    containerValue: {
+        marginTop: 25,
+        gap: 5
+    },
+    value: {
+        height: 40,
+        fontSize: 28,
+        color: colors.red_500,
+        fontFamily: 'Outfit_600SemiBold'
+    },
+    iconContainer: {
+        marginLeft: 8,
+    },
+    input: {
+        backgroundColor: colors.gray_800,
+        borderRadius: 12,
+        textAlignVertical: 'top',
+        padding: 15,
+        fontFamily: 'Outfit_500Medium',
+        color: colors.white,
+        fontSize: 15,
+    },
+    overlay: {
+        width,
+        height
     },
 });

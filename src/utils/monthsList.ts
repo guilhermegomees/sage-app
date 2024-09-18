@@ -1,5 +1,3 @@
-// src/utils/monthsList.ts
-
 export const monthsList = [
     'Janeiro',
     'Fevereiro',

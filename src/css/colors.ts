@@ -1,5 +1,7 @@
 export const colors = {
+    gray_925 : '#0F1319',
     gray_900 : '#111519',
+    gray_875 : '#141921',
     gray_850 : '#1D222C',
     gray_800 : '#212836',
     gray_750 : '#2F4659',

@@ -8,66 +8,82 @@ import { ICategory } from '~/interfaces';
 import { monthsList } from '~/utils/monthsList';
 
 // Categorias
-export const categories: ICategory[] = [{
-	id: 1,
-	user: "user1",
-	icon: "home",
-	name: "Moradia",
-	color: "#FF6347",
-},{
-	id: 2,
-	user: "user1",
-	icon: "food",
-	name: "Alimentação",
-	color: "#FFD700",
-},{
-	id: 3,
-	user: "user2",
-	icon: "car",
-	name: "Transporte",
-	color: "#1E90FF",
-},{
-	id: 4,
-	user: "user3",
-	icon: "heart",
-	name: "Saúde",
-	color: "#FF1493",
-},{
-	id: 5,
-	user: "user1",
-	icon: "star",
-	name: "Lazer",
-	color: "#32CD32",
-},{
-	id: 6,
-	user: "user2",
-	icon: "education",
-	name: "Educação",
-	color: "#8A2BE2",
-},{
-	id: 6,
-	user: "user2",
-	icon: "education",
-	name: "Salário",
-	color: "#00FF0D",
-}];
+export const categories: ICategory[] = [
+	{
+		id: 1,
+		user: "user1",
+		icon: "home",
+		name: "Moradia",
+		color: "#FF6347",
+	},
+	{
+		id: 2,
+		user: "user1",
+		icon: "food",
+		name: "Alimentação",
+		color: "#FFD700",
+	},
+	{
+		id: 3,
+		user: "user2",
+		icon: "car",
+		name: "Transporte",
+		color: "#1E90FF",
+	},
+	{
+		id: 4,
+		user: "user3",
+		icon: "heart",
+		name: "Saúde",
+		color: "#FF1493",
+	},
+	{
+		id: 5,
+		user: "user1",
+		icon: "star",
+		name: "Lazer",
+		color: "#32CD32",
+	},
+	{
+		id: 6,
+		user: "user2",
+		icon: "education",
+		name: "Educação",
+		color: "#8A2BE2",
+	},
+	{
+		id: 7,
+		user: "user1",
+		icon: "briefcase",
+		name: "Salário",
+		color: "#00FF0D",
+	},
+	{
+		id: 8,
+		user: "user2",
+		icon: "donation",
+		name: "Doação",
+		color: "#FF4500",
+	}
+];
 
 // Dados de despesas
 const transactions: ITransaction[] = [
-	{ id: 1, description: "Aluguel", value: 1500.05, date: '2024-05-03T03:00:00.000Z', isExpense: 1, icon: 'home', wallet: 1, category: categories[0] },
-	{ id: 2, description: "Supermercado", value: 550, date: '2024-05-03T03:00:00.000Z', isExpense: 1, icon: 'food', wallet: 1, category: categories[1] },
-	{ id: 3, description: "Gasolina", value: 400, date: '2024-05-03T03:00:00.000Z', isExpense: 1, icon: 'car', wallet: 1, category: categories[2] },
-	{ id: 4, description: "Plano de Saúde", value: 320, date: '2024-06-04T03:00:00.000Z', isExpense: 1, icon: 'heart', wallet: 1, category: categories[3] },
-	{ id: 5, description: "Cinema", value: 80, date: '2024-06-03T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1, category: categories[4] },
-	{ id: 6, description: "Faculdade", value: 900, date: '2024-07-03T03:00:00.000Z', isExpense: 1, icon: 'education', wallet: 1, category: categories[5] },
-	{ id: 7, description: "Aluguel", value: 1500, date: '2024-07-03T03:00:00.000Z', isExpense: 1, icon: 'home', wallet: 1, category: categories[0] }, 
-	{ id: 8, description: "Restaurante", value: 150, date: '2024-07-03T03:00:00.000Z', isExpense: 1, icon: 'food', wallet: 1, category: categories[1] },
-	{ id: 9, description: "Ônibus", value: 50, date: '2024-08-03T03:00:00.000Z', isExpense: 1, icon: 'car', wallet: 1, category: categories[2] },
-	{ id: 10, description: "Consulta Médica", value: 250, date: '2024-08-03T03:00:00.000Z', isExpense: 1, icon: 'heart', wallet: 1, category: categories[3] },
-	{ id: 11, description: "Viagem", value: 2000, date: '2024-08-03T03:00:00.000Z', isExpense: 1, icon: 'star', wallet: 1, category: categories[4] },
-	{ id: 12, description: "Curso Online", value: 300, date: '2024-08-03T03:00:00.000Z', isExpense: 1, icon: 'education', wallet: 1, category: categories[5] },
-	{ id: 13, description: "Salário", value: 3000, date: '2024-08-03T03:00:00.000Z', isExpense: 0, icon: 'education', wallet: 1, category: categories[6] }
+	{ id: 1, description: "Salário", value: 3000, date: '2024-09-01T03:00:00.000Z', isExpense: 0, wallet: 1, category: categories[6] }, // Salário
+	{ id: 2, description: "Pagamento de aluguel", value: 1200, date: '2024-09-03T03:00:00.000Z', isExpense: 1, wallet: 1, category: categories[0] }, // Moradia
+	{ id: 3, description: "Supermercado", value: 450, date: '2024-09-03T03:00:00.000Z', isExpense: 1, wallet: 1, category: categories[1] }, // Alimentação
+	{ id: 4, description: "Pix - Reembolso", value: 150, date: '2024-09-05T03:00:00.000Z', isExpense: 0, wallet: 1, category: categories[4] }, // Lazer
+	{ id: 5, description: "Restaurante", value: 200, date: '2024-09-05T03:00:00.000Z', isExpense: 1, wallet: 1, category: categories[1] }, // Alimentação
+	{ id: 6, description: "Conta de luz", value: 180, date: '2024-09-08T03:00:00.000Z', isExpense: 1, wallet: 1, category: categories[0] }, // Moradia
+	{ id: 7, description: "Academia", value: 100, date: '2024-09-08T03:00:00.000Z', isExpense: 1, wallet: 1, category: categories[3] }, // Saúde
+	{ id: 8, description: "Pix - Transferência poupança", value: 500, date: '2024-09-10T03:00:00.000Z', isExpense: 1, wallet: 2, category: categories[4] }, // Lazer
+	{ id: 9, description: "Bônus anual", value: 1500, date: '2024-09-10T03:00:00.000Z', isExpense: 0, wallet: 1, category: categories[6] }, // Salário
+	{ id: 10, description: "Manutenção do carro", value: 400, date: '2024-09-12T03:00:00.000Z', isExpense: 1, wallet: 1, category: categories[2] }, // Transporte
+	{ id: 11, description: "Jantar especial", value: 250, date: '2024-09-12T03:00:00.000Z', isExpense: 1, wallet: 1, category: categories[4] }, // Lazer
+	{ id: 12, description: "Consultoria freelance", value: 800, date: '2024-09-15T03:00:00.000Z', isExpense: 0, wallet: 2, category: categories[5] }, // Educação
+	{ id: 13, description: "Doação para caridade", value: 100, date: '2024-09-15T03:00:00.000Z', isExpense: 1, wallet: 1, category: categories[7] }, // Doação
 ];
+
 
 export default function CategoryGraphic() {
 	const currentDate = new Date();

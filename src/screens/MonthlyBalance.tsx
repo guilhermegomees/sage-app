@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { View, StyleSheet } from 'react-native';
 import {
     VictoryChart,
     VictoryTheme,
@@ -6,18 +7,13 @@ import {
     VictoryGroup,
     VictoryAxis,
 } from 'victory-native';
-import {
-    View,
-    StyleSheet,
-    colors,
-    base,
-    TypeScreem,
-} from '~/imports';
-
-import PeriodSelector, { charts } from '~/components/PeriodSelector';
-import { ITransaction } from '~/interfaces';
+import PeriodSelector from '~/components/PeriodSelector';
 import BottomSheet from '~/components/BottomSheet';
-import { monthsList } from '~/utils/monthsList';
+import { monthsList } from '~/constants/monthsList';
+import { ITransaction } from '~/interfaces/interfaces';
+import base from '~/css/base';
+import colors from '~/css/colors';
+import { charts, TypeScreem } from '~/enums/enums';
 
 interface DataItem {
     month: number;

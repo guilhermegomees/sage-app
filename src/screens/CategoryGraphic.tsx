@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import { ScrollView, TouchableOpacity, View, Text, StyleSheet, Image } from 'react-native';
 import { VictoryPie, VictoryTooltip } from 'victory-native';
-import { Text, View, StyleSheet, colors, base, ITransaction, Image } from '~/imports';
-import { ScrollView, TouchableOpacity } from 'react-native';
 import { CardTransaction, CardProps } from '~/components/CardTransaction';
-import PeriodSelector, { charts } from '~/components/PeriodSelector';
-import { ICategory } from '~/interfaces';
-import { monthsList } from '~/utils/monthsList';
+import PeriodSelector from '~/components/PeriodSelector';
+import { monthsList } from '~/constants/monthsList';
+import { ICategory, ITransaction } from '~/interfaces/interfaces';
+import base from '~/css/base';
+import { charts } from '~/enums/enums';
+import colors from '~/css/colors';
 
 // Categorias
 export const categories: ICategory[] = [

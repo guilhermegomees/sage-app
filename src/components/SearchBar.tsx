@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, StyleSheet } from 'react-native';
-
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { colors } from '~/imports';
+import colors from '~/css/colors';
 
 interface SearchBarProps {
     onSearch: (text: string) => void;

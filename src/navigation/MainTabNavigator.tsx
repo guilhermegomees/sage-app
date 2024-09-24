@@ -1,6 +1,5 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { colors } from '~/imports';
 import { BottomFabBar } from 'rn-wave-bottom-bar';
 import { Octicons } from '@expo/vector-icons';
 import HomeStack from './HomeStackNavigator';
@@ -8,6 +7,7 @@ import Transactions from '~/screens/Transactions';
 import Goals from '~/screens/Goals';
 import ChartsTab from './ChartsTabNavigator';
 import CardsStack from './CardsStackNavigator';
+import colors from '~/css/colors';
 
 const Tab = createBottomTabNavigator();
 

@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Button, Dimensions } from "react-native";
+import { Dimensions, TouchableOpacity, View, Text, StyleSheet } from "react-native";
 import Input from "~/components/Input";
 import Overlay from "~/components/Overlay";
-import { TouchableOpacity, View, Text, colors, StyleSheet, base } from "~/imports";
 import Modal from "react-native-modal";
 import { Calendar } from "react-native-calendars";
+import base from "~/css/base";
+import colors from "~/css/colors";
 
 const { width, height } = Dimensions.get('window');
 

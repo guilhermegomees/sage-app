@@ -1,16 +1,12 @@
-import { Text, View, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
-
-import { useNavigation } from '@react-navigation/native';
+import { View, Image, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-
-import { colors } from '../css/colors';
-import { base } from '../css/base';
-
-import { ITransaction } from '~/interfaces';
-import { TypeScreem } from '~/enums';
-
 import BottomSheet from '~/components/BottomSheet';
+import { ITransaction } from '~/interfaces/interfaces';
+import { useNavigation } from '@react-navigation/native';
+import { TypeScreem } from '~/enums/enums';
+import colors from '~/css/colors';
+import base from '~/css/base';
 
 type CardsScreenNavigationProp = StackNavigationProp<any, 'Cards'>;
 

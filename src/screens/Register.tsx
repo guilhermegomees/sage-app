@@ -1,20 +1,12 @@
 import React, { useState } from 'react';
+import { View, Image, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import Input from '~/components/Input';
 import Overlay from '~/components/Overlay';
 import PasswordInput from '~/components/PasswordInput';
-import {
-    View,
-    Text,
-    TouchableOpacity,
-    StyleSheet,
-    Image,
-    ScrollView,
-    StackNavigationProp,
-    base,
-    colors,
-    useNavigation,
-    Dimensions
-} from '~/imports';
+import base from '~/css/base';
+import colors from '~/css/colors';
 
 const { width, height } = Dimensions.get('window');
 

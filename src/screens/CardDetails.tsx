@@ -1,21 +1,13 @@
 import React, { useRef, useState } from 'react';
+import { Dimensions, View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import Input from '~/components/Input';
 import { Dropdown } from 'react-native-element-dropdown';
-import {
-    Text,
-    View,
-    StyleSheet,
-    TouchableOpacity,
-    colors,
-    base,
-    Image,
-    MaterialIcons,
-    FontAwesome5,
-    useNavigation,
-    StackNavigationProp,
-    Dimensions,
-} from '~/imports';
 import Overlay from '~/components/Overlay';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import base from '~/css/base';
+import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
+import colors from '~/css/colors';
 
 const { width, height } = Dimensions.get('window');
 

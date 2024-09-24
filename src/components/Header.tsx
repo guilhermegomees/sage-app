@@ -1,13 +1,10 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Button, TextInput, Dimensions } from 'react-native';
-import { MaterialIcons } from '~/imports';
-import colors from '~/css/colors';
-import { base } from '~/imports';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { HeaderContext } from '~/context/HeaderContext';
-import Modal from "react-native-modal";
-import Input from './Input';
-import Overlay from './Overlay';
 import NewTransaction from '~/screens/NewTransaction';
+import { MaterialIcons } from '@expo/vector-icons';
+import base from '~/css/base';
+import colors from '~/css/colors';
 
 const { width, height } = Dimensions.get('window');
 

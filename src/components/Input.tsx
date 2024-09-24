@@ -1,7 +1,9 @@
 import React, { createRef, useState } from "react";
 import { TouchableOpacity, StyleSheet, Text, Modal, TextInput, View, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { base, colors, MaterialIcons } from "~/imports";
+import { MaterialIcons } from "@expo/vector-icons";
+import base from "~/css/base";
+import colors from "~/css/colors";
 
 const Input: React.FC<any> = (props) => {
     const [modalVisible, setModalVisible] = useState(false);

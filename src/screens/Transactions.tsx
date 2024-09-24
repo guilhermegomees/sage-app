@@ -1,32 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import {
-    Text,
-    View,
-    StyleSheet,
-    TouchableOpacity,
-    colors,
-    base,
-    MaterialIcons,
-    useNavigation,
-    StackNavigationProp
-} from '~/imports';
-
-import { TypeScreem } from '~/enums';
-import { ITransaction } from '~/interfaces';
-
+import { View, StyleSheet } from 'react-native';
 import BottomSheet from '~/components/BottomSheet';
 import SearchBar from '~/components/SearchBar';
-
-type TransactionsScreenNavigationProp = StackNavigationProp<any, 'Transactions'>;
+import base from '~/css/base';
+import colors from '~/css/colors';
+import { TypeScreem } from '~/enums/enums';
+import { ITransaction } from '~/interfaces/interfaces';
 
 export default function Transactions() {
-    const navigation = useNavigation<TransactionsScreenNavigationProp>();
     const [transactions, setTransactions] = useState<ITransaction[]>([]);
     const [filteredTransactions, setFilteredTransactions] = useState<ITransaction[]>([]);
-
-    const handleNavigateToBack = () => {
-        navigation.navigate('Home');
-    };
 
     const fetchTransactions = async (): Promise<void> => {
         //TODO: Trazer transações através do banco e popular o data
@@ -61,17 +44,6 @@ export default function Transactions() {
 
     return (
         <View style={[styles.container]}>
-            {/* <View style={[styles.containerBack]}>
-                <View style={[base.flexRow, base.gap_8]}>
-                    <TouchableOpacity onPress={handleNavigateToBack}>
-                        <MaterialIcons name="chevron-left" size={30} color={colors.gray_50} />
-                    </TouchableOpacity>
-                    <Text style={[styles.titleTransactions]}>Transações</Text>
-                </View>
-                <TouchableOpacity style={[styles.buttonAdd]}>
-                    <Text style={[styles.textButtonAdd]}>Adicionar</Text>
-                </TouchableOpacity>
-            </View> */}
             <View style={[base.mb_20, base.mt_25, base.mx_2]}>
                 <SearchBar onSearch={handleSearch} />
             </View>

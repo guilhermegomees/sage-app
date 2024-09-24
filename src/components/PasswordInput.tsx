@@ -1,7 +1,9 @@
 import React, { useState, createRef } from "react";
 import { TouchableOpacity, StyleSheet, TextInput, View, Platform, Text, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { base, colors, MaterialIcons } from "~/imports";
+import { MaterialIcons } from "@expo/vector-icons";
+import base from "~/css/base";
+import colors from "~/css/colors";
 
 const PasswordInput: React.FC<any> = (props) => {
     const [modalVisible, setModalVisible] = useState(false);

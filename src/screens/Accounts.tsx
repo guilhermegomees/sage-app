@@ -1,17 +1,15 @@
-import { Text, View, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { colors } from '../css/colors';
-import { base } from '../css/base';
 import React, { useContext, useEffect, useState } from 'react';
-import { TypeScreem } from '~/enums';
+import { TouchableOpacity, View, StyleSheet, Text, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import BottomSheet from '~/components/BottomSheet';
-import { api } from '~/server/api'
-import { ITransaction } from '~/interfaces';
 import Header from '~/components/Header';
 import { HeaderContext } from '~/context/HeaderContext';
+import { ITransaction } from '~/interfaces/interfaces';
+import base from '~/css/base';
+import { FontAwesome, FontAwesome6 } from '@expo/vector-icons';
+import colors from '~/css/colors';
+import { TypeScreem } from '~/enums/enums';
 
 // Formatar valores com duas casas decimais
 function formatValue(value: number): string {
@@ -28,22 +26,8 @@ type AccountsScreenNavigationProp = StackNavigationProp<any, 'Accounts'>;
 
 export default function Accounts() {
     const navigation = useNavigation<AccountsScreenNavigationProp>();
-
     const { showValues } = useContext(HeaderContext);
-    
     const [data, setData] = useState<ITransaction[]>([]);
-    // const userId = 2; // TODO: Trazer id com base no usuário logado
-    // const wallet = 2; // TODO: Trazer id da wallet com base na carteira selecionada
-
-    // const fetchData = async (): Promise<any> => {
-    //   try {
-    //     const response = await api.get(`/transaction?userId=${userId}`);
-    //     const formattedData = response.data.data.filter((item: ITransaction) => item.wallet === wallet);
-    //     setData(formattedData);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // };
 
     const transactions: ITransaction[] = [
         { id: 1, description: "Salário", value: 5000, date: '2024-09-01T03:00:00.000Z', isExpense: 0, icon: 'briefcase', wallet: 1 },

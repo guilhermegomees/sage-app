@@ -36,7 +36,6 @@ const LoginScreen = () => {
                     <View style={styles.inputsContainer}>
                         <Input
                             style={[base.input]}
-                            inputWrapperColor={colors.gray_800}
                             placeholder="E-mail"
                             placeholderTextColor={colors.gray_200}
                             onChangeText={(name: string) => setEmail(name)}
@@ -46,7 +45,6 @@ const LoginScreen = () => {
                         />
                         <PasswordInput
                             style={[base.input]}
-                            inputWrapperColor={colors.gray_800}
                             placeholder="Senha"
                             placeholderTextColor={colors.gray_200}
                             onChangeText={(name: string) => setPassword(name)}

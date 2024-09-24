@@ -38,7 +38,6 @@ const RegisterScreen = () => {
                     <View style={styles.inputsContainer}>
                         <Input
                             style={[base.input]}
-                            inputWrapperColor={colors.gray_800}
                             placeholder="Nome"
                             placeholderTextColor={colors.gray_200}
                             onChangeText={(name: string) => setName(name)}
@@ -48,7 +47,6 @@ const RegisterScreen = () => {
                         />
                         <Input
                             style={[base.input]}
-                            inputWrapperColor={colors.gray_800}
                             placeholder="E-mail"
                             placeholderTextColor={colors.gray_200}
                             onChangeText={(name: string) => setEmail(name)}
@@ -58,7 +56,6 @@ const RegisterScreen = () => {
                         />
                         <PasswordInput
                             style={[base.input]}
-                            inputWrapperColor={colors.gray_800}
                             placeholder="Senha"
                             placeholderTextColor={colors.gray_200}
                             onChangeText={(name: string) => setPassword(name)}
@@ -67,7 +64,6 @@ const RegisterScreen = () => {
                         />
                         <PasswordInput
                             style={[base.input]}
-                            inputWrapperColor={colors.gray_800}
                             placeholder="Confirmar senha"
                             placeholderTextColor={colors.gray_200}
                             onChangeText={(name: string) => setConfirmPassword(name)}

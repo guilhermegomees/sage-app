@@ -1,25 +1,23 @@
 import { useState } from "react";
-import { Dimensions, TouchableOpacity, View, Text, StyleSheet } from "react-native";
+import { Dimensions, TouchableOpacity, View, Text, StyleSheet, Platform, TextInput } from "react-native";
 import Input from "~/components/Input";
 import Overlay from "~/components/Overlay";
 import Modal from "react-native-modal";
 import { Calendar } from "react-native-calendars";
 import base from "~/css/base";
 import colors from "~/css/colors";
+import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get('window');
 
 const NewTransaction: React.FC<any> = (props) => {
     const [value, setValue] = useState<number>(0);
     const [descript, setDescript] = useState<string>();
-    const [overlay, setOverley] = useState(false);
 
-    const getToday = () => {
-        return new Date().toLocaleDateString('pt-BR');
-    };
+    const getToday = () => { return new Date().toLocaleDateString('pt-BR'); };
 
-    const [selectedDate, setSelectedDate] = useState<string>(getToday()); // Data selecionada
-    const [isCalendarVisible, setIsCalendarVisible] = useState<boolean>(false); // Controle da visibilidade da janela
+    const [selectedDate, setSelectedDate] = useState<string>(getToday());
+    const [isCalendarVisible, setIsCalendarVisible] = useState<boolean>(false);
 
     const formatCurrency = (num: number) => {
         return `R$ ${num.toLocaleString('pt-BR', {
@@ -44,16 +42,19 @@ const NewTransaction: React.FC<any> = (props) => {
     // Função para definir a data atual
     const handleTodayPress = () => {
         setSelectedDate(getToday());
+        setIsCalendarVisible(false)
     };
 
     // Função para definir a data de ontem
     const handleYesterdayPress = () => {
         setSelectedDate(getYesterday());
+        setIsCalendarVisible(false)
     };
 
     // Função para selecionar a data no calendário
     const handleSelectDate = (date: string) => {
-        setSelectedDate(date);
+        const [year, month, day] = date.split("-");
+        setSelectedDate(new Date(Number(year), Number(month) - 1, Number(day)).toLocaleDateString('pt-BR'));
         setIsCalendarVisible(false);
     };
 
@@ -68,9 +69,6 @@ const NewTransaction: React.FC<any> = (props) => {
             swipeDirection="down"
             style={styles.containerModal}
         >
-            <View style={[base.w_100, base.justifyContentCenter, base.px_25, { position: 'absolute', top: 34 }]}>
-                <View style={[styles.containerBack]} />
-            </View>
             <View style={[styles.modal]}>
                 <View style={[styles.containerBtnActions]}>
                     <TouchableOpacity onPress={props.onClose}>
@@ -82,59 +80,64 @@ const NewTransaction: React.FC<any> = (props) => {
                 </View>
                 <View style={[styles.containerValue]}>
                     <Text style={[styles.text, { fontSize: 15, color: colors.gray_400 }]}>Valor</Text>
-                    <Input
+                    <TextInput 
                         style={styles.value}
-                        textStyle={styles.value}
                         placeholder={'R$ 0.00'}
                         placeholderTextColor={colors.red_500}
                         keyboardType="numeric"
                         onChangeText={handleChange}
                         value={formatCurrency(value)}
-                        overlay={(value: boolean) => setOverley(value)}
                     />
                 </View>
-                <View style={[base.mt_15, base.gap_15]}>
-                    <Input
-                        style={[styles.input, { height: 70 }]}
+                <View style={[base.gap_15, base.mt_20]}>
+                    <View style={[styles.containerDate]}>
+                        <TouchableOpacity style={[base.input, styles.input, base.justifyContentStart, base.gap_15]} onPress={handleDateClick}>
+                            <FontAwesome5 name="calendar-alt" color={colors.gray_100} size={20} />
+                            <Text style={styles.textBtnDate}>
+                                {selectedDate}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                    <TextInput
+                        style={[styles.inputDesc, styles.input, { height: 75 }]}
                         placeholder="Descrição"
                         placeholderTextColor="#F8F1F1"
                         onChangeText={setDescript}
                         value={descript}
                         maxLength={25}
-                        overlay={(value: boolean) => setOverley(value)}
                     />
-                    {/* Botões de seleção */}
-                    <Text style={[styles.text]}>Data Selecionada: {selectedDate}</Text>
-                    <View style={[base.flexRow, base.gap_10]}>
-                        <TouchableOpacity style={[styles.btnDate]} onPress={handleTodayPress}>
-                            <Text style={[styles.textBtnDate]}>Hoje</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.btnDate]} onPress={handleYesterdayPress}>
-                            <Text style={[styles.textBtnDate]}>Ontem</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.btnDate]} onPress={() => setIsCalendarVisible(true)}>
-                            <Text style={[styles.textBtnDate]}>Selecionar data</Text>
-                        </TouchableOpacity>
-                    </View>
-                    {/* Janela do calendário */}
-                    {isCalendarVisible && (
-                        <View style={styles.calendarWindow}>
-                            <View style={styles.calendarContainer}>
-                                <Calendar
-                                    onDayPress={(day: any) => handleSelectDate(day.dateString)}
-                                    markedDates={{
-                                        [selectedDate]: { selected: true, selectedColor: 'blue' },
-                                    }}
-                                />
-                                <TouchableOpacity onPress={() => setIsCalendarVisible(false)}>
-                                    <Text style={styles.closeText}>Fechar</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    )}
                 </View>
             </View>
-            {overlay && <Overlay style={[styles.overlay]} />}
+            {/* Calendário */}
+            {isCalendarVisible && (
+                <View style={styles.calendarWindow}>
+                    <View style={styles.calendarContainer}>
+                        <TouchableOpacity style={[base.alignItemsEnd, base.w_100]} onPress={() => setIsCalendarVisible(false)}>
+                            <MaterialIcons name="close" size={25}/>
+                        </TouchableOpacity>
+                        <Calendar
+                            onDayPress={(day: any) => handleSelectDate(day.dateString)}
+                            markedDates={{
+                                [selectedDate]: { selected: true, selectedColor: 'blue' },
+                            }}
+                        />
+                        <View style={[base.flexRow, base.justifyContentCenter, base.gap_10]}>
+                            <TouchableOpacity
+                                style={[styles.btnDate]}
+                                onPress={handleTodayPress}
+                            >
+                                <Text style={[styles.textBtnDate]}>Hoje</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.btnDate]}
+                                onPress={handleYesterdayPress}
+                            >
+                                <Text style={[styles.textBtnDate]}>Ontem</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            )}
         </Modal>
     );
 }
@@ -159,14 +162,9 @@ const styles = StyleSheet.create({
     },
     modal: {
         backgroundColor: colors.gray_875,
-        flex: 0.94,
+        flex: 0.91,
         borderRadius: 15,
-        padding: 20
-    },
-    containerBack: {
-        height: 30,
-        backgroundColor: colors.gray_925,
-        borderRadius: 20
+        padding: 20,
     },
     containerBtnActions: {
         width: '100%',
@@ -185,31 +183,33 @@ const styles = StyleSheet.create({
     },
     containerValue: {
         marginTop: 25,
-        gap: 5
+        gap: 5,
+        paddingBottom: 5,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.gray_600
     },
     value: {
         height: 40,
         fontSize: 28,
         color: colors.red_500,
-        fontFamily: 'Outfit_600SemiBold'
+        fontFamily: 'Outfit_600SemiBold',
     },
-    iconContainer: {
-        marginLeft: 8,
+    containerDate: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 15,
     },
     input: {
         backgroundColor: colors.gray_800,
+    },
+    inputDesc: {
         borderRadius: 12,
         textAlignVertical: 'top',
         padding: 15,
         fontFamily: 'Outfit_500Medium',
         color: colors.white,
-        fontSize: 15,
+        fontSize: 17,
     },
-    overlay: {
-        width,
-        height
-    },
-
     dateText: {
         fontSize: 18,
         marginBottom: 20,
@@ -252,20 +252,9 @@ const styles = StyleSheet.create({
         borderRadius: 20
     },
     textBtnDate: {
-        fontSize: 15,
-        fontFamily: 'Outfit_400Regular',
-        color: colors.gray_100,
-        lineHeight: 16
-    },
-    btnSelected: {
-        backgroundColor: colors.blue_600, // Cor diferente para o botão selecionado
-    },
-    selectedDateText: {
         fontSize: 18,
-        color: colors.blue_600,
-        textAlign: 'center',
-        marginTop: 10,
-        textDecorationLine: 'underline',
+        fontFamily: 'Outfit_500Medium',
+        color: colors.gray_100,
     },
 })
 

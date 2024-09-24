@@ -24,7 +24,7 @@ const Input: React.FC<any> = (props) => {
 
     return (
         <TouchableOpacity style={[props.style, props.containerStyle]} activeOpacity={1} onPress={setVisibility}>
-            <Text style={[base.inputText, props.textStyle, {color: props.value ? colors.white : colors.gray_200}]}>
+            <Text style={[base.inputText, {color: props.value ? colors.white : colors.gray_200}, props.textStyle]}>
                 {props.value || props.placeholder}
             </Text>
             { props.icon && <MaterialIcons name={props.icon} size={20} color={colors.gray_200} /> }
@@ -40,15 +40,15 @@ const Input: React.FC<any> = (props) => {
                     <View 
                         style={[
                             styles.inputWrapper,
-                            {backgroundColor: props.inputWrapperColor ?? colors.gray_900},
+                            props.inputWrapperStyle,
+                            {backgroundColor: props.inputWrapperColor ?? colors.gray_800},
                             {flexDirection: props.icon && 'row'},
-                            {backgroundColor: props.inputWrapperColor ?? colors.gray_900}
                         ]}
                     >
                         <View style={[base.input]}>
                             <TextInput
                                 {...props}
-                                style={[base.inputText]}
+                                style={[base.inputText, props.textStyle]}
                                 placeholderTextColor={colors.gray_200}
                                 ref={inputRef}
                                 autoFocus={Platform.OS === 'ios'}

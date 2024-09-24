@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import Input from '~/components/Input';
+import Overlay from '~/components/Overlay';
+import PasswordInput from '~/components/PasswordInput';
 import {
     View,
     Text,
-    TextInput,
     TouchableOpacity,
     StyleSheet,
     Image,
@@ -10,27 +12,28 @@ import {
     StackNavigationProp,
     base,
     colors,
-    MaterialIcons,
-    useNavigation
+    useNavigation,
+    Dimensions
 } from '~/imports';
+
+const { width, height } = Dimensions.get('window');
 
 type RegisterScreenNavigationProp = StackNavigationProp<any, 'Register'>;
 
 const RegisterScreen = () => {
     const navigation = useNavigation<RegisterScreenNavigationProp>();
-    const [showPassword, setShowPassword] = useState(false); // Controlar a visibilidade da senha
+    const [name, setName] = useState<string>();
+    const [email, setEmail] = useState<string>();
+    const [confirmPassword, setConfirmPassword] = useState<string>();
+    const [password, setPassword] = useState<string>();
+    const [overlay, setOverley] = useState(false);
 
     const handleLogin = () => {
         navigation.navigate('Login');
     };
 
     const handleRegister = () => {
-        navigation.navigate('Home');
-    };
-
-    // Alternar entre mostrar e ocultar a senha
-    const toggleShowPassword = () => {
-        setShowPassword(!showPassword);
+        navigation.navigate('Main');
     };
 
     return (
@@ -41,44 +44,44 @@ const RegisterScreen = () => {
                 <View style={styles.halfContainer}>
                     <Text style={styles.title}>Seja bem-vindo(a)</Text>
                     <View style={styles.inputsContainer}>
-                        <View style={[styles.input, base.flexRowReverse]}>
-                            <MaterialIcons name="person" size={20} color={colors.gray_200} />
-                            <TextInput style={styles.inputText} placeholder="Nome" placeholderTextColor={colors.gray_200} />
-                        </View>
-                        <View style={[styles.input, base.flexRowReverse]}>
-                            <MaterialIcons name="email" size={20} color={colors.gray_200} />
-                            <TextInput style={styles.inputText} placeholder="E-mail" placeholderTextColor={colors.gray_200} />
-                        </View>
-                        <View style={[styles.input, base.flexRow]}>
-                            <TextInput
-                                style={styles.inputText}
-                                placeholder="Senha"
-                                placeholderTextColor={colors.gray_200}
-                                secureTextEntry={!showPassword}
-                            />
-                            <TouchableOpacity onPress={toggleShowPassword}>
-                                <MaterialIcons
-                                    name={showPassword ? 'visibility-off' : 'visibility'}
-                                    size={20}
-                                    color={colors.gray_200}
-                                />
-                            </TouchableOpacity>
-                        </View>
-                        <View style={[styles.input, base.flexRow]}>
-                            <TextInput
-                                style={styles.inputText}
-                                placeholder="Confirmar senha"
-                                placeholderTextColor={colors.gray_200}
-                                secureTextEntry={!showPassword}
-                            />
-                            <TouchableOpacity onPress={toggleShowPassword}>
-                                <MaterialIcons
-                                    name={showPassword ? 'visibility-off' : 'visibility'}
-                                    size={20}
-                                    color={colors.gray_200}
-                                />
-                            </TouchableOpacity>
-                        </View>
+                        <Input
+                            style={[base.input]}
+                            inputWrapperColor={colors.gray_800}
+                            placeholder="Nome"
+                            placeholderTextColor={colors.gray_200}
+                            onChangeText={(name: string) => setName(name)}
+                            value={name}
+                            icon="person"
+                            overlay={(value: boolean) => setOverley(value)}
+                        />
+                        <Input
+                            style={[base.input]}
+                            inputWrapperColor={colors.gray_800}
+                            placeholder="E-mail"
+                            placeholderTextColor={colors.gray_200}
+                            onChangeText={(name: string) => setEmail(name)}
+                            value={email}
+                            icon="email"
+                            overlay={(value: boolean) => setOverley(value)}
+                        />
+                        <PasswordInput
+                            style={[base.input]}
+                            inputWrapperColor={colors.gray_800}
+                            placeholder="Senha"
+                            placeholderTextColor={colors.gray_200}
+                            onChangeText={(name: string) => setPassword(name)}
+                            value={password}
+                            overlay={(value: boolean) => setOverley(value)}
+                        />
+                        <PasswordInput
+                            style={[base.input]}
+                            inputWrapperColor={colors.gray_800}
+                            placeholder="Confirmar senha"
+                            placeholderTextColor={colors.gray_200}
+                            onChangeText={(name: string) => setConfirmPassword(name)}
+                            value={confirmPassword}
+                            overlay={(value: boolean) => setOverley(value)}
+                        />
                     </View>
                     <TouchableOpacity style={styles.loginBtn} onPress={handleRegister}>
                         <Text style={styles.loginBtnText}>Criar conta</Text>
@@ -91,6 +94,7 @@ const RegisterScreen = () => {
                     </View>
                 </View>
             </View>
+            {overlay && <Overlay style={[styles.overlay]} />}
         </ScrollView>
     );
 };
@@ -174,6 +178,10 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: colors.blue_300,
         textDecorationLine: 'underline'
+    },
+    overlay: {
+        width,
+        height
     },
 });
 

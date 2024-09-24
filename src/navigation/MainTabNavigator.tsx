@@ -1,6 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { StyleSheet, colors } from '~/imports';
+import { colors } from '~/imports';
 import { BottomFabBar } from 'rn-wave-bottom-bar';
 import { Octicons } from '@expo/vector-icons';
 import HomeStack from './HomeStackNavigator';
@@ -9,43 +9,9 @@ import Goals from '~/screens/Goals';
 import ChartsTab from './ChartsTabNavigator';
 import CardsStack from './CardsStackNavigator';
 
-type ScreenComponent = () => JSX.Element;
-
-interface ScreensMap {
-    HomeStack: ScreenComponent;
-    Transactions: ScreenComponent;
-    Goals: ScreenComponent;
-    ChartsTab: ScreenComponent;
-    CardsStack: ScreenComponent;
-};
-
-const screensMap: ScreensMap = {
-    HomeStack,
-    Transactions,
-    Goals,
-    ChartsTab,
-    CardsStack
-};
-
-const generateScreen = (screen: keyof ScreensMap): ScreenComponent => {
-    const ScreenComponent = screensMap[screen];
-    if (!ScreenComponent) {
-        throw new Error(`Unknown screen: ${screen}`);
-    }
-    return ScreenComponent;
-};
-
 const Tab = createBottomTabNavigator();
 
-const tabBarIcon =
-    (name: any) =>
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ({ focused, color, size } : {
-            focused: boolean;
-            color: string;
-            size: number;
-        }) =>
-            <Octicons name={name} size={25} color={colors.white} />;
+const tabBarIcon = (name: any) => () => <Octicons name={name} size={25} color={colors.white} />;
 
 export default function MainTabNavigator(){
     return (
@@ -55,7 +21,6 @@ export default function MainTabNavigator(){
                 headerShown: false,
                 tabBarActiveTintColor: colors.gray_700,
                 tabBarActiveBackgroundColor: colors.gray_700,
-                tabBarInactiveBackgroundColor: 'red',
                 tabBarLabelStyle: {
                     color: 'white',
                     fontFamily: 'Outfit_400Regular',
@@ -88,7 +53,7 @@ export default function MainTabNavigator(){
         >
             <Tab.Screen
                 name="HomeStack"
-                component={generateScreen('HomeStack')}
+                component={HomeStack}
                 options={{
                     tabBarIcon: tabBarIcon('home'),
                     tabBarLabel: 'Home',
@@ -96,7 +61,7 @@ export default function MainTabNavigator(){
             />
             <Tab.Screen
                 name="Transactions"
-                component={generateScreen('Transactions')}
+                component={Transactions}
                 options={{
                     tabBarIcon: tabBarIcon('arrow-switch'),
                     tabBarLabel: 'Transações',
@@ -104,7 +69,7 @@ export default function MainTabNavigator(){
             />
             <Tab.Screen
                 name="ChartList"
-                component={generateScreen('ChartsTab')}
+                component={ChartsTab}
                 options={{
                     tabBarIcon: tabBarIcon('graph'),
                     tabBarLabel: 'Gráficos',
@@ -112,7 +77,7 @@ export default function MainTabNavigator(){
             />
             <Tab.Screen
                 name="CardsStack"
-                component={generateScreen('CardsStack')}
+                component={CardsStack}
                 options={{
                     tabBarIcon: tabBarIcon('credit-card'),
                     tabBarLabel: 'Cartões',
@@ -120,7 +85,7 @@ export default function MainTabNavigator(){
             />
             <Tab.Screen
                 name="Goals"
-                component={generateScreen('Goals')}
+                component={Goals}
                 options={{
                     tabBarIcon: tabBarIcon('rocket'),
                     tabBarLabel: 'Metas',

@@ -1,6 +1,27 @@
 import { StyleSheet } from 'react-native';
+import colors from './colors';
 
 export const base = StyleSheet.create({
+	input: {
+        backgroundColor: colors.gray_900,
+        borderRadius: 15,
+        height: 50,
+		width: '100%',
+        paddingHorizontal: 15,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        fontFamily: 'Outfit_500Medium',
+        color: colors.white,
+        fontSize: 15,
+    },
+    inputText: {
+        fontFamily: 'Outfit_500Medium',
+        fontSize: 15,
+		width: '90%',
+		color: colors.white
+    },
+
 	// Widths
 	w_0: {
 		width: '0%',

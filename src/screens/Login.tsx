@@ -11,26 +11,29 @@ import {
     base,
     colors,
     MaterialIcons,
-    useNavigation
+    useNavigation,
+    Dimensions
 } from '~/imports';
+import Input from '~/components/Input';
+import Overlay from '~/components/Overlay';
+import PasswordInput from '~/components/PasswordInput';
+
+const { width, height } = Dimensions.get('window');
 
 type LoginScreenNavigationProp = StackNavigationProp<any, 'Login'>;
 
 const LoginScreen = () => {
     const navigation = useNavigation<LoginScreenNavigationProp>();
-    const [showPassword, setShowPassword] = useState(false); // Controlar a visibilidade da senha
+    const [email, setEmail] = useState<string>();
+    const [password, setPassword] = useState<string>();
+    const [overlay, setOverley] = useState(false);
 
     const handleLogin = () => {
-        navigation.navigate('Home');
+        navigation.navigate('Main');
     };
 
     const handleRegister = () => {
         navigation.navigate('Register');
-    };
-
-    // Alternar entre mostrar e ocultar a senha
-    const toggleShowPassword = () => {
-        setShowPassword(!showPassword);
     };
 
     return (
@@ -41,25 +44,25 @@ const LoginScreen = () => {
                 <View style={styles.halfContainer}>
                     <Text style={styles.title}>Bem-vindo(a) de volta</Text>
                     <View style={styles.inputsContainer}>
-                        <View style={[styles.input, base.flexRowReverse]}>
-                            <MaterialIcons name="email" size={20} color={colors.gray_200} />
-                            <TextInput style={styles.inputText} placeholder="E-mail" placeholderTextColor={colors.gray_200} />
-                        </View>
-                        <View style={[styles.input, base.flexRow]}>
-                            <TextInput
-                                style={styles.inputText}
-                                placeholder="Senha"
-                                placeholderTextColor={colors.gray_200}
-                                secureTextEntry={!showPassword}
-                            />
-                            <TouchableOpacity onPress={toggleShowPassword}>
-                                <MaterialIcons
-                                    name={showPassword ? 'visibility-off' : 'visibility'}
-                                    size={20}
-                                    color={colors.gray_200}
-                                />
-                            </TouchableOpacity>
-                        </View>
+                        <Input
+                            style={[base.input]}
+                            inputWrapperColor={colors.gray_800}
+                            placeholder="E-mail"
+                            placeholderTextColor={colors.gray_200}
+                            onChangeText={(name: string) => setEmail(name)}
+                            value={email}
+                            icon="email"
+                            overlay={(value: boolean) => setOverley(value)}
+                        />
+                        <PasswordInput
+                            style={[base.input]}
+                            inputWrapperColor={colors.gray_800}
+                            placeholder="Senha"
+                            placeholderTextColor={colors.gray_200}
+                            onChangeText={(name: string) => setPassword(name)}
+                            value={password}
+                            overlay={(value: boolean) => setOverley(value)}
+                        />
                     </View>
                     <TouchableOpacity style={styles.loginBtn} onPress={handleLogin}>
                         <Text style={styles.loginBtnText}>Entrar</Text>
@@ -72,6 +75,7 @@ const LoginScreen = () => {
                     </View>
                 </View>
             </View>
+            {overlay && <Overlay style={[styles.overlay]} />}
         </ScrollView>
     );
 };
@@ -115,21 +119,7 @@ const styles = StyleSheet.create({
     },
     inputsContainer: {
         gap: 25,
-        marginBottom: 50
-    },
-    input: {
-        width: '100%',
-        backgroundColor: colors.gray_900,
-        borderRadius: 15,
-        height: 50,
-        alignItems: 'center',
-        paddingHorizontal: 15
-    },
-    inputText: {
-        fontFamily: 'Outfit_500Medium',
-        height: 50,
-        color: colors.white,
-        flex: 1
+        marginBottom: 50,
     },
     loginBtn: {
         width: '100%',
@@ -155,6 +145,10 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: colors.blue_300,
         textDecorationLine: 'underline'
+    },
+    overlay: {
+        width,
+        height
     },
 });
 

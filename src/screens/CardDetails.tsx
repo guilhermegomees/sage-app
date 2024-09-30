@@ -162,7 +162,7 @@ export default function CardDatails() {
                     <TouchableOpacity style={[styles.button, styles.btnCardRegister]}>
                         <Text style={[styles.btnText]}>Salvar</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.button, styles.btnCancel]}>
+                    <TouchableOpacity style={[styles.button, styles.btnCancel]} onPress={handleNavigateToBack}>
                         <Text style={[styles.btnText]}>Cancelar</Text>
                     </TouchableOpacity>
                 </View>

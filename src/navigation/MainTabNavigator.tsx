@@ -2,12 +2,12 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { BottomFabBar } from 'rn-wave-bottom-bar';
 import { Octicons } from '@expo/vector-icons';
-import HomeStack from './HomeStackNavigator';
 import Transactions from '~/screens/Transactions';
 import Goals from '~/screens/Goals';
 import ChartsTab from './ChartsTabNavigator';
-import CardsStack from './CardsStackNavigator';
 import colors from '~/css/colors';
+import Cards from '~/screens/Cards';
+import Home from '~/screens/Home';
 
 const Tab = createBottomTabNavigator();
 
@@ -52,8 +52,8 @@ export default function MainTabNavigator(){
             )}
         >
             <Tab.Screen
-                name="HomeStack"
-                component={HomeStack}
+                name="Home"
+                component={Home}
                 options={{
                     tabBarIcon: tabBarIcon('home'),
                     tabBarLabel: 'Home',
@@ -76,8 +76,8 @@ export default function MainTabNavigator(){
                 }}
             />
             <Tab.Screen
-                name="CardsStack"
-                component={CardsStack}
+                name="Cards"
+                component={Cards}
                 options={{
                     tabBarIcon: tabBarIcon('credit-card'),
                     tabBarLabel: 'Cartões',

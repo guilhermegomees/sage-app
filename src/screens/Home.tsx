@@ -24,7 +24,7 @@ function formatValue(value: number): string {
 
 type AccountsScreenNavigationProp = StackNavigationProp<any, 'Accounts'>;
 
-export default function Accounts() {
+export default function Home() {
     const navigation = useNavigation<AccountsScreenNavigationProp>();
     const { showValues } = useContext(HeaderContext);
     const [data, setData] = useState<ITransaction[]>([]);

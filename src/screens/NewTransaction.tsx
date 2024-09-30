@@ -1,14 +1,10 @@
 import { useState } from "react";
-import { Dimensions, TouchableOpacity, View, Text, StyleSheet, Platform, TextInput } from "react-native";
-import Input from "~/components/Input";
-import Overlay from "~/components/Overlay";
+import { Dimensions, TouchableOpacity, View, Text, StyleSheet, Platform, TextInput, TouchableWithoutFeedback } from "react-native";
 import Modal from "react-native-modal";
 import { Calendar } from "react-native-calendars";
 import base from "~/css/base";
 import colors from "~/css/colors";
-import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
-
-const { width, height } = Dimensions.get('window');
+import { FontAwesome5 } from "@expo/vector-icons";
 
 const NewTransaction: React.FC<any> = (props) => {
     const [value, setValue] = useState<number>(0);
@@ -32,24 +28,6 @@ const NewTransaction: React.FC<any> = (props) => {
 
         setValue(numericValue);
     };    
-
-    const getYesterday = () => {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        return yesterday.toLocaleDateString('pt-BR');
-    };
-
-    // Função para definir a data atual
-    const handleTodayPress = () => {
-        setSelectedDate(getToday());
-        setIsCalendarVisible(false)
-    };
-
-    // Função para definir a data de ontem
-    const handleYesterdayPress = () => {
-        setSelectedDate(getYesterday());
-        setIsCalendarVisible(false)
-    };
 
     // Função para selecionar a data no calendário
     const handleSelectDate = (date: string) => {
@@ -108,36 +86,42 @@ const NewTransaction: React.FC<any> = (props) => {
                     />
                 </View>
             </View>
-            {/* Calendário */}
-            {isCalendarVisible && (
-                <View style={styles.calendarWindow}>
-                    <View style={styles.calendarContainer}>
-                        <TouchableOpacity style={[base.alignItemsEnd, base.w_100]} onPress={() => setIsCalendarVisible(false)}>
-                            <MaterialIcons name="close" size={25}/>
-                        </TouchableOpacity>
-                        <Calendar
-                            onDayPress={(day: any) => handleSelectDate(day.dateString)}
-                            markedDates={{
-                                [selectedDate]: { selected: true, selectedColor: 'blue' },
-                            }}
-                        />
-                        <View style={[base.flexRow, base.justifyContentCenter, base.gap_10]}>
-                            <TouchableOpacity
-                                style={[styles.btnDate]}
-                                onPress={handleTodayPress}
-                            >
-                                <Text style={[styles.textBtnDate]}>Hoje</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={[styles.btnDate]}
-                                onPress={handleYesterdayPress}
-                            >
-                                <Text style={[styles.textBtnDate]}>Ontem</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-            )}
+            <Modal
+                isVisible={isCalendarVisible}
+                onBackdropPress={() => setIsCalendarVisible(false)}
+                animationIn="slideInUp"
+                animationOut="slideOutDown"
+                backdropOpacity={0.5}
+            >
+                <Calendar
+                    onDayPress={(day: any) => handleSelectDate(day.dateString)}
+                    markedDates={{ [selectedDate]: { selected: true, selectedColor: 'blue' } }}
+                    style={{ borderRadius: 20, overflow: 'hidden', }}
+                    theme={{
+                        calendarBackground: colors.gray_800,
+                        textSectionTitleColor: colors.gray_500,
+                        selectedDayBackgroundColor: colors.blue_300,
+                        todayTextColor: colors.blue_300,
+                        dayTextColor: colors.gray_100,
+                        textDisabledColor: colors.gray_600,
+                        dotColor: colors.blue_300,
+                        arrowColor: colors.blue_300,
+                        monthTextColor: colors.blue_300,
+                        indicatorColor: colors.blue_300,
+                        textDayFontFamily: 'Outfit_600SemiBold',
+                        textMonthFontFamily: 'Outfit_600SemiBold',
+                        textDayHeaderFontFamily: 'Outfit_600SemiBold',
+                        'stylesheet.day': {
+                            base: {
+                                margin: 1, // Ajuste para evitar que os dias se sobreponham
+                            },
+                            text: {
+                                borderRadius: 10, // Adicionando borda arredondada aos textos dos dias
+                            },
+                        },
+                    }}
+                />
+            </Modal>
         </Modal>
     );
 }
@@ -233,10 +217,10 @@ const styles = StyleSheet.create({
     calendarContainer: {
         width: Dimensions.get('window').width * 0.8,
         padding: 20,
-        backgroundColor: 'white',
+        backgroundColor: colors.gray_800,
         borderRadius: 10,
-        elevation: 10, // Sombra para Android
-        shadowColor: '#000', // Sombra para iOS
+        elevation: 10,
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.8,
         shadowRadius: 2,

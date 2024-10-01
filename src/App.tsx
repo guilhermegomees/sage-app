@@ -1,4 +1,4 @@
-import { StatusBar } from 'react-native';
+import { SafeAreaView, StatusBar } from 'react-native';
 import RootStack from '~/navigation/RootStack';
 import colors from '~/css/colors';
 import {
@@ -20,9 +20,9 @@ export default function App() {
     }
 
     return (
-        <>
+        <SafeAreaView style={[{flex: 1}]}>
             <StatusBar barStyle="light-content" backgroundColor={colors.gray_900} />
             <RootStack />
-        </>
+        </SafeAreaView>
     )
 }

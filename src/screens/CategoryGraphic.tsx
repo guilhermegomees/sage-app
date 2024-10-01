@@ -21,7 +21,7 @@ export const categories: ICategory[] = [
 	{
 		id: 2,
 		user: "user1",
-		icon: "food",
+		icon: "apple-alt",
 		name: "Alimentação",
 		color: "#FFD700",
 	},
@@ -49,7 +49,7 @@ export const categories: ICategory[] = [
 	{
 		id: 6,
 		user: "user2",
-		icon: "education",
+		icon: "book",
 		name: "Educação",
 		color: "#8A2BE2",
 	},
@@ -63,7 +63,7 @@ export const categories: ICategory[] = [
 	{
 		id: 8,
 		user: "user2",
-		icon: "donation",
+		icon: "hand-holding-heart",
 		name: "Doação",
 		color: "#FF4500",
 	}

@@ -109,7 +109,6 @@ const MainTabNavigator: React.FC<BottomSheetProps> = ({ data, type }) => {
                                                         <View style={[styles.containerIconTransactions, {
                                                             backgroundColor: transaction.isExpense ? colors.red_500 : colors.green_500
                                                         }]}>
-
                                                             <FontAwesome5 name={transaction.icon ?? 'star'} color={colors.gray_900} size={15} />
                                                         </View>
                                                         <Text style={[styles.textTransaction]}>{transaction.description}</Text>

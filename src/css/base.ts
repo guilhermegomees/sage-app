@@ -18,8 +18,8 @@ export const base = StyleSheet.create({
     inputText: {
         fontFamily: 'Outfit_500Medium',
         fontSize: 15,
-		width: '90%',
-		color: colors.white
+		color: colors.white,
+		lineHeight: 18
     },
 
 	// Widths
@@ -615,6 +615,9 @@ export const base = StyleSheet.create({
 	},
 	justifyContentEnd: {
 		justifyContent: 'flex-end',
+	},
+	justifyContentSpaceBetween: {
+		justifyContent: 'space-between',
 	},
 	alignItemsCenter: {
 		alignItems: 'center',

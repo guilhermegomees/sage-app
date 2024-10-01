@@ -1,18 +1,33 @@
 import { useState } from "react";
-import { Dimensions, TouchableOpacity, View, Text, StyleSheet, Platform, TextInput, TouchableWithoutFeedback } from "react-native";
+import { TouchableOpacity, View, Text, StyleSheet, TextInput } from "react-native";
 import Modal from "react-native-modal";
-import { Calendar } from "react-native-calendars";
+import { Calendar, LocaleConfig } from "react-native-calendars";
 import base from "~/css/base";
 import colors from "~/css/colors";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
+
+LocaleConfig.locales['pt-BR'] = {
+    monthNames: [
+        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ],
+    monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+    dayNames: ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'],
+    dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+    today: 'Hoje'
+};
+LocaleConfig.defaultLocale = 'pt-BR';
 
 const NewTransaction: React.FC<any> = (props) => {
     const [value, setValue] = useState<number>(0);
     const [descript, setDescript] = useState<string>();
+    const [isCategoriesVisible, setIsCategoriesVisible] = useState<boolean>(false)
 
-    const getToday = () => { return new Date().toLocaleDateString('pt-BR'); };
+    const getToday = () => { return new Date(); };
 
-    const [selectedDate, setSelectedDate] = useState<string>(getToday());
+    const [selectedDate, setSelectedDate] = useState<string>(getToday().toISOString().split('T')[0]);
+    const [selectedTempDate, setSelectedTempDate] = useState<string>(getToday().toISOString().split('T')[0]);
+    const [formattedDate, setFormattedDate] = useState<string>(getToday().toLocaleDateString('pt-BR'));
     const [isCalendarVisible, setIsCalendarVisible] = useState<boolean>(false);
 
     const formatCurrency = (num: number) => {
@@ -27,14 +42,25 @@ const NewTransaction: React.FC<any> = (props) => {
         const numericValue = parseFloat(rawValue) / 100;
 
         setValue(numericValue);
-    };    
+    };
+    
+    const handleSelectTempDate = (date: string) => {
+        setSelectedTempDate(date);
+    };
 
-    // Função para selecionar a data no calendário
-    const handleSelectDate = (date: string) => {
-        const [year, month, day] = date.split("-");
-        setSelectedDate(new Date(Number(year), Number(month) - 1, Number(day)).toLocaleDateString('pt-BR'));
+    const handleSelectDate = () => {
+        setSelectedDate(selectedTempDate);
+
+        // Converter a data para o formato brasileiro 'DD/MM/YYYY' e exibir
+        const [year, month, day] = selectedTempDate.split("-");
+        setFormattedDate(new Date(Number(year), Number(month) - 1, Number(day)).toLocaleDateString('pt-BR'));
         setIsCalendarVisible(false);
     };
+
+    const handleCancelCalendar = () => {
+        setSelectedTempDate(selectedDate)
+        setIsCalendarVisible(false)
+    }
 
     const handleDateClick = () => {
         setIsCalendarVisible(true);
@@ -44,7 +70,6 @@ const NewTransaction: React.FC<any> = (props) => {
         <Modal
             isVisible={props.isModalVisible}
             onBackdropPress={props.onClose}
-            swipeDirection="down"
             style={styles.containerModal}
         >
             <View style={[styles.modal]}>
@@ -68,14 +93,6 @@ const NewTransaction: React.FC<any> = (props) => {
                     />
                 </View>
                 <View style={[base.gap_15, base.mt_20]}>
-                    <View style={[styles.containerDate]}>
-                        <TouchableOpacity style={[base.input, styles.input, base.justifyContentStart, base.gap_15]} onPress={handleDateClick}>
-                            <FontAwesome5 name="calendar-alt" color={colors.gray_100} size={20} />
-                            <Text style={styles.textBtnDate}>
-                                {selectedDate}
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
                     <TextInput
                         style={[styles.inputDesc, styles.input, { height: 75 }]}
                         placeholder="Descrição"
@@ -84,6 +101,21 @@ const NewTransaction: React.FC<any> = (props) => {
                         value={descript}
                         maxLength={25}
                     />
+                    <View style={[styles.containerDate]}>
+                        <TouchableOpacity style={[base.input, styles.input, base.justifyContentStart, base.gap_15]} onPress={handleDateClick}>
+                            <FontAwesome5 name="calendar-alt" color={colors.gray_100} size={20} />
+                            <Text style={styles.textBtnDate}>
+                                {formattedDate}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                    <TouchableOpacity style={[base.input, styles.input]} onPress={() => setIsCategoriesVisible(true)}>
+                        <View style={[base.flexRow, base.alignItemsCenter, {gap: 12}]}>
+                            <MaterialIcons name="more-horiz" color={colors.gray_100} size={25} />
+                            <Text style={[base.inputText]}>Categorias</Text>
+                        </View>
+                        <MaterialIcons name="chevron-right" color={colors.gray_100} size={25} />
+                    </TouchableOpacity>
                 </View>
             </View>
             <Modal
@@ -91,36 +123,63 @@ const NewTransaction: React.FC<any> = (props) => {
                 onBackdropPress={() => setIsCalendarVisible(false)}
                 animationIn="slideInUp"
                 animationOut="slideOutDown"
-                backdropOpacity={0.5}
+                backdropOpacity={0.8}
+                style={[base.alignItemsCenter, base.px_10]}
             >
-                <Calendar
-                    onDayPress={(day: any) => handleSelectDate(day.dateString)}
-                    markedDates={{ [selectedDate]: { selected: true, selectedColor: 'blue' } }}
-                    style={{ borderRadius: 20, overflow: 'hidden', }}
-                    theme={{
-                        calendarBackground: colors.gray_800,
-                        textSectionTitleColor: colors.gray_500,
-                        selectedDayBackgroundColor: colors.blue_300,
-                        todayTextColor: colors.blue_300,
-                        dayTextColor: colors.gray_100,
-                        textDisabledColor: colors.gray_600,
-                        dotColor: colors.blue_300,
-                        arrowColor: colors.blue_300,
-                        monthTextColor: colors.blue_300,
-                        indicatorColor: colors.blue_300,
-                        textDayFontFamily: 'Outfit_600SemiBold',
-                        textMonthFontFamily: 'Outfit_600SemiBold',
-                        textDayHeaderFontFamily: 'Outfit_600SemiBold',
-                        'stylesheet.day': {
-                            base: {
-                                margin: 1, // Ajuste para evitar que os dias se sobreponham
+                <View style={styles.calendarContainer}>
+                    <Calendar
+                        initialDate={selectedTempDate || selectedDate}
+                        onDayPress={(day: any) => handleSelectTempDate(day.dateString)}
+                        markedDates={{ [selectedTempDate]: { selected: true, selectedColor: colors.blue_300 } }}
+                        style={{ borderRadius: 20, overflow: 'hidden' }}
+                        hideExtraDays={true}
+                        theme={{
+                            calendarBackground: colors.gray_800,
+                            textSectionTitleColor: colors.gray_500,
+                            todayTextColor: colors.blue_300,
+                            dayTextColor: colors.gray_100,
+                            dotColor: colors.blue_300,
+                            arrowColor: colors.blue_300,
+                            monthTextColor: colors.blue_300,
+                            indicatorColor: colors.blue_300,
+                            textDayFontFamily: 'Outfit_600SemiBold',
+                            textMonthFontFamily: 'Outfit_600SemiBold',
+                            textDayHeaderFontFamily: 'Outfit_600SemiBold',
+                            selectedDayTextColor: 'black',
+                            'stylesheet.day': {
+                                base: { margin: 1 },
+                                text: { borderRadius: 10 },
                             },
-                            text: {
-                                borderRadius: 10, // Adicionando borda arredondada aos textos dos dias
-                            },
-                        },
-                    }}
-                />
+                        }}
+                        renderArrow={(direction: string) => (
+                            <MaterialIcons
+                                name={direction === 'left' ? 'chevron-left' : 'chevron-right'}
+                                size={24}
+                                color={colors.blue_300}
+                            />
+                        )}
+                    />
+                    <View style={[base.flexRow, base.justifyContentSpaceBetween, base.px_15, base.mt_20]}>
+                        <TouchableOpacity onPress={handleCancelCalendar}>
+                            <Text style={styles.calendarText}>Cancelar</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={handleSelectDate}>
+                            <Text style={styles.calendarText}>Salvar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+            <Modal
+                isVisible={isCategoriesVisible}
+                onBackdropPress={() => setIsCategoriesVisible(false)}
+                animationIn="slideInUp"
+                animationOut="slideOutDown"
+                backdropOpacity={0.8}
+                style={[base.justifyContentEnd]}
+            >
+                <View style={[{ backgroundColor: colors.gray_800, height: '60%', width: '100%' }]}>
+                    <Text>Teste</Text>
+                </View>
             </Modal>
         </Modal>
     );
@@ -192,7 +251,7 @@ const styles = StyleSheet.create({
         padding: 15,
         fontFamily: 'Outfit_500Medium',
         color: colors.white,
-        fontSize: 17,
+        fontSize: 15,
     },
     dateText: {
         fontSize: 18,
@@ -204,19 +263,10 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         marginBottom: 20,
     },
-    calendarWindow: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fundo escuro para realçar a janela
-    },
     calendarContainer: {
-        width: Dimensions.get('window').width * 0.8,
-        padding: 20,
+        width: "100%",
+        padding: 10,
+        paddingBottom: 25,
         backgroundColor: colors.gray_800,
         borderRadius: 10,
         elevation: 10,
@@ -225,10 +275,10 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.8,
         shadowRadius: 2,
     },
-    closeText: {
-        color: 'blue',
-        textAlign: 'center',
-        marginTop: 10,
+    calendarText: {
+        fontFamily: 'Outfit_500Medium',
+        fontSize: 16,
+        color: colors.blue_300,
     },
     btnDate: {
         backgroundColor: colors.gray_500,
@@ -236,7 +286,7 @@ const styles = StyleSheet.create({
         borderRadius: 20
     },
     textBtnDate: {
-        fontSize: 18,
+        fontSize: 15,
         fontFamily: 'Outfit_500Medium',
         color: colors.gray_100,
     },

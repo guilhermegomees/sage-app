@@ -8,14 +8,18 @@ import {
     base,
     MaterialIcons,
     useNavigation,
-    StackNavigationProp
+    StackNavigationProp,
 } from '~/imports';
+import { FlatList } from 'react-native';
 
 import { TypeScreem } from '~/enums';
 import { ITransaction } from '~/interfaces';
 
 import BottomSheet from '~/components/BottomSheet';
 import SearchBar from '~/components/SearchBar';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { db } from '../config';
 
 type TransactionsScreenNavigationProp = StackNavigationProp<any, 'Transactions'>;
 
@@ -23,10 +27,6 @@ export default function Transactions() {
     const navigation = useNavigation<TransactionsScreenNavigationProp>();
     const [transactions, setTransactions] = useState<ITransaction[]>([]);
     const [filteredTransactions, setFilteredTransactions] = useState<ITransaction[]>([]);
-
-    const handleNavigateToBack = () => {
-        navigation.navigate('Home');
-    };
 
     const fetchTransactions = async (): Promise<void> => {
         //TODO: Trazer transações através do banco e popular o data
@@ -48,8 +48,57 @@ export default function Transactions() {
         setFilteredTransactions(data);
     };
 
+    const convertToDate = (timeObject: { seconds: number; nanoseconds: number }): Date => {
+        const { seconds, nanoseconds } = timeObject;
+        
+        const millisecondsFromSeconds = seconds * 1000;
+        
+        const millisecondsFromNanoseconds = nanoseconds / 1_000_000;
+        
+        const totalMilliseconds = millisecondsFromSeconds + millisecondsFromNanoseconds;
+        
+        return new Date(totalMilliseconds);
+
+      };
+
+    const fetchTransactionsFromFirebase = async () => {
+        try {
+          const querySnapshot = await getDocs(collection(db, "transaction"));
+          const data: ITransaction[] = querySnapshot.docs.map(doc => {
+            const transactionData = doc.data();
+            
+            // Verifica se transactionData.date existe e é um Timestamp
+            let dateString = '';
+            if (transactionData.date && typeof transactionData.date.toDate === 'function') {
+                dateString = new Date(transactionData.date.toDate()).toISOString();
+            } else {
+                console.warn("Documento sem campo 'date' válido ou 'date' não é um Timestamp:", doc.id); 
+            }
+            console.log(transactionData.date);
+            return {
+              id: transactionData.id || 0, 
+              date: convertToDate(transactionData.date),
+              description: transactionData.description || '', 
+              icon: transactionData.icon || '',
+              isExpense: transactionData.isExpense ? 1 : 0,
+              value: transactionData.value || 0,
+              wallet: transactionData.wallet || 0
+            };
+          });
+      
+          console.log(data);
+          
+      
+          setTransactions(data);
+          setFilteredTransactions(data);
+        } catch (error) {
+          console.error("Erro ao buscar transações do Firebase: ", error);
+        }
+      };
+
     useEffect(() => {
-        fetchTransactions();
+        // fetchTransactions();
+        fetchTransactionsFromFirebase();
     }, []);
 
     const handleSearch = (text: string) => {
@@ -58,6 +107,15 @@ export default function Transactions() {
         );
         setFilteredTransactions(filtered);
     };
+
+    const renderItem = ({ item }: { item: ITransaction }) => (
+        <View style={styles.transactionItem}> 
+            <Text>{item.description}</Text> 
+            <Text>{item.value.toString()}</Text> {/* Certifique-se de converter o valor para string */}
+            {/* Adicione mais elementos Text para exibir outros detalhes */}
+        </View>
+    );
+
 
     return (
         <View style={[styles.container]}>
@@ -76,6 +134,12 @@ export default function Transactions() {
                 <SearchBar onSearch={handleSearch} />
             </View>
             <BottomSheet data={filteredTransactions} type={TypeScreem.Transaction} />
+            {/* <FlatList // Use o FlatList para renderizar a lista de transações
+                data={filteredTransactions}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.id.toString()} 
+            /> */}
+
         </View>
     );
 }
@@ -107,5 +171,11 @@ const styles = StyleSheet.create({
     textButtonAdd : {
         fontFamily: 'Outfit_500Medium',
         color: colors.gray_50
+    },
+    transactionItem: {
+        // Adicione estilos para cada item da lista de transações
+        padding: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: 'gray',
     }
 })

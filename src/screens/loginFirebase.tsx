@@ -13,51 +13,74 @@ import {
     MaterialIcons,
     useNavigation
 } from '~/imports';
-import auth from '@react-native-firebase/auth';
+import auth from '@react-native-firebase/auth'; // Firebase importado
 
 type LoginScreenNavigationProp = StackNavigationProp<any, 'Login'>;
 
 const LoginScreen = () => {
     const navigation = useNavigation<LoginScreenNavigationProp>();
-    const [showPassword, setShowPassword] = useState(false); // Controlar a visibilidade da senha
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    const handleLogin = () => {
-        navigation.navigate('Home');
+    // Função de login com Firebase
+    const handleLogin = async () => {
+        try {
+            await auth().signInWithEmailAndPassword(email, password);
+            navigation.navigate('Home'); // Navegar para Home após o login bem-sucedido
+        } catch (error) {
+            setErrorMessage('Falha no login. Verifique suas credenciais.');
+        }
     };
 
-    const handleRegister = () => {
-        navigation.navigate('Register');
+    const handleRegister = async () => {
+        try {
+            await auth().createUserWithEmailAndPassword(email, password);
+            navigation.navigate('Home'); // Navegar para Home após o registro bem-sucedido
+        } catch (error) {
+            setErrorMessage('Falha no registro. Verifique suas credenciais.');
+        }
     };
 
-    // Alternar entre mostrar e ocultar a senha
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);
     };
 
     return (
         <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-            <View style={[base.flex_1]}>
+            <View style={styles.flex_1}>
                 <Image source={require('../assets/images/logo.png')} style={styles.logo} />
                 <Text style={styles.nameCompany}>Sage</Text>
                 <View style={styles.halfContainer}>
                     <Text style={styles.title}>Bem-vindo(a) de volta</Text>
+                    {errorMessage && <Text style={styles.errorMessage}>{errorMessage}</Text>}
                     <View style={styles.inputsContainer}>
-                        <View style={[styles.input, base.flexRowReverse]}>
-                            <MaterialIcons name="email" size={20} color={colors.gray_200} />
-                            <TextInput style={styles.inputText} placeholder="E-mail" placeholderTextColor={colors.gray_200} />
+                        <View style={[styles.input, styles.flexRowReverse]}>
+                            <MaterialIcons name="email" size={20} color="#b0b0b0" />
+                            <TextInput
+                                style={styles.inputText}
+                                placeholder="E-mail"
+                                placeholderTextColor="#b0b0b0"
+                                value={email}
+                                onChangeText={setEmail}
+                                keyboardType="email-address"
+                            />
                         </View>
-                        <View style={[styles.input, base.flexRow]}>
+                        <View style={[styles.input, styles.flexRow]}>
                             <TextInput
                                 style={styles.inputText}
                                 placeholder="Senha"
-                                placeholderTextColor={colors.gray_200}
+                                placeholderTextColor="#b0b0b0"
                                 secureTextEntry={!showPassword}
+                                value={password}
+                                onChangeText={setPassword}
                             />
                             <TouchableOpacity onPress={toggleShowPassword}>
                                 <MaterialIcons
                                     name={showPassword ? 'visibility-off' : 'visibility'}
                                     size={20}
-                                    color={colors.gray_200}
+                                    color="#b0b0b0"
                                 />
                             </TouchableOpacity>
                         </View>
@@ -65,10 +88,10 @@ const LoginScreen = () => {
                     <TouchableOpacity style={styles.loginBtn} onPress={handleLogin}>
                         <Text style={styles.loginBtnText}>Entrar</Text>
                     </TouchableOpacity>
-                    <View style={[base.flexRow, base.gap_4, base.mb_10]}>
+                    <View style={styles.flexRow}>
                         <Text style={styles.signUpText}>Sem Conta?</Text>
                         <TouchableOpacity onPress={handleRegister}>
-                            <Text style={styles.signUpTextLink}>Registre Aqui</Text>
+                            <Text style={styles.signUpTextLink}>Registre Aqui2</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -80,7 +103,10 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
-        backgroundColor: colors.gray_900,
+        backgroundColor: '#121212',
+    },
+    flex_1: {
+        flex: 1,
     },
     logo: {
         width: 40,
@@ -91,71 +117,76 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-end',
     },
     nameCompany: {
-        fontFamily: 'Outfit_400Regular',
         fontSize: 45,
         height: 60,
-        color: colors.gray_50,
+        color: '#fff',
         textAlign: 'center',
-        marginBottom: 90
+        marginBottom: 90,
     },
     halfContainer: {
         flex: 1,
         alignItems: 'center',
         borderTopLeftRadius: 50,
         borderTopRightRadius: 50,
-        backgroundColor: colors.gray_800,
+        backgroundColor: '#1E1E1E',
         paddingHorizontal: 30,
     },
     title: {
-        fontFamily: 'Outfit_600SemiBold',
         fontSize: 25,
-        color: colors.gray_50,
+        color: '#fff',
         marginTop: 40,
         marginBottom: 40,
-        height: 33
+        height: 33,
     },
     inputsContainer: {
         gap: 25,
-        marginBottom: 50
+        marginBottom: 50,
     },
     input: {
         width: '100%',
-        backgroundColor: colors.gray_900,
+        backgroundColor: '#121212',
         borderRadius: 15,
         height: 50,
         alignItems: 'center',
-        paddingHorizontal: 15
+        paddingHorizontal: 15,
     },
     inputText: {
-        fontFamily: 'Outfit_500Medium',
         height: 50,
-        color: colors.white,
-        flex: 1
+        color: '#fff',
+        flex: 1,
     },
     loginBtn: {
         width: '100%',
-        backgroundColor: colors.blue_600,
+        backgroundColor: '#1E88E5',
         borderRadius: 15,
         height: 50,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 20
+        marginBottom: 20,
     },
     loginBtnText: {
-        fontFamily: 'Outfit_500Medium',
         fontSize: 20,
-        color: colors.gray_50,
+        color: '#fff',
     },
     signUpText: {
-        fontFamily: 'Outfit_500Medium',
         fontSize: 15,
-        color: colors.gray_50,
+        color: '#fff',
     },
     signUpTextLink: {
-        fontFamily: 'Outfit_500Medium',
         fontSize: 15,
-        color: colors.blue_300,
-        textDecorationLine: 'underline'
+        color: '#1E88E5',
+        textDecorationLine: 'underline',
+    },
+    errorMessage: {
+        color: '#ff3333',
+        marginBottom: 10,
+    },
+    flexRow: {
+        flexDirection: 'row',
+        gap: 4,
+    },
+    flexRowReverse: {
+        flexDirection: 'row-reverse',
     },
 });
 

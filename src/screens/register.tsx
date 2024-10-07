@@ -13,19 +13,36 @@ import {
     MaterialIcons,
     useNavigation
 } from '~/imports';
+import auth from '@react-native-firebase/auth'; // Importação do Firebase Authentication
 
 type RegisterScreenNavigationProp = StackNavigationProp<any, 'Register'>;
 
 const RegisterScreen = () => {
     const navigation = useNavigation<RegisterScreenNavigationProp>();
+    const [name, setName] = useState(''); // Adicionado estado para o nome
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false); // Controlar a visibilidade da senha
+    const [errorMessage, setErrorMessage] = useState(''); // Mensagem de erro caso o cadastro falhe
 
     const handleLogin = () => {
         navigation.navigate('Login');
     };
 
-    const handleRegister = () => {
-        navigation.navigate('Home');
+    const handleRegister = async () => {
+        if (password !== confirmPassword) {
+            setErrorMessage('As senhas não correspondem.');
+            return;
+        }
+
+        try {
+            // Criação de usuário com email e senha no Firebase
+            await auth().createUserWithEmailAndPassword(email, password);
+            navigation.navigate('Home'); // Navega para a tela Home após o registro bem-sucedido
+        } catch (error: any) {
+            setErrorMessage(error.message); // Exibe a mensagem de erro
+        }
     };
 
     // Alternar entre mostrar e ocultar a senha
@@ -43,11 +60,24 @@ const RegisterScreen = () => {
                     <View style={styles.inputsContainer}>
                         <View style={[styles.input, base.flexRowReverse]}>
                             <MaterialIcons name="person" size={20} color={colors.gray_200} />
-                            <TextInput style={styles.inputText} placeholder="Nome" placeholderTextColor={colors.gray_200} />
+                            <TextInput
+                                style={styles.inputText}
+                                placeholder="Nome"
+                                placeholderTextColor={colors.gray_200}
+                                value={name}
+                                onChangeText={setName}
+                            />
                         </View>
                         <View style={[styles.input, base.flexRowReverse]}>
                             <MaterialIcons name="email" size={20} color={colors.gray_200} />
-                            <TextInput style={styles.inputText} placeholder="E-mail" placeholderTextColor={colors.gray_200} />
+                            <TextInput
+                                style={styles.inputText}
+                                placeholder="E-mail"
+                                placeholderTextColor={colors.gray_200}
+                                value={email}
+                                onChangeText={setEmail}
+                                keyboardType="email-address"
+                            />
                         </View>
                         <View style={[styles.input, base.flexRow]}>
                             <TextInput
@@ -55,6 +85,8 @@ const RegisterScreen = () => {
                                 placeholder="Senha"
                                 placeholderTextColor={colors.gray_200}
                                 secureTextEntry={!showPassword}
+                                value={password}
+                                onChangeText={setPassword}
                             />
                             <TouchableOpacity onPress={toggleShowPassword}>
                                 <MaterialIcons
@@ -70,6 +102,8 @@ const RegisterScreen = () => {
                                 placeholder="Confirmar senha"
                                 placeholderTextColor={colors.gray_200}
                                 secureTextEntry={!showPassword}
+                                value={confirmPassword}
+                                onChangeText={setConfirmPassword}
                             />
                             <TouchableOpacity onPress={toggleShowPassword}>
                                 <MaterialIcons
@@ -79,6 +113,7 @@ const RegisterScreen = () => {
                                 />
                             </TouchableOpacity>
                         </View>
+                        {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
                     </View>
                     <TouchableOpacity style={styles.loginBtn} onPress={handleRegister}>
                         <Text style={styles.loginBtnText}>Criar conta</Text>
@@ -174,6 +209,11 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: colors.blue_300,
         textDecorationLine: 'underline'
+    },
+    errorText: {
+        color: 'red',
+        marginTop: 10,
+        textAlign: 'center',
     },
 });
 

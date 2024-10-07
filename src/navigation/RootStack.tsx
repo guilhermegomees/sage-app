@@ -1,7 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-import LoginScreen from '~/screens/Login';
+import LoginScreen from '~/screens/loginFirebase';
 import RegisterScreen from '~/screens/Register';
 import Transactions from '~/screens/Transactions';
 import CardDetails from '~/screens/CardDetails';
@@ -28,7 +28,7 @@ const Stack = createStackNavigator<RootStackParamList>();
 export default function RootStack() {
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName="Main">
+            <Stack.Navigator initialRouteName="Login">
                 <Stack.Screen
                     name="Main"
                     component={MainTabNavigator}

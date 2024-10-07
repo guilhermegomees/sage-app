@@ -11,7 +11,7 @@ const { width, height } = Dimensions.get('window');
 export default function Header() {
     const { showValues, setShowValues } = useContext(HeaderContext);
     const [isModalVisible, setModalVisible] = useState<boolean>(false);
-
+    
     const toggleModal = () => {
         setModalVisible(!isModalVisible);
     };

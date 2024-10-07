@@ -37,7 +37,7 @@ export default function Transactions() {
 
     const handleSearch = (text: string) => {
         const filtered: ITransaction[] = transactions.filter((transaction: ITransaction) =>
-            transaction.description.toLowerCase().startsWith(text.toLowerCase())
+            transaction.description.toLowerCase().includes(text.toLowerCase())
         );
         setFilteredTransactions(filtered);
     };

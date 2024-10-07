@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import colors from './colors';
+import { ClipPath } from 'react-native-svg';
 
 export const base = StyleSheet.create({
 	input: {
@@ -19,7 +20,27 @@ export const base = StyleSheet.create({
         fontFamily: 'Outfit_500Medium',
         fontSize: 15,
 		color: colors.white,
-		lineHeight: 18
+		lineHeight: 18,
+    },
+	button: {
+		width: 160,
+        height: 45,
+        justifyContent: 'center',
+        borderRadius: 13,
+		backgroundColor: colors.blue_600
+	},
+	btnText: {
+        fontFamily: 'Outfit_500Medium',
+        fontSize: 18,
+        color: colors.gray_50,
+        textAlign: 'center',
+        height: 22
+    },
+	btnCancel: {
+        backgroundColor: colors.orange_300
+    },
+	btnSave: {
+        backgroundColor: colors.blue_600
     },
 
 	// Widths
@@ -542,6 +563,9 @@ export const base = StyleSheet.create({
 	},
 	py_15: {
 		paddingVertical: 15,
+	},
+	py_18: {
+		paddingVertical: 18,
 	},
 	py_20: {
 		paddingVertical: 20,

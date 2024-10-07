@@ -1,21 +1,13 @@
 import React, { useRef, useState } from 'react';
+import { Dimensions, View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import Input from '~/components/Input';
 import { Dropdown } from 'react-native-element-dropdown';
-import {
-    Text,
-    View,
-    StyleSheet,
-    TouchableOpacity,
-    colors,
-    base,
-    Image,
-    MaterialIcons,
-    FontAwesome5,
-    useNavigation,
-    StackNavigationProp,
-    Dimensions,
-} from '~/imports';
 import Overlay from '~/components/Overlay';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import base from '~/css/base';
+import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
+import colors from '~/css/colors';
 
 const { width, height } = Dimensions.get('window');
 
@@ -167,11 +159,11 @@ export default function CardDatails() {
                 </View>
                 {/* Botões */}
                 <View style={[styles.buttonContainer]}>
-                    <TouchableOpacity style={[styles.button, styles.btnCardRegister]}>
-                        <Text style={[styles.btnText]}>Salvar</Text>
+                    <TouchableOpacity style={[base.button, base.btnCancel]} onPress={handleNavigateToBack}>
+                        <Text style={[base.btnText]}>Cancelar</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.button, styles.btnCancel]}>
-                        <Text style={[styles.btnText]}>Cancelar</Text>
+                    <TouchableOpacity style={[base.button, base.btnSave]}>
+                        <Text style={[base.btnText]}>Salvar</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -277,25 +269,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         gap: 15
-    },
-    button: {
-        width: 160,
-        height: 45,
-        justifyContent: 'center',
-        borderRadius: 13
-    },
-    btnCardRegister: {
-        backgroundColor: colors.blue_600
-    },
-    btnCancel: {
-        backgroundColor: colors.orange_300
-    },
-    btnText: {
-        fontFamily: 'Outfit_500Medium',
-        fontSize: 18,
-        color: colors.gray_50,
-        textAlign: 'center',
-        height: 22
     },
     overlay: {
         width,

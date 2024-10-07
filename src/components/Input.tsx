@@ -1,7 +1,9 @@
 import React, { createRef, useState } from "react";
 import { TouchableOpacity, StyleSheet, Text, Modal, TextInput, View, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { base, colors } from "~/imports";
+import { MaterialIcons } from "@expo/vector-icons";
+import base from "~/css/base";
+import colors from "~/css/colors";
 
 const Input: React.FC<any> = (props) => {
     const [modalVisible, setModalVisible] = useState(false);
@@ -22,8 +24,11 @@ const Input: React.FC<any> = (props) => {
 
     return (
         <TouchableOpacity style={[props.style, props.containerStyle]} activeOpacity={1} onPress={setVisibility}>
-            <Text style={[styles.inputText, props.textStyle]}>{props.value || props.placeholder}</Text>
-            <Modal 
+            <Text style={[base.inputText, {color: props.value ? colors.white : colors.gray_200}, props.textStyle]}>
+                {props.value || props.placeholder}
+            </Text>
+            { props.icon && <MaterialIcons name={props.icon} size={20} color={colors.gray_200} /> }
+            <Modal
                 visible={modalVisible} 
                 onRequestClose={setVisibility}
                 onShow={setFocus}
@@ -32,15 +37,26 @@ const Input: React.FC<any> = (props) => {
             >
                 <SafeAreaView style={[base.flex_1]}>
                     <TouchableOpacity style={[styles.outside]} onPress={setVisibility}/>
-                    <View style={[styles.inputWrapper]}>
-                        <TextInput 
-                            {...props}
-                            style={[props.style, base.w_100]}
-                            ref={inputRef}
-                            autoFocus={Platform.OS === 'ios'}
-                            onBlur={setVisibility}
-                            onSubmitEditing={setVisibility}
-                        />
+                    <View 
+                        style={[
+                            styles.inputWrapper,
+                            props.inputWrapperStyle,
+                            {backgroundColor: props.inputWrapperColor ?? colors.gray_800},
+                            {flexDirection: props.icon && 'row'},
+                        ]}
+                    >
+                        <View style={[base.input]}>
+                            <TextInput
+                                {...props}
+                                style={[base.inputText, props.textStyle]}
+                                placeholderTextColor={colors.gray_200}
+                                ref={inputRef}
+                                autoFocus={Platform.OS === 'ios'}
+                                onBlur={setVisibility}
+                                onSubmitEditing={setVisibility}
+                            />
+                            { props.icon && <MaterialIcons name={props.icon} size={20} color={colors.gray_200} /> }
+                        </View>
                     </View>
                 </SafeAreaView>
             </Modal>
@@ -57,19 +73,13 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         paddingHorizontal: 10
     },
-    inputText: {
-        fontFamily: 'Outfit_500Medium',
-        color: colors.white,
-        fontSize: 15,
-    },
     inputWrapper: {
         flex: Platform.OS === 'ios' ? 1 : 0,
-        backgroundColor: colors.gray_900,
         paddingTop: 20,
         paddingBottom: Platform.OS === 'ios' ? 0 : 20,
         paddingHorizontal: 15,
         borderTopLeftRadius: 12,
-        borderTopRightRadius: 12
+        borderTopRightRadius: 12,
     },
     outside: {
         flex: 1

@@ -1,19 +1,10 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { IGoal } from '~/interfaces';
-import {
-    React,
-    Text,
-    View,
-    StyleSheet,
-    Dimensions,
-    ScrollView,
-    TouchableOpacity,
-    Bar,
-    MaterialIcons,
-    colors,
-    base,
-} from '../imports';
-import { Modal } from 'react-native';
+import { Dimensions, Modal, ScrollView, TouchableOpacity, View, Text, StyleSheet } from 'react-native';
+import { Bar } from 'react-native-progress';
+import base from '~/css/base';
+import colors from '~/css/colors';
+import { IGoal } from '~/interfaces/interfaces';
 
 export default function Goals() {
     const [filter, setFilter] = useState<'all' | 'completed' | 'incomplete'>('all');

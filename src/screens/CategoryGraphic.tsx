@@ -1,70 +1,121 @@
 import React, { useEffect, useState } from 'react';
+import { ScrollView, TouchableOpacity, View, Text, StyleSheet, Image } from 'react-native';
 import { VictoryPie, VictoryTooltip } from 'victory-native';
-import { Text, View, StyleSheet, colors, base, ITransaction, Image } from '~/imports';
-import { ScrollView, TouchableOpacity } from 'react-native';
 import { CardTransaction, CardProps } from '~/components/CardTransaction';
-import PeriodSelector, { charts } from '~/components/PeriodSelector';
-import { ICategory } from '~/interfaces';
-import { monthsList } from '~/utils/monthsList';
+import PeriodSelector from '~/components/PeriodSelector';
+import { monthsList } from '~/constants/monthsList';
+import { ICategory, ITransaction } from '~/interfaces/interfaces';
+import base from '~/css/base';
+import { charts } from '~/enums/enums';
+import colors from '~/css/colors';
 
 // Categorias
 export const categories: ICategory[] = [
-	{
-		id: 1,
-		user: "user1",
-		icon: "home",
-		name: "Moradia",
-		color: "#FF6347",
-	},
-	{
-		id: 2,
-		user: "user1",
-		icon: "food",
-		name: "Alimentação",
-		color: "#FFD700",
-	},
-	{
-		id: 3,
-		user: "user2",
-		icon: "car",
-		name: "Transporte",
-		color: "#1E90FF",
-	},
-	{
-		id: 4,
-		user: "user3",
-		icon: "heart",
-		name: "Saúde",
-		color: "#FF1493",
-	},
-	{
-		id: 5,
-		user: "user1",
-		icon: "star",
-		name: "Lazer",
-		color: "#32CD32",
-	},
-	{
-		id: 6,
-		user: "user2",
-		icon: "education",
-		name: "Educação",
-		color: "#8A2BE2",
-	},
-	{
-		id: 7,
-		user: "user1",
-		icon: "briefcase",
-		name: "Salário",
-		color: "#00FF0D",
-	},
-	{
-		id: 8,
-		user: "user2",
-		icon: "donation",
-		name: "Doação",
-		color: "#FF4500",
-	}
+    {
+        id: 1,
+        user: "user1",
+        icon: "home",
+        name: "Moradia",
+        color: "#FF6347",
+    },
+    {
+        id: 2,
+        user: "user1",
+        icon: "apple-alt",
+        name: "Alimentação",
+        color: "#FFD700",
+    },
+    {
+        id: 3,
+        user: "user2",
+        icon: "car",
+        name: "Transporte",
+        color: "#1E90FF",
+    },
+    {
+        id: 4,
+        user: "user3",
+        icon: "heart",
+        name: "Saúde",
+        color: "#FF1493",
+    },
+    {
+        id: 5,
+        user: "user1",
+        icon: "star",
+        name: "Lazer",
+        color: "#32CD32",
+    },
+    {
+        id: 6,
+        user: "user2",
+        icon: "book",
+        name: "Educação",
+        color: "#8A2BE2",
+    },
+    {
+        id: 7,
+        user: "user1",
+        icon: "briefcase",
+        name: "Salário",
+        color: "#00FF0D",
+    },
+    {
+        id: 8,
+        user: "user2",
+        icon: "hand-holding-heart",
+        name: "Doação",
+        color: "#FF4500",
+    },
+    {
+        id: 9,
+        user: "user3",
+        icon: "shopping-cart",
+        name: "Compras",
+        color: "#FF8C00",
+    },
+    {
+        id: 10,
+        user: "user1",
+        icon: "running",
+        name: "Esportes",
+        color: "#00BFFF",
+    },
+    {
+        id: 11,
+        user: "user2",
+        icon: "cocktail",
+        name: "Bebidas",
+        color: "#DC143C",
+    },
+    {
+        id: 12,
+        user: "user3",
+        icon: "plane",
+        name: "Viagens",
+        color: "#4682B4",
+    },
+    {
+        id: 13,
+        user: "user1",
+        icon: "gift",
+        name: "Presentes",
+        color: "#FF69B4",
+    },
+    {
+        id: 14,
+        user: "user3",
+        icon: "tools",
+        name: "Manutenção",
+        color: "#A52A2A",
+    },
+    {
+        id: 15,
+        user: "user2",
+        icon: "dollar-sign",
+        name: "Investimentos",
+        color: "#228B22",
+    }
 ];
 
 // Dados de despesas

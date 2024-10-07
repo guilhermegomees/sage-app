@@ -1,6 +1,48 @@
 import { StyleSheet } from 'react-native';
+import colors from './colors';
+import { ClipPath } from 'react-native-svg';
 
 export const base = StyleSheet.create({
+	input: {
+        backgroundColor: colors.gray_900,
+        borderRadius: 15,
+        height: 50,
+		width: '100%',
+        paddingHorizontal: 15,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        fontFamily: 'Outfit_500Medium',
+        color: colors.white,
+        fontSize: 15,
+    },
+    inputText: {
+        fontFamily: 'Outfit_500Medium',
+        fontSize: 15,
+		color: colors.white,
+		lineHeight: 18,
+    },
+	button: {
+		width: 160,
+        height: 45,
+        justifyContent: 'center',
+        borderRadius: 13,
+		backgroundColor: colors.blue_600
+	},
+	btnText: {
+        fontFamily: 'Outfit_500Medium',
+        fontSize: 18,
+        color: colors.gray_50,
+        textAlign: 'center',
+        height: 22
+    },
+	btnCancel: {
+        backgroundColor: colors.orange_300
+    },
+	btnSave: {
+        backgroundColor: colors.blue_600
+    },
+
 	// Widths
 	w_0: {
 		width: '0%',
@@ -522,6 +564,9 @@ export const base = StyleSheet.create({
 	py_15: {
 		paddingVertical: 15,
 	},
+	py_18: {
+		paddingVertical: 18,
+	},
 	py_20: {
 		paddingVertical: 20,
 	},
@@ -594,6 +639,9 @@ export const base = StyleSheet.create({
 	},
 	justifyContentEnd: {
 		justifyContent: 'flex-end',
+	},
+	justifyContentSpaceBetween: {
+		justifyContent: 'space-between',
 	},
 	alignItemsCenter: {
 		alignItems: 'center',

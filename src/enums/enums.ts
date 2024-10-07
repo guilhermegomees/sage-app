@@ -5,3 +5,9 @@ export enum TypeScreem {
     Transaction = 3,
     Graphics = 4
 }
+
+// Tipos de gráficos
+export enum charts {
+    pie = 1,
+    bar = 2,
+}

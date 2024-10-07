@@ -1,7 +1,9 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import { MaterialIcons, colors } from '~/imports';
-import { monthsList } from '~/utils/monthsList';
+import { monthsList } from '~/constants/monthsList';
+import colors from '~/css/colors';
+import { charts } from '~/enums/enums';
 
 interface PeriodSelectorProps {
     currentPeriod: string;
@@ -9,11 +11,6 @@ interface PeriodSelectorProps {
     onPrevPeriod: () => void;
     onNextPeriod: () => void;
     chart?: charts;
-}
-
-export enum charts {
-    pie = 1,
-    bar = 2,
 }
 
 const getAdjacentMonths = (currentPeriod: string) => {

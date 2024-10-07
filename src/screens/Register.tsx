@@ -126,6 +126,7 @@ const RegisterScreen = () => {
                     </View>
                 </View>
             </View>
+            {overlay && <Overlay style={[styles.overlay]} />}
         </ScrollView>
     );
 };

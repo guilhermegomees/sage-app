@@ -1,17 +1,11 @@
 import React from 'react';
-import {
-    FontAwesome5,
-    colors,
-    base,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
-    TypeScreem,
-    ITransaction,
-    Image
-} from '~/imports';
-import { monthsList } from '~/utils/monthsList';
+import { ScrollView, View, Text, StyleSheet, Image } from 'react-native';
+import { FontAwesome5 } from '@expo/vector-icons';
+import { monthsList } from '~/constants/monthsList';
+import { TypeScreem } from '~/enums/enums';
+import { ITransaction } from '~/interfaces/interfaces';
+import base from '~/css/base';
+import colors from '~/css/colors';
 
 interface BottomSheetProps {
     data: ITransaction[];
@@ -115,7 +109,6 @@ const MainTabNavigator: React.FC<BottomSheetProps> = ({ data, type }) => {
                                                         <View style={[styles.containerIconTransactions, {
                                                             backgroundColor: transaction.isExpense ? colors.red_500 : colors.green_500
                                                         }]}>
-
                                                             <FontAwesome5 name={transaction.icon ?? 'star'} color={colors.gray_900} size={15} />
                                                         </View>
                                                         <Text style={[styles.textTransaction]}>{transaction.description}</Text>

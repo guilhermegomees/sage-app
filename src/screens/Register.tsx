@@ -1,19 +1,14 @@
 import React, { useState } from 'react';
-import {
-    View,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    StyleSheet,
-    Image,
-    ScrollView,
-    StackNavigationProp,
-    base,
-    colors,
-    MaterialIcons,
-    useNavigation
-} from '~/imports';
-import auth from '@react-native-firebase/auth'; // Importação do Firebase Authentication
+import auth from '@react-native-firebase/auth';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { useNavigation } from '@react-navigation/native';
+import { ScrollView, TextInput, TouchableOpacity, View, StyleSheet, Image, Text, Dimensions } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import base from '~/css/base';
+import colors from '~/css/colors';
+import Overlay from '~/components/Overlay';
+
+const { width, height } = Dimensions.get('window');
 
 type RegisterScreenNavigationProp = StackNavigationProp<any, 'Register'>;
 
@@ -25,6 +20,7 @@ const RegisterScreen = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false); // Controlar a visibilidade da senha
     const [errorMessage, setErrorMessage] = useState(''); // Mensagem de erro caso o cadastro falhe
+    const [overlay, setOverley] = useState(false);
 
     const handleLogin = () => {
         navigation.navigate('Login');
@@ -215,6 +211,10 @@ const styles = StyleSheet.create({
         color: 'red',
         marginTop: 10,
         textAlign: 'center',
+    },
+    overlay: {
+        width,
+        height
     },
 });
 

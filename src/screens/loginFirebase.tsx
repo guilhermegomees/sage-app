@@ -1,19 +1,9 @@
 import React, { useState } from 'react';
-import {
-    View,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    StyleSheet,
-    Image,
-    ScrollView,
-    StackNavigationProp,
-    base,
-    colors,
-    MaterialIcons,
-    useNavigation
-} from '~/imports';
-import auth from '@react-native-firebase/auth'; // Firebase importado
+import { ScrollView, View, Image, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import auth from '@react-native-firebase/auth';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { useNavigation } from '@react-navigation/native';
+import { MaterialIcons } from '@expo/vector-icons';
 
 type LoginScreenNavigationProp = StackNavigationProp<any, 'Login'>;
 

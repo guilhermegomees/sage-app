@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TouchableOpacity, View, Text, StyleSheet, TextInput, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import Modal from "react-native-modal";
 import { Calendar, LocaleConfig } from "react-native-calendars";
@@ -7,6 +7,8 @@ import colors from "~/css/colors";
 import { FontAwesome5, MaterialIcons, Octicons } from "@expo/vector-icons";
 import { ICategory } from "~/interfaces/interfaces";
 import { categories as categoriesList } from "./CategoryGraphic";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "~/config";
 
 LocaleConfig.locales['pt-BR'] = {
     monthNames: [
@@ -31,6 +33,7 @@ const NewTransaction: React.FC<any> = (props) => {
     const [categorie, setCategorie] = useState<ICategory | null>(null);
     const [searchCategorie, setSearchCategorie] = useState<string>('');
     const [descriptNewCtg, setDescriptNewCtg] = useState<string | any>();
+    const [categories, setCategories] = useState<ICategory[] | any>();
 
     const getToday = () => { return new Date(); };
 
@@ -90,10 +93,6 @@ const NewTransaction: React.FC<any> = (props) => {
         setCategorie(null);
     }
 
-    const filteredCategories = categoriesList.filter((ctg) =>
-        ctg.name.toLowerCase().includes(searchCategorie.toLowerCase())
-    );
-
     const handleNewCategorie = () => {
         setIsCategoriesVisible(false);
         setIsNewCategorieVisible(true);
@@ -108,6 +107,35 @@ const NewTransaction: React.FC<any> = (props) => {
         setSelectedIcon(icon);
         setIsIconPickerVisible(false);
     };
+
+    const fetchCategories = async () => {
+        try {
+            const querySnapshot = await getDocs(collection(db, "categorie"));
+            const data: ICategory[] = querySnapshot.docs.map(doc => {
+                const categorieData = doc.data();
+
+                return {
+                    id: categorieData.id || 0,
+                    user: categorieData.user,
+                    name: categorieData.name,
+                    icon: categorieData.icon,
+                    color: categorieData.color,
+                };
+            });
+
+            setCategories(data);
+        } catch (error) {
+            console.error("Erro ao buscar categorias: ", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchCategories();
+    }, []);
+
+    const filteredCategories = categories?.filter((ctg : ICategory) =>
+        ctg.name.toLowerCase().includes(searchCategorie.toLowerCase())
+    );
     
     return (
         <Modal
@@ -117,18 +145,10 @@ const NewTransaction: React.FC<any> = (props) => {
             style={[base.justifyContentEnd, base.m_0]}
         >
             <View style={styles.modal}>
-                <View style={styles.containerBtnActions}>
-                    <TouchableOpacity onPress={handleCloseAndReset}>
-                        <Text style={styles.cancel}>Cancelar</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity>
-                        <Text style={styles.save}>Salvar</Text>
-                    </TouchableOpacity>
-                </View>
-                <View style={styles.containerValue}>
+                <View style={styles.containerValueTransaction}>
                     <Text style={styles.label}>Valor</Text>
                     <TextInput 
-                        style={styles.value}
+                        style={styles.valueTransaction}
                         placeholder={'R$ 0.00'}
                         placeholderTextColor={colors.red_500}
                         keyboardType="numeric"
@@ -139,7 +159,7 @@ const NewTransaction: React.FC<any> = (props) => {
                 <View style={[base.gap_18, base.mt_20]}>
                     {/* Descrição */}
                     <TextInput
-                        style={styles.inputDesc}
+                        style={base.inputDescript}
                         placeholder="Descrição"
                         placeholderTextColor="#F8F1F1"
                         onChangeText={setDescript}
@@ -147,12 +167,12 @@ const NewTransaction: React.FC<any> = (props) => {
                         maxLength={25}
                     />
                     {/* Data */}
-                    <TouchableOpacity style={[styles.input, base.gap_5]} onPress={handleDateClick}>
+                    <TouchableOpacity style={[base.input, base.gap_5, base.justifyContentStart, { backgroundColor: colors.gray_825 }]} onPress={handleDateClick}>
                         <FontAwesome5 name="calendar-alt" color={colors.gray_100} size={20} />
                         <Text style={styles.textBtnDate}>{formattedDate}</Text>
                     </TouchableOpacity>
                     {/* Categoria */}
-                    <TouchableOpacity style={[styles.input, base.justifyContentSpaceBetween]} onPress={() => setIsCategoriesVisible(true)}>
+                    <TouchableOpacity style={[base.input, { backgroundColor: colors.gray_825 }]} onPress={() => setIsCategoriesVisible(true)}>
                         <View style={styles.row}>
                             {categorie
                                 ? <FontAwesome5 name={categorie.icon} color={categorie.color} size={20}/>
@@ -161,6 +181,14 @@ const NewTransaction: React.FC<any> = (props) => {
                             <Text style={base.inputText}>{categorie?.name || "Categoria"}</Text>
                         </View>
                         <MaterialIcons name="chevron-right" color={colors.gray_100} size={20} />
+                    </TouchableOpacity>
+                </View>
+                <View style={[base.flexRow, base.justifyContentSpaceBetween, base.mt_30]}>
+                    <TouchableOpacity style={[base.button, base.btnCancel]} onPress={handleCloseAndReset}>
+                        <Text style={[base.btnText]}>Cancelar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[base.button, base.btnSave]}>
+                        <Text style={[base.btnText]}>Salvar</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -356,22 +384,21 @@ const NewCategoryModal: React.FC<NewCategoryModalProps> = ({ isVisible, descript
             <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={[base.gap_15]}>
                     <TextInput
-                        style={[styles.inputDesc, {backgroundColor: colors.gray_900}]}
-                        placeholder="Descrição"
+                        style={[base.input, { backgroundColor: colors.gray_825 }]}
+                        placeholder="Nome"
                         placeholderTextColor="#F8F1F1"
                         onChangeText={setDescriptNewCtg}
                         value={descriptNewCtg}
                         maxLength={25}
                     />
-                    <TouchableOpacity style={[styles.input, base.justifyContentSpaceBetween, {backgroundColor: colors.gray_900}]} onPress={() => setIsColorPickerVisible(true)}>
+                    <TouchableOpacity style={[base.input, base.justifyContentSpaceBetween, { backgroundColor: colors.gray_825 }]} onPress={() => setIsColorPickerVisible(true)}>
                         <View style={styles.row}>
                             <FontAwesome5 name="palette" color={colors.gray_100} size={20}/>
                             <Text style={base.inputText}>Cor</Text>
                         </View>
-                        {/* <MaterialIcons name="chevron-right" color={colors.gray_100} size={20} /> */}
                         <View style={[styles.colorCircleCtg, base.m_0, { backgroundColor: selectedColor }]} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.input, base.justifyContentSpaceBetween, {backgroundColor: colors.gray_900}]} onPress={() => setIsIconPickerVisible(true)}>
+                    <TouchableOpacity style={[base.input, base.justifyContentSpaceBetween, { backgroundColor: colors.gray_825 }]} onPress={() => setIsIconPickerVisible(true)}>
                         <View style={styles.row}>
                             <FontAwesome5 name="image" color={colors.gray_100} size={20}/>
                             <Text style={base.inputText}>Ícone</Text>
@@ -379,7 +406,7 @@ const NewCategoryModal: React.FC<NewCategoryModalProps> = ({ isVisible, descript
                         <FontAwesome5 name={selectedIcon} color={selectedColor} size={20}/>
                     </TouchableOpacity>
                     <View style={[base.flexRow, base.justifyContentSpaceBetween, base.mt_10]}>
-                        <TouchableOpacity style={[base.button, base.btnCancel]}>
+                        <TouchableOpacity style={[base.button, base.btnCancel]} onPress={() => setIsNewCategorieVisible(false)}>
                             <Text style={[base.btnText]}>Cancelar</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={[base.button, base.btnSave]}>
@@ -505,51 +532,20 @@ const styles = StyleSheet.create({
     modal: {
         backgroundColor: colors.gray_875,
         flex: 0.91,
-        borderRadius: 15,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
         padding: 20,
     },
-    containerBtnActions: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-    cancel: {
-        fontFamily: 'Outfit_500Medium',
-        color: colors.orange_300,
-        fontSize: 16
-    },
-    save: {
-        fontFamily: 'Outfit_500Medium',
-        color: colors.blue_400,
-        fontSize: 16
-    },
-    containerValue: {
-        marginTop: 25,
+    containerValueTransaction: {
         paddingBottom: 5,
         borderBottomWidth: 1,
         borderBottomColor: colors.gray_600
     },
-    value: {
+    valueTransaction: {
         height: 40,
         fontSize: 28,
         color: colors.red_500,
         fontFamily: 'Outfit_600SemiBold',
-    },
-    input: {
-        backgroundColor: colors.gray_800,
-        flexDirection: "row",
-        alignItems: "center",
-        padding: 15,
-        borderRadius: 12,
-    },
-    inputDesc: {
-        backgroundColor: colors.gray_800,
-        borderRadius: 12,
-        textAlignVertical: 'top',
-        padding: 15,
-        fontFamily: 'Outfit_500Medium',
-        color: colors.white,
-        fontSize: 15,
-        height: 75,
     },
     row: {
         flexDirection: "row",
@@ -587,10 +583,11 @@ const styles = StyleSheet.create({
         marginLeft: 10,
     },
     categoriesContainer: {
-        backgroundColor: colors.gray_800,
+        backgroundColor: colors.gray_875,
         height: '80%',
         width: '100%',
-        borderRadius: 20
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
     },
     createNewCtg: {
         fontFamily: 'Outfit_400Regular',
@@ -628,11 +625,12 @@ const styles = StyleSheet.create({
 
     // Nova Categoria
     newCategorieContainer: {
-        backgroundColor: colors.gray_800,
-        height: '40%',
+        backgroundColor: colors.gray_875,
         width: '100%',
-        borderRadius: 20,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
         padding: 20,
+        paddingBottom: 30,
         gap: 15
     },
     colorCircleCtg: {
@@ -644,10 +642,11 @@ const styles = StyleSheet.create({
     // Color Picker
     modalColorPicker: {
         backgroundColor: colors.gray_800,
-        borderRadius: 10,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
         padding: 20,
         width: "100%",
-        height: "45%",
+        height: "50%",
         alignItems: "center",
     },
     colorPickerTitle: {
@@ -660,7 +659,8 @@ const styles = StyleSheet.create({
     colorsContainer: {
         flexDirection: "row",
         flexWrap: "wrap",
-        gap: 30
+        gap: 30,
+        justifyContent: "center"
     },
     colorCircle: {
         width: 40,
@@ -671,10 +671,11 @@ const styles = StyleSheet.create({
     // Icon Picker
     modalIconPicker: {
         backgroundColor: colors.gray_800,
-        borderRadius: 10,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
         padding: 20,
         width: "100%",
-        height: "45%",
+        height: "50%",
         alignItems: "center",
     },
     iconPickerTitle: {
@@ -687,7 +688,8 @@ const styles = StyleSheet.create({
     iconsContainer: {
         flexDirection: "row",
         flexWrap: "wrap",
-        gap: 30
+        gap: 30,
+        justifyContent: "center"
     },
     icon: {
         width: 40,

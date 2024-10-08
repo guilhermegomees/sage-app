@@ -22,6 +22,16 @@ export const base = StyleSheet.create({
 		color: colors.white,
 		lineHeight: 18,
     },
+	inputDescript: {
+		backgroundColor: colors.gray_825,
+		borderRadius: 12,
+		textAlignVertical: 'top',
+		padding: 15,
+		fontFamily: 'Outfit_500Medium',
+		color: colors.white,
+		fontSize: 15,
+		height: 75,
+	},
 	button: {
 		width: 160,
         height: 45,

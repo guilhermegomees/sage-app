@@ -10,7 +10,7 @@ export interface ITransaction {
 }
 
 export interface ICategory {
-    id: number;
+    id: string;
     user: string;
     icon: string;
     name: string;

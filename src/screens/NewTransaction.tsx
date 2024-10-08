@@ -1,102 +1,81 @@
 import { useEffect, useState } from "react";
-import { TouchableOpacity, View, Text, StyleSheet, TextInput, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
+import { TouchableOpacity, View, Text, StyleSheet, TextInput, ScrollView } from "react-native";
 import Modal from "react-native-modal";
-import { Calendar, LocaleConfig } from "react-native-calendars";
 import base from "~/css/base";
 import colors from "~/css/colors";
 import { FontAwesome5, MaterialIcons, Octicons } from "@expo/vector-icons";
 import { ICategory } from "~/interfaces/interfaces";
-import { categories as categoriesList } from "./CategoryGraphic";
-import { collection, getDocs } from "firebase/firestore";
+import { addDoc, collection, getDocs } from "firebase/firestore";
 import { db } from "~/config";
+import { Calendar } from "~/components/Calendar";
 
-LocaleConfig.locales['pt-BR'] = {
-    monthNames: [
-        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-    ],
-    monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-    dayNames: ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'],
-    dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
-    today: 'Hoje'
-};
-LocaleConfig.defaultLocale = 'pt-BR';
+interface NewTransactionProps {
+    isModalVisible: boolean;
+    onClose: () => void;
+}
 
-const NewTransaction: React.FC<any> = (props) => {
-    const [isCategoriesVisible, setIsCategoriesVisible] = useState<boolean>(false);
-    const [isNewCategorieVisible, setIsNewCategorieVisible] = useState<boolean>(false);
-    const [isColorPickerVisible, setIsColorPickerVisible] = useState<boolean>(false);
-    const [isIconPickerVisible, setIsIconPickerVisible] = useState<boolean>(false);
+const NewTransaction: React.FC<NewTransactionProps> = ({ isModalVisible, onClose }) => {
+    const [isCategoriesVisible, setIsCategoriesVisible] = useState(false);
+    const [isNewCategorieVisible, setIsNewCategorieVisible] = useState(false);
+    const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
+    const [isIconPickerVisible, setIsIconPickerVisible] = useState(false);
+    const [isCalendarVisible, setIsCalendarVisible] = useState(false);
 
     const [valueTransaction, setValueTransaction] = useState<number>(0);
-    const [descript, setDescript] = useState<string | any>();
-    const [categorie, setCategorie] = useState<ICategory | null>(null);
-    const [searchCategorie, setSearchCategorie] = useState<string>('');
-    const [descriptNewCtg, setDescriptNewCtg] = useState<string | any>();
-    const [categories, setCategories] = useState<ICategory[] | any>();
+    const [description, setDescription] = useState<string>('');
+    const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(null);
+    const [searchCategory, setSearchCategory] = useState<string>('');
+    const [categories, setCategories] = useState<ICategory[]>([]);
+    const [nameNewCategory, setNameNewCategory] = useState<string>('');
+    const [selectedColor, setSelectedColor] = useState<string>('#FF6347');
+    const [selectedIcon, setSelectedIcon] = useState<string>('home');
 
-    const getToday = () => { return new Date(); };
+    const today = new Date();
+    const [selectedDate, setSelectedDate] = useState<string>(today.toISOString().split('T')[0]);
+    const [selectedTempDate, setSelectedTempDate] = useState<string>(today.toISOString().split('T')[0]);
+    const [formattedDate, setFormattedDate] = useState<string>(today.toLocaleDateString('pt-BR'));
 
-    const [selectedDate, setSelectedDate] = useState<string>(getToday().toISOString().split('T')[0]);
-    const [selectedTempDate, setSelectedTempDate] = useState<string>(getToday().toISOString().split('T')[0]);
-    const [formattedDate, setFormattedDate] = useState<string>(getToday().toLocaleDateString('pt-BR'));
-    const [isCalendarVisible, setIsCalendarVisible] = useState<boolean>(false);
+    const formatCurrency = (num: number): string => 
+        `R$ ${num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-    const [selectedColor, setSelectedColor] = useState<string>("#FF6347");
-    const [selectedIcon, setSelectedIcon] = useState<string>("home");
-
-    const formatCurrency = (num: number) => {
-        return `R$ ${num.toLocaleString('pt-BR', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        })}`;
-    };
-
-    const handleChange = (text: string) => {
-        const rawValue = text.replace(/[^\d]/g, '');
-        const numericValue = parseFloat(rawValue) / 100;
-
+    const handleChange = (text: string): void => {
+        const numericValue = parseFloat(text.replace(/[^\d]/g, '')) / 100;
         setValueTransaction(numericValue);
     };
-    
-    const handleSelectTempDate = (date: string) => {
-        setSelectedTempDate(date);
-    };
 
-    const handleSelectDate = () => {
+    const handleSelectTempDate = (date: string): void => setSelectedTempDate(date);
+
+    const handleSelectDate = (): void => {
         setSelectedDate(selectedTempDate);
-
         const [year, month, day] = selectedTempDate.split("-");
         setFormattedDate(new Date(Number(year), Number(month) - 1, Number(day)).toLocaleDateString('pt-BR'));
         setIsCalendarVisible(false);
     };
 
-    const handleCancelCalendar = () => {
-        setSelectedTempDate(selectedDate)
-        setIsCalendarVisible(false)
-    }
-
-    const handleDateClick = () => {
-        setIsCalendarVisible(true);
+    const handleCancelCalendar = (): void => {
+        setSelectedTempDate(selectedDate);
+        setIsCalendarVisible(false);
     };
 
-    const handleSelectCategorie = (ctg: ICategory) => {
-        setCategorie(ctg);
+    const handleDateClick = (): void => setIsCalendarVisible(true);
+
+    const handleSelectCategory = (category: ICategory): void => {
+        setSelectedCategory(category);
         setIsCategoriesVisible(false);
-    }
+    };
 
-    const handleCloseAndReset = () => {
-        props.onClose();
+    const handleCloseAndReset = (): void => {
+        onClose();
         setValueTransaction(0);
-        setDescript(null);
-        setSelectedDate(getToday().toISOString().split('T')[0]);
-        setCategorie(null);
-    }
+        setDescription('');
+        setSelectedDate(today.toISOString().split('T')[0]);
+        setSelectedCategory(null);
+    };
 
-    const handleNewCategorie = () => {
+    const handleNewCategory = (): void => {
         setIsCategoriesVisible(false);
         setIsNewCategorieVisible(true);
-    }
+    };
 
     const handleSelectColor = (color: string): void => {
         setSelectedColor(color);
@@ -108,20 +87,40 @@ const NewTransaction: React.FC<any> = (props) => {
         setIsIconPickerVisible(false);
     };
 
-    const fetchCategories = async () => {
-        try {
-            const querySnapshot = await getDocs(collection(db, "categorie"));
-            const data: ICategory[] = querySnapshot.docs.map(doc => {
-                const categorieData = doc.data();
+    const categorieCollectionRef = collection(db, "categorie");
 
-                return {
-                    id: categorieData.id || 0,
-                    user: categorieData.user,
-                    name: categorieData.name,
-                    icon: categorieData.icon,
-                    color: categorieData.color,
-                };
+    const createCategory = async (): Promise<void> => {
+        if (!nameNewCategory || !selectedColor || !selectedIcon) {
+            alert("Por favor, preencha todos os campos antes de continuar.");
+            return;
+        }
+
+        try {
+            await addDoc(categorieCollectionRef, {
+                name: nameNewCategory,
+                color: selectedColor,
+                icon: selectedIcon,
+                user: "user1",
             });
+
+            await fetchCategories();
+            setIsNewCategorieVisible(false);
+            setIsCategoriesVisible(true);
+        } catch (error) {
+            console.error("Erro ao criar categoria: ", error);
+        }
+    };
+
+    const fetchCategories = async (): Promise<void> => {
+        try {
+            const querySnapshot = await getDocs(categorieCollectionRef);
+            const data: ICategory[] = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                user: doc.data().user,
+                name: doc.data().name,
+                icon: doc.data().icon,
+                color: doc.data().color,
+            }));
 
             setCategories(data);
         } catch (error) {
@@ -133,13 +132,13 @@ const NewTransaction: React.FC<any> = (props) => {
         fetchCategories();
     }, []);
 
-    const filteredCategories = categories?.filter((ctg : ICategory) =>
-        ctg.name.toLowerCase().includes(searchCategorie.toLowerCase())
+    const filteredCategories = categories.filter(ctg => 
+        ctg.name.toLowerCase().includes(searchCategory.toLowerCase())
     );
     
     return (
         <Modal
-            isVisible={props.isModalVisible}
+            isVisible={isModalVisible}
             onBackdropPress={handleCloseAndReset}
             backdropOpacity={0.5}
             style={[base.justifyContentEnd, base.m_0]}
@@ -162,8 +161,8 @@ const NewTransaction: React.FC<any> = (props) => {
                         style={base.inputDescript}
                         placeholder="Descrição"
                         placeholderTextColor="#F8F1F1"
-                        onChangeText={setDescript}
-                        value={descript}
+                        onChangeText={setDescription}
+                        value={description}
                         maxLength={25}
                     />
                     {/* Data */}
@@ -174,11 +173,11 @@ const NewTransaction: React.FC<any> = (props) => {
                     {/* Categoria */}
                     <TouchableOpacity style={[base.input, { backgroundColor: colors.gray_825 }]} onPress={() => setIsCategoriesVisible(true)}>
                         <View style={styles.row}>
-                            {categorie
-                                ? <FontAwesome5 name={categorie.icon} color={categorie.color} size={20}/>
+                            {selectedCategory
+                                ? <FontAwesome5 name={selectedCategory.icon} color={selectedCategory.color} size={20}/>
                                 : <MaterialIcons name="more-horiz" color={colors.gray_100} size={20} style={styles.iconCtgEmpty}/>
                             }
-                            <Text style={base.inputText}>{categorie?.name || "Categoria"}</Text>
+                            <Text style={base.inputText}>{selectedCategory?.name || "Categoria"}</Text>
                         </View>
                         <MaterialIcons name="chevron-right" color={colors.gray_100} size={20} />
                     </TouchableOpacity>
@@ -192,7 +191,7 @@ const NewTransaction: React.FC<any> = (props) => {
                     </TouchableOpacity>
                 </View>
             </View>
-            <CalendarModal
+            <Calendar
                 isVisible={isCalendarVisible}
                 selectedTempDate={selectedTempDate || selectedDate}
                 handleSelectTempDate={handleSelectTempDate}
@@ -202,22 +201,23 @@ const NewTransaction: React.FC<any> = (props) => {
             <CategoriesModal
                 isVisible={isCategoriesVisible}
                 filteredCategories={filteredCategories}
-                searchCategorie={searchCategorie}
-                setSearchCategorie={setSearchCategorie}
-                handleSelectCategorie={handleSelectCategorie}
-                handleNewCategorie={handleNewCategorie}
+                searchCategorie={searchCategory}
+                setSearchCategorie={setSearchCategory}
+                handleSelectCategorie={handleSelectCategory}
+                handleNewCategorie={handleNewCategory}
                 setIsCategoriesVisible={setIsCategoriesVisible}
-                categorie={categorie}
+                categorie={selectedCategory}
             />
             <NewCategoryModal
                 isVisible={isNewCategorieVisible}
-                descriptNewCtg={descriptNewCtg}
+                nameNewCategory={nameNewCategory}
                 selectedColor={selectedColor}
                 selectedIcon={selectedIcon}
                 setIsNewCategorieVisible={setIsNewCategorieVisible}
-                setDescriptNewCtg={setDescriptNewCtg}
+                setNameNewCtg={setNameNewCategory}
                 setIsColorPickerVisible={setIsColorPickerVisible}
                 setIsIconPickerVisible={setIsIconPickerVisible}
+                createCategory={createCategory}
             />
             <ColorPickerModal
                 isVisible={isColorPickerVisible}
@@ -232,55 +232,6 @@ const NewTransaction: React.FC<any> = (props) => {
         </Modal>
     );
 }
-
-interface CalendarModalProps {
-    isVisible: boolean;
-    selectedTempDate: string;
-    handleSelectTempDate: (date: string) => void;
-    handleSelectDate: () => void;
-    handleCancelCalendar: () => void;
-  }
-  
-const CalendarModal: React.FC<CalendarModalProps> = ({
-    isVisible,
-    selectedTempDate,
-    handleSelectTempDate,
-    handleSelectDate,
-    handleCancelCalendar,
-}) => (
-    <Modal
-        isVisible={isVisible}
-        onBackdropPress={handleCancelCalendar}
-        backdropOpacity={0.4}
-        style={[base.alignItemsCenter, base.px_10]}
-    >
-        <View style={styles.calendarContainer}>
-            <Calendar
-                initialDate={selectedTempDate}
-                onDayPress={(day: any) => handleSelectTempDate(day.dateString)}
-                markedDates={{ [selectedTempDate]: { selected: true, selectedColor: colors.blue_300 } }}
-                style={styles.calendar}
-                hideExtraDays={true}
-                theme={calendarTheme}
-                renderArrow={(direction: string) => (
-                    <MaterialIcons
-                        name={direction === 'left' ? 'chevron-left' : 'chevron-right'}
-                        size={24}
-                        color={colors.blue_300}
-                    />
-                )}
-            />
-            <View style={[base.flexRow, base.justifyContentSpaceBetween, base.px_15, base.mt_20]}>
-                <TouchableOpacity onPress={handleCancelCalendar}>
-                    <Text style={[styles.calendarText, {color: colors.orange_300}]}>Cancelar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={handleSelectDate}>
-                    <Text style={styles.calendarText}>Salvar</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
-    </Modal>
-);
 
 interface CategoriesModalProps {
     isVisible: boolean;
@@ -363,16 +314,17 @@ const CategoriesModal: React.FC<CategoriesModalProps> = ({
 
 interface NewCategoryModalProps {
     isVisible: boolean;
-    descriptNewCtg: string | any;
+    nameNewCategory: string | any;
     selectedColor: string;
     selectedIcon: string;
     setIsNewCategorieVisible: (visible: boolean) => void;
-    setDescriptNewCtg: (desc: string) => void;
+    setNameNewCtg: (desc: string) => void;
     setIsColorPickerVisible: (visible: boolean) => void;
     setIsIconPickerVisible: (visible: boolean) => void;
+    createCategory: () => void;
 }
 
-const NewCategoryModal: React.FC<NewCategoryModalProps> = ({ isVisible, descriptNewCtg, selectedColor, selectedIcon, setIsNewCategorieVisible, setDescriptNewCtg, setIsColorPickerVisible, setIsIconPickerVisible }) => (
+const NewCategoryModal: React.FC<NewCategoryModalProps> = ({ isVisible, nameNewCategory, selectedColor, selectedIcon, setIsNewCategorieVisible, setNameNewCtg, setIsColorPickerVisible, setIsIconPickerVisible, createCategory }) => (
     <Modal
         isVisible={isVisible}
         onBackdropPress={() => setIsNewCategorieVisible(false)}
@@ -387,8 +339,8 @@ const NewCategoryModal: React.FC<NewCategoryModalProps> = ({ isVisible, descript
                         style={[base.input, { backgroundColor: colors.gray_825 }]}
                         placeholder="Nome"
                         placeholderTextColor="#F8F1F1"
-                        onChangeText={setDescriptNewCtg}
-                        value={descriptNewCtg}
+                        value={nameNewCategory}
+                        onChangeText={setNameNewCtg}
                         maxLength={25}
                     />
                     <TouchableOpacity style={[base.input, base.justifyContentSpaceBetween, { backgroundColor: colors.gray_825 }]} onPress={() => setIsColorPickerVisible(true)}>
@@ -409,7 +361,7 @@ const NewCategoryModal: React.FC<NewCategoryModalProps> = ({ isVisible, descript
                         <TouchableOpacity style={[base.button, base.btnCancel]} onPress={() => setIsNewCategorieVisible(false)}>
                             <Text style={[base.btnText]}>Cancelar</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={[base.button, base.btnSave]}>
+                        <TouchableOpacity style={[base.button, base.btnSave]} onPress={createCategory}>
                             <Text style={[base.btnText]}>Salvar</Text>
                         </TouchableOpacity>
                     </View>
@@ -451,11 +403,11 @@ const ColorPickerModal: React.FC<ColorPickerModalProps> = ({ isVisible, handleSe
                 <Text style={[styles.colorPickerTitle, styles.line, base.w_100]}>Selecione uma cor</Text>
                 <View style={styles.colorsContainer}>
                     {predefinedColors.map((color) => (
-                    <TouchableOpacity
-                        key={color}
-                        style={[styles.colorCircle, { backgroundColor: color }]}
-                        onPress={() => handleSelectColor(color)}
-                    />
+                        <TouchableOpacity
+                            key={color}
+                            style={[styles.colorCircle, { backgroundColor: color }]}
+                            onPress={() => handleSelectColor(color)}
+                        />
                     ))}
                 </View>
             </View>
@@ -509,25 +461,6 @@ const IconPickerModal: React.FC<IconPickerModalProps> = ({ isVisible, handleSele
     );
 };
 
-const calendarTheme = {
-    calendarBackground: colors.gray_800,
-    textSectionTitleColor: colors.gray_500,
-    todayTextColor: colors.blue_300,
-    dayTextColor: colors.gray_100,
-    dotColor: colors.blue_300,
-    arrowColor: colors.blue_300,
-    monthTextColor: colors.blue_300,
-    indicatorColor: colors.blue_300,
-    textDayFontFamily: 'Outfit_600SemiBold',
-    textMonthFontFamily: 'Outfit_600SemiBold',
-    textDayHeaderFontFamily: 'Outfit_600SemiBold',
-    selectedDayTextColor: 'black',
-    'stylesheet.day': {
-        base: { margin: 1 },
-        text: { borderRadius: 10 },
-    },
-};
-
 const styles = StyleSheet.create({
     modal: {
         backgroundColor: colors.gray_875,
@@ -554,22 +487,6 @@ const styles = StyleSheet.create({
     },
     iconCtgEmpty: {
         width: 18,
-    },
-    calendarContainer: {
-        width: "100%",
-        padding: 15,
-        paddingBottom: 25,
-        backgroundColor: colors.gray_800,
-        borderRadius: 15,
-    },
-    calendar: {
-        backgroundColor: colors.gray_800,
-        borderRadius: 15,
-    },
-    calendarText: {
-        fontSize: 16,
-        fontFamily: 'Outfit_600SemiBold',
-        color: colors.blue_300,
     },
     label: {
         color: colors.gray_200,
@@ -638,7 +555,6 @@ const styles = StyleSheet.create({
         height: 22,
         borderRadius: 25,
     },
-
     // Color Picker
     modalColorPicker: {
         backgroundColor: colors.gray_800,
@@ -660,14 +576,12 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         flexWrap: "wrap",
         gap: 30,
-        justifyContent: "center"
     },
     colorCircle: {
         width: 40,
         height: 40,
         borderRadius: 25, 
     },
-
     // Icon Picker
     modalIconPicker: {
         backgroundColor: colors.gray_800,
@@ -689,7 +603,6 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         flexWrap: "wrap",
         gap: 30,
-        justifyContent: "center"
     },
     icon: {
         width: 40,

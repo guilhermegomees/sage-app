@@ -1,5 +1,5 @@
 import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { FontAwesome6 } from '@expo/vector-icons';
 import colors from '~/css/colors';
 
 interface CustomTabBarProps {
@@ -57,10 +57,10 @@ export function ChartsTabNavigator({ state, descriptors, navigation }: CustomTab
                                         backgroundColor: isFocused ? colors.gray_800 : 'transparent',
                                     }}
                                 >
-                                    <MaterialCommunityIcons
+                                    <FontAwesome6
                                         name={options.title}
-                                        size={30}
-                                        color={isFocused ? '#E2E2E2' : '#8D8C8C'}
+                                        size={23}
+                                        color={isFocused ? colors.gray_100 : colors.gray_500}
                                     />
                                 </View>
                             </View>

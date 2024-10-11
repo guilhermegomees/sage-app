@@ -1,20 +1,18 @@
 import { useEffect, useState } from "react";
-import { TouchableOpacity, View, Text, StyleSheet, TextInput, ScrollView } from "react-native";
+import { TouchableOpacity, View, Text, StyleSheet, TextInput, ScrollView, Image } from "react-native";
 import Modal from "react-native-modal";
 import base from "~/css/base";
 import colors from "~/css/colors";
-import { FontAwesome5, MaterialIcons, Octicons } from "@expo/vector-icons";
+import { FontAwesome5, FontAwesome6, MaterialIcons, Octicons } from "@expo/vector-icons";
 import { ICategory } from "~/interfaces/interfaces";
-import { addDoc, collection, getDocs } from "firebase/firestore";
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "~/config";
 import { Calendar } from "~/components/Calendar";
+import { transactionContext } from "~/enums/enums";
+import { predefinedColors } from "~/constants/colors";
+import { predefinedIcons } from "~/constants/icons";
 
-interface NewTransactionProps {
-    isModalVisible: boolean;
-    onClose: () => void;
-}
-
-const NewTransaction: React.FC<NewTransactionProps> = ({ isModalVisible, onClose }) => {
+const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { isModalVisible: boolean, context: transactionContext, onClose: () => void }) => {
     const [isCategoriesVisible, setIsCategoriesVisible] = useState(false);
     const [isNewCategorieVisible, setIsNewCategorieVisible] = useState(false);
     const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
@@ -59,6 +57,11 @@ const NewTransaction: React.FC<NewTransactionProps> = ({ isModalVisible, onClose
 
     const handleDateClick = (): void => setIsCalendarVisible(true);
 
+    const openCategoryModal = async (): Promise<void> => {
+        await fetchCategories();
+        setIsCategoriesVisible(true);
+    }
+
     const handleSelectCategory = (category: ICategory): void => {
         setSelectedCategory(category);
         setIsCategoriesVisible(false);
@@ -87,7 +90,7 @@ const NewTransaction: React.FC<NewTransactionProps> = ({ isModalVisible, onClose
         setIsIconPickerVisible(false);
     };
 
-    const categorieCollectionRef = collection(db, "categorie");
+    const categorieCollectionRef = collection(db, "category");
 
     const createCategory = async (): Promise<void> => {
         if (!nameNewCategory || !selectedColor || !selectedIcon) {
@@ -96,30 +99,42 @@ const NewTransaction: React.FC<NewTransactionProps> = ({ isModalVisible, onClose
         }
 
         try {
-            await addDoc(categorieCollectionRef, {
+            const newCategoryData = {
                 name: nameNewCategory,
                 color: selectedColor,
                 icon: selectedIcon,
-                user: "user1",
-            });
+                user: "user1", // TODO: ID do usuário logado
+                context: context === transactionContext.revenue ? 1 : 2
+            }
+            
+            const docRef = await addDoc(categorieCollectionRef, newCategoryData);
 
-            await fetchCategories();
+            setSelectedCategory({ id: docRef.id, ...newCategoryData });
+
+            resetNewCategory();
             setIsNewCategorieVisible(false);
-            setIsCategoriesVisible(true);
         } catch (error) {
             console.error("Erro ao criar categoria: ", error);
         }
     };
 
+    const resetNewCategory = (): void => {
+        setNameNewCategory('');
+        setSelectedColor('#FF6347');
+        setSelectedIcon('home');
+    };
+
     const fetchCategories = async (): Promise<void> => {
         try {
-            const querySnapshot = await getDocs(categorieCollectionRef);
+            const q = query(categorieCollectionRef, where("context", "==", context === transactionContext.revenue ? 1 : 2));
+            const querySnapshot = await getDocs(q);
             const data: ICategory[] = querySnapshot.docs.map(doc => ({
                 id: doc.id,
                 user: doc.data().user,
                 name: doc.data().name,
                 icon: doc.data().icon,
                 color: doc.data().color,
+                context: doc.data().context
             }));
 
             setCategories(data);
@@ -147,9 +162,9 @@ const NewTransaction: React.FC<NewTransactionProps> = ({ isModalVisible, onClose
                 <View style={styles.containerValueTransaction}>
                     <Text style={styles.label}>Valor</Text>
                     <TextInput 
-                        style={styles.valueTransaction}
+                        style={[styles.valueTransaction, { color: context === transactionContext.revenue ? colors.green_500 : colors.red_500 }]}
                         placeholder={'R$ 0.00'}
-                        placeholderTextColor={colors.red_500}
+                        placeholderTextColor={context === transactionContext.revenue ? colors.green_500 : colors.red_500}
                         keyboardType="numeric"
                         onChangeText={handleChange}
                         value={formatCurrency(valueTransaction)}
@@ -167,14 +182,14 @@ const NewTransaction: React.FC<NewTransactionProps> = ({ isModalVisible, onClose
                     />
                     {/* Data */}
                     <TouchableOpacity style={[base.input, base.gap_5, base.justifyContentStart, { backgroundColor: colors.gray_825 }]} onPress={handleDateClick}>
-                        <FontAwesome5 name="calendar-alt" color={colors.gray_100} size={20} />
+                        <FontAwesome6 name="calendar-alt" color={colors.gray_100} size={20} />
                         <Text style={styles.textBtnDate}>{formattedDate}</Text>
                     </TouchableOpacity>
                     {/* Categoria */}
-                    <TouchableOpacity style={[base.input, { backgroundColor: colors.gray_825 }]} onPress={() => setIsCategoriesVisible(true)}>
+                    <TouchableOpacity style={[base.input, { backgroundColor: colors.gray_825 }]} onPress={openCategoryModal}>
                         <View style={styles.row}>
                             {selectedCategory
-                                ? <FontAwesome5 name={selectedCategory.icon} color={selectedCategory.color} size={20}/>
+                                ? <FontAwesome6 name={selectedCategory.icon} color={selectedCategory.color} size={20}/>
                                 : <MaterialIcons name="more-horiz" color={colors.gray_100} size={20} style={styles.iconCtgEmpty}/>
                             }
                             <Text style={base.inputText}>{selectedCategory?.name || "Categoria"}</Text>
@@ -201,12 +216,13 @@ const NewTransaction: React.FC<NewTransactionProps> = ({ isModalVisible, onClose
             <CategoriesModal
                 isVisible={isCategoriesVisible}
                 filteredCategories={filteredCategories}
-                searchCategorie={searchCategory}
-                setSearchCategorie={setSearchCategory}
-                handleSelectCategorie={handleSelectCategory}
-                handleNewCategorie={handleNewCategory}
+                searchCategory={searchCategory}
+                setSearchCategory={setSearchCategory}
+                handleSelectCategory={handleSelectCategory}
+                handleNewCategory={handleNewCategory}
                 setIsCategoriesVisible={setIsCategoriesVisible}
-                categorie={selectedCategory}
+                category={selectedCategory}
+                context={context}
             />
             <NewCategoryModal
                 isVisible={isNewCategorieVisible}
@@ -236,23 +252,25 @@ const NewTransaction: React.FC<NewTransactionProps> = ({ isModalVisible, onClose
 interface CategoriesModalProps {
     isVisible: boolean;
     filteredCategories: ICategory[];
-    searchCategorie: string;
-    setSearchCategorie: (text: string) => void;
-    handleSelectCategorie: (ctg: ICategory) => void;
-    handleNewCategorie: () => void;
+    searchCategory: string;
+    setSearchCategory: (text: string) => void;
+    handleSelectCategory: (ctg: ICategory) => void;
+    handleNewCategory: () => void;
     setIsCategoriesVisible: (visible: boolean) => void;
-    categorie: ICategory | null;
+    category: ICategory | null;
+    context: transactionContext
   }
   
 const CategoriesModal: React.FC<CategoriesModalProps> = ({
     isVisible,
     filteredCategories,
-    searchCategorie,
-    setSearchCategorie,
-    handleSelectCategorie,
-    handleNewCategorie,
+    searchCategory,
+    setSearchCategory,
+    handleSelectCategory,
+    handleNewCategory,
     setIsCategoriesVisible,
-    categorie,
+    category,
+    context
 }) => (
     <Modal
         isVisible={isVisible}
@@ -265,22 +283,22 @@ const CategoriesModal: React.FC<CategoriesModalProps> = ({
                 {/* Barra de pesquisa */}
                 <View style={[base.flexRow, base.alignItemsCenter, base.gap_15, base.py_18, styles.line]}>
                     <View style={[styles.containerIcon, {backgroundColor: colors.gray_600}]}>
-                        <FontAwesome5 name="search" color={colors.white} size={15}/>
+                        <FontAwesome6 name="magnifying-glass" color={colors.white} size={15}/>
                     </View>
                     <TextInput
                         placeholder="Pesquisar categoria"
                         placeholderTextColor={colors.gray_300}
                         style={[styles.searchBar]}
-                        value={searchCategorie}
-                        onChangeText={setSearchCategorie}
+                        value={searchCategory}
+                        onChangeText={setSearchCategory}
                     />
                 </View>
             </View>
             <ScrollView showsVerticalScrollIndicator={false}>
                 {filteredCategories.map((ctg) => {
-                    const isSelected = categorie?.id === ctg.id;
+                    const isSelected = category?.id === ctg.id;
                     return (
-                        <TouchableOpacity key={ctg.id} style={[base.px_20]} onPress={() => handleSelectCategorie(ctg)}>
+                        <TouchableOpacity key={ctg.id} style={[base.px_20]} onPress={() => handleSelectCategory(ctg)}>
                             <View style={[base.flexRow, base.justifyContentSpaceBetween, base.alignItemsCenter, base.w_100, base.py_18]}>
                                 <View style={[base.flexRow, base.alignItemsCenter, base.gap_15]}>
                                     <View style={[styles.containerIcon, {backgroundColor: ctg.color}]}>
@@ -298,11 +316,23 @@ const CategoriesModal: React.FC<CategoriesModalProps> = ({
                         </TouchableOpacity>
                     )
                 })}
+                {Object.keys(filteredCategories).length === 0 && (
+                    <View style={[base.justifyContentCenter, base.alignItemsCenter, base.flex_1, base.pt_25, base.pb_10, base.px_25]}>
+                        <View style={[base.justifyContentCenter, base.alignItemsCenter, base.gap_15]}>
+                            <Image source={require('./../assets/images/empty-folder.png')} tintColor={colors.gray_100} style={{ width: 65, height: 65 }} />
+                            <Text style={base.emptyMessage}>
+                                Você ainda não tem categorias de
+                                {context === transactionContext.revenue ? ' receitas' : ' despesas'}. 
+                                Comece criando uma em "Criar nova categoria".
+                            </Text>
+                        </View>
+                    </View>
+                )}
                 {/* Nova categoria */}
-                <TouchableOpacity style={[base.px_20, base.pb_10]} onPress={handleNewCategorie}>
+                <TouchableOpacity style={[base.px_20, base.pb_10]} onPress={handleNewCategory}>
                     <View style={[base.flexRow, base.alignItemsCenter, base.gap_15, base.py_18]}>
                         <View style={[styles.containerIcon, {backgroundColor: colors.gray_600}]}>
-                            <FontAwesome5 name="plus" color={colors.white} size={15}/>
+                            <FontAwesome6 name="plus" color={colors.white} size={15}/>
                         </View>
                         <Text style={[styles.textCreateCtg]}>Criar nova categoria</Text>
                     </View>
@@ -378,20 +408,6 @@ interface ColorPickerModalProps {
 }
   
 const ColorPickerModal: React.FC<ColorPickerModalProps> = ({ isVisible, handleSelectColor, setIsColorPickerVisible }) => {
-    // Lista de cores pré-definidas
-    const predefinedColors = [
-        "#FF6347", // Tomato
-        "#FFD700", // Gold
-        "#32CD32", // Lime Green
-        "#1E90FF", // Dodger Blue
-        "#FF69B4", // Hot Pink
-        "#8A2BE2", // Blue Violet
-        "#FF4500", // Orange Red
-        "#2E8B57", // Sea Green
-        "#4682B4", // Steel Blue
-        "#A52A2A", // Brown
-    ];
-  
     return (
         <Modal
             isVisible={isVisible}
@@ -422,20 +438,6 @@ interface IconPickerModalProps {
 }
   
 const IconPickerModal: React.FC<IconPickerModalProps> = ({ isVisible, handleSelectIcon, setIsIconPickerVisible }) => {
-    // Lista de ícones pré-definidos
-    const predefinedIcons = [
-        "home",
-        "apple-alt",
-        "heart",
-        "mug-hot",
-        "music",
-        "paw",
-        "plane",
-        "umbrella-beach",
-        "wallet",
-        "wrench",
-    ];
-  
     return (
         <Modal
             isVisible={isVisible}
@@ -477,7 +479,6 @@ const styles = StyleSheet.create({
     valueTransaction: {
         height: 40,
         fontSize: 28,
-        color: colors.red_500,
         fontFamily: 'Outfit_600SemiBold',
     },
     row: {
@@ -527,7 +528,8 @@ const styles = StyleSheet.create({
     categorieName: {
         color: colors.gray_100,
         fontSize: 15,
-        fontFamily: 'Outfit_500Medium'
+        fontFamily: 'Outfit_500Medium',
+        lineHeight: 18
     },
     textCreateCtg: {
         color: colors.gray_200,

@@ -1,4 +1,4 @@
-import { MaterialIcons } from '@expo/vector-icons';
+import { FontAwesome6, MaterialIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Dimensions, Modal, ScrollView, TouchableOpacity, View, Text, StyleSheet } from 'react-native';
 import { Bar } from 'react-native-progress';
@@ -172,7 +172,7 @@ export default function Goals() {
                 })}
             </ScrollView>
             <TouchableOpacity style={styles.fabButton} onPress={() => console.log('Adicionar nova meta')}>
-                <MaterialIcons name="add" size={28} color={colors.gray_50} />
+                <FontAwesome6 name="plus" size={22} color={colors.gray_50} />
             </TouchableOpacity>
             <Modal
                 transparent={true}

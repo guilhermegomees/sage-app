@@ -134,7 +134,7 @@ const MainTabNavigator: React.FC<BottomSheetProps> = ({ data, type }) => {
                 ]}>
                     <View style={[base.justifyContentCenter, base.alignItemsCenter, base.gap_15]}>
                         <Image source={require('./../assets/images/bankrupt.png')} tintColor={colors.gray_100} style={{width: 65, height: 65}}/>
-                        <Text style={styles.noTransactionsMessage}>
+                        <Text style={base.emptyMessage}>
                             {type == TypeScreem.Graphics 
                                 ? 'Sem transações por aqui!'
                                 : 'Parece que você ainda não fez nenhuma transação ou nenhuma transação foi encontrada!'}
@@ -245,12 +245,6 @@ const styles = StyleSheet.create({
     iconButtonAction: {
         width: 30,
         height: 30
-    },
-    noTransactionsMessage: {
-        fontFamily: 'Outfit_500Medium',
-        textAlign: 'center',
-        color: colors.gray_50,
-        fontSize: 16,
     },
     cardValuesLimit: {
         fontFamily: 'Outfit_600SemiBold',

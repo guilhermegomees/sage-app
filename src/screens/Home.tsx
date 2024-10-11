@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { TouchableOpacity, View, StyleSheet, Text, Image } from 'react-native';
+import { View, StyleSheet, Text, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import BottomSheet from '~/components/BottomSheet';
@@ -7,9 +7,11 @@ import Header from '~/components/Header';
 import { HeaderContext } from '~/context/HeaderContext';
 import { ITransaction } from '~/interfaces/interfaces';
 import base from '~/css/base';
-import { FontAwesome, FontAwesome6 } from '@expo/vector-icons';
+import { FontAwesome6 } from '@expo/vector-icons';
 import colors from '~/css/colors';
 import { TypeScreem } from '~/enums/enums';
+import FloatingButton from '~/components/FloatingButton';
+//import { FloatingAction } from "react-native-floating-action";
 
 // Formatar valores com duas casas decimais
 function formatValue(value: number): string {
@@ -83,17 +85,17 @@ export default function Home() {
                     <Text style={[styles.textValue, !showValues && styles.hideValues]}> {formatValue(totalIncome - totalExpenses)} </Text>
                     <View style={[base.alignItemsCenter, base.justifyContentCenter, base.flexRow, base.gap_15]}>
                         <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_5]}>
-                            <FontAwesome name='caret-up' color={colors.green_500} size={20} />
+                            <FontAwesome6 name='caret-up' color={colors.green_500} size={20} />
                             <Text style={[styles.textValueEntrance, !showValues && styles.hideValues, styles.shortText]}>{formatValue(totalIncome)}</Text>
                         </View>
                         <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_5]}>
-                            <FontAwesome name='caret-down' color={colors.red_500} size={20} />
+                            <FontAwesome6 name='caret-down' color={colors.red_500} size={20} />
                             <Text style={[styles.textValueOutPut, !showValues && styles.hideValues, styles.shortText]}>{formatValue(totalExpenses)}</Text>
                         </View>
                     </View>
                 </View>
                 {/* Botões de ação */}
-                <View style={[styles.buttonsActionsContainer]}>
+                {/* <View style={[styles.buttonsActionsContainer]}>
                     <View style={[styles.buttonAction]}>
                         <TouchableOpacity onPress={handleNavigateToNewTransaction}>
                             <View style={[styles.button]}>
@@ -110,10 +112,11 @@ export default function Home() {
                         </TouchableOpacity>
                         <Text style={[styles.textBtnsActions]}>Balancear</Text>
                     </View>
-                </View>
+                </View> */}
                 {/* Painel de transações */}
                 <BottomSheet data={data} type={TypeScreem.Account} />
             </View>
+            <FloatingButton/>
         </>
     );
 }
@@ -253,5 +256,5 @@ const styles = StyleSheet.create({
         backgroundColor: colors.gray_500,
         borderRadius: 5,
         color: 'transparent'
-    }
+    },
 })

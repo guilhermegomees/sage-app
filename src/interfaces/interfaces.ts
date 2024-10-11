@@ -15,6 +15,7 @@ export interface ICategory {
     icon: string;
     name: string;
     color: string;
+    context: number;
 }
 
 export interface IGoal {

@@ -34,6 +34,7 @@
     "react-native-awesome-slider": "^2.5.3",
     "react-native-calendars": "^1.1307.0",
     "react-native-element-dropdown": "^2.12.1",
+    "react-native-floating-action": "^1.22.0",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-modal": "^13.0.1",
     "react-native-progress": "^5.0.1",

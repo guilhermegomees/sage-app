@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { BottomFabBar } from 'rn-wave-bottom-bar';
-import { Octicons } from '@expo/vector-icons';
+import { FontAwesome6 } from '@expo/vector-icons';
 import Transactions from '~/screens/Transactions';
 import Goals from '~/screens/Goals';
 import ChartsTab from './ChartsTabNavigator';
@@ -12,7 +12,7 @@ import { HeaderProvider } from '~/context/HeaderContext';
 
 const Tab = createBottomTabNavigator();
 
-const tabBarIcon = (name: any) => () => <Octicons name={name} size={25} color={colors.white} />;
+const tabBarIcon = (name: any) => () => <FontAwesome6 name={name} size={22} color={colors.white} />;
 
 export default function MainTabNavigator(){
     return (
@@ -57,7 +57,7 @@ export default function MainTabNavigator(){
                     name="Home"
                     component={Home}
                     options={{
-                        tabBarIcon: tabBarIcon('home'),
+                        tabBarIcon: tabBarIcon('house'),
                         tabBarLabel: 'Home',
                     }}
                 />
@@ -65,7 +65,7 @@ export default function MainTabNavigator(){
                     name="Transactions"
                     component={Transactions}
                     options={{
-                        tabBarIcon: tabBarIcon('arrow-switch'),
+                        tabBarIcon: tabBarIcon('arrow-right-arrow-left'),
                         tabBarLabel: 'Transações',
                     }}
                 />
@@ -73,7 +73,7 @@ export default function MainTabNavigator(){
                     name="ChartList"
                     component={ChartsTab}
                     options={{
-                        tabBarIcon: tabBarIcon('graph'),
+                        tabBarIcon: tabBarIcon('chart-line'),
                         tabBarLabel: 'Gráficos',
                     }}
                 />
@@ -89,7 +89,7 @@ export default function MainTabNavigator(){
                     name="Goals"
                     component={Goals}
                     options={{
-                        tabBarIcon: tabBarIcon('rocket'),
+                        tabBarIcon: tabBarIcon('bullseye'),
                         tabBarLabel: 'Metas',
                     }}
                 />

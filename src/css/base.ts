@@ -52,6 +52,12 @@ export const base = StyleSheet.create({
 	btnSave: {
         backgroundColor: colors.blue_600
     },
+	emptyMessage: {
+		fontFamily: 'Outfit_500Medium',
+		textAlign: 'center',
+		color: colors.gray_50,
+		fontSize: 15,
+	},
 
 	// Widths
 	w_0: {

@@ -77,7 +77,7 @@ const FloatingButton: React.FC = () => {
                     </TouchableOpacity>
                 </Animated.View>
                 <TouchableOpacity
-                    style={[styles.circle, { backgroundColor: colors.gray_700 }]}
+                    style={[styles.circle, { backgroundColor: colors.blue_600 }]}
                     activeOpacity={0.8}
                     onPress={() => {
                         pop === false ? popIn() : popOut();
@@ -114,6 +114,6 @@ const styles = StyleSheet.create({
     fabButton: {
         position: 'absolute',
         bottom: 40,
-        right: -30
+        right: -20
     },
 });

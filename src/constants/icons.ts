@@ -9,4 +9,5 @@ export const predefinedIcons = [
     "umbrella-beach",
     "wallet",
     "wrench",
+    "money-bill-wave"
 ];

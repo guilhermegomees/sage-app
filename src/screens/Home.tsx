@@ -11,6 +11,8 @@ import { FontAwesome6 } from '@expo/vector-icons';
 import colors from '~/css/colors';
 import { TypeScreem } from '~/enums/enums';
 import FloatingButton from '~/components/FloatingButton';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '~/config';
 //import { FloatingAction } from "react-native-floating-action";
 
 // Formatar valores com duas casas decimais
@@ -29,34 +31,50 @@ type AccountsScreenNavigationProp = StackNavigationProp<any, 'Accounts'>;
 export default function Home() {
     const navigation = useNavigation<AccountsScreenNavigationProp>();
     const { showValues } = useContext(HeaderContext);
-    const [data, setData] = useState<ITransaction[]>([]);
+    const [transactions, setTransactions] = useState<ITransaction[]>([]);
 
-    const transactions: ITransaction[] = [
-        { id: 1, description: "Salário", value: 5000, date: '2024-09-01T03:00:00.000Z', isExpense: 0, icon: 'briefcase', wallet: 1 },
-        { id: 2, description: "Pagamento de aluguel", value: 1200, date: '2024-09-03T03:00:00.000Z', isExpense: 1, icon: 'home', wallet: 1 },
-        { id: 3, description: "Supermercado", value: 450, date: '2024-09-03T03:00:00.000Z', isExpense: 1, icon: 'shopping-cart', wallet: 1 },
-        { id: 4, description: "Pix - Reembolso", value: 150, date: '2024-09-05T03:00:00.000Z', isExpense: 0, icon: 'dollar-sign', wallet: 1 },
-        { id: 5, description: "Restaurante", value: 200, date: '2024-09-05T03:00:00.000Z', isExpense: 1, icon: 'utensils', wallet: 1 },
-        { id: 6, description: "Conta de luz", value: 180, date: '2024-09-08T03:00:00.000Z', isExpense: 1, icon: 'bolt', wallet: 1 },
-        { id: 7, description: "Academia", value: 100, date: '2024-09-08T03:00:00.000Z', isExpense: 1, icon: 'dumbbell', wallet: 1 },
-        { id: 8, description: "Pix - Transferência poupança", value: 500, date: '2024-09-10T03:00:00.000Z', isExpense: 1, icon: 'piggy-bank', wallet: 2 },
-        { id: 9, description: "Bônus anual", value: 1500, date: '2024-09-10T03:00:00.000Z', isExpense: 0, icon: 'gift', wallet: 1 },
-        { id: 10, description: "Manutenção do carro", value: 400, date: '2024-09-12T03:00:00.000Z', isExpense: 1, icon: 'wrench', wallet: 1 },
-        { id: 11, description: "Jantar especial", value: 250, date: '2024-09-12T03:00:00.000Z', isExpense: 1, icon: 'wine-glass', wallet: 1 },
-        { id: 12, description: "Consultoria freelance", value: 800, date: '2024-09-15T03:00:00.000Z', isExpense: 0, icon: 'laptop', wallet: 2 },
-        { id: 13, description: "Doação para caridade", value: 100, date: '2024-09-15T03:00:00.000Z', isExpense: 1, icon: 'heart', wallet: 1 },
-    ];
+    const transactionCollectionRef = collection(db, "transaction");
+
+    const convertToDate = (timeObject: { seconds: number; nanoseconds: number }): Date => {
+        const { seconds, nanoseconds } = timeObject;
+        
+        const millisecondsFromSeconds = seconds * 1000;
+        const millisecondsFromNanoseconds = nanoseconds / 1_000_000;
+        const totalMilliseconds = millisecondsFromSeconds + millisecondsFromNanoseconds;
+        
+        return new Date(totalMilliseconds);
+    };
+
+    const fetchTransactions = async (): Promise<void> => {
+        try {
+            const querySnapshot = await getDocs(transactionCollectionRef);
+            const data: ITransaction[] = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                description: doc.data().description,
+                date: convertToDate(doc.data().date),
+                category: doc.data().category,
+                isExpense: doc.data().isExpense,
+                value: doc.data().value,
+                account: doc.data().account,
+                user: doc.data().user
+            }));
+
+            setTransactions(data);
+        } catch (error) {
+            console.error("Erro ao buscar transações: ", error);
+        }
+    };
 
     useEffect(() => {
-        setData(transactions);
+        fetchTransactions();
     }, []);
 
     // TODO: Calcular o total de entradas e saídas para a wallet específica
     let totalExpenses = 0;
     let totalIncome = 0;
 
-    for (const item of data) {
-        if (item.isExpense === 1) {
+    for (const item of transactions) {
+        if (item.isExpense) {
             totalExpenses += item.value;
         } else {
             totalIncome += item.value;
@@ -114,7 +132,7 @@ export default function Home() {
                     </View>
                 </View> */}
                 {/* Painel de transações */}
-                <BottomSheet data={data} type={TypeScreem.Account} />
+                <BottomSheet data={transactions} type={TypeScreem.Account} />
             </View>
             <FloatingButton/>
         </>

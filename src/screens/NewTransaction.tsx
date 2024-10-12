@@ -33,6 +33,9 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
     const [selectedTempDate, setSelectedTempDate] = useState<string>(today.toISOString().split('T')[0]);
     const [formattedDate, setFormattedDate] = useState<string>(today.toLocaleDateString('pt-BR'));
 
+    const transactionCollectionRef = collection(db, "transaction");
+    const categoryCollectionRef = collection(db, "category");
+
     const formatCurrency = (num: number): string => 
         `R$ ${num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
@@ -90,7 +93,34 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
         setIsIconPickerVisible(false);
     };
 
-    const categorieCollectionRef = collection(db, "category");
+    const createTransaction = async (): Promise<void> => {
+        if (!valueTransaction || !description || !selectedDate || !selectedCategory) {
+            alert("Por favor, preencha todos os campos antes de continuar.");
+            return;
+        }
+    
+        try {
+            const date = new Date(selectedDate);
+            date.setHours(date.getHours() + 3);
+
+            const newTransactionData = {
+                value: valueTransaction,
+                description: description,
+                date: date,
+                category: selectedCategory,
+                isExpense: context != transactionContext.revenue,
+                source: context === transactionContext.cardExpense ? 2 : 1,
+                account: "Nubank", // TODO: conta do usuário
+                user: "user1", // TODO: ID do usuário logado
+            }
+            
+            await addDoc(transactionCollectionRef, newTransactionData);
+    
+            handleCloseAndReset();
+        } catch (error) {
+            console.error("Erro ao criar transação: ", error);
+        }
+    };    
 
     const createCategory = async (): Promise<void> => {
         if (!nameNewCategory || !selectedColor || !selectedIcon) {
@@ -107,7 +137,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                 context: context === transactionContext.revenue ? 1 : 2
             }
             
-            const docRef = await addDoc(categorieCollectionRef, newCategoryData);
+            const docRef = await addDoc(categoryCollectionRef, newCategoryData);
 
             setSelectedCategory({ id: docRef.id, ...newCategoryData });
 
@@ -126,7 +156,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
 
     const fetchCategories = async (): Promise<void> => {
         try {
-            const q = query(categorieCollectionRef, where("context", "==", context === transactionContext.revenue ? 1 : 2));
+            const q = query(categoryCollectionRef, where("context", "==", context === transactionContext.revenue ? 1 : 2));
             const querySnapshot = await getDocs(q);
             const data: ICategory[] = querySnapshot.docs.map(doc => ({
                 id: doc.id,
@@ -175,7 +205,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                     <TextInput
                         style={base.inputDescript}
                         placeholder="Descrição"
-                        placeholderTextColor="#F8F1F1"
+                        placeholderTextColor={colors.gray_200}
                         onChangeText={setDescription}
                         value={description}
                         maxLength={25}
@@ -201,7 +231,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                     <TouchableOpacity style={[base.button, base.btnCancel]} onPress={handleCloseAndReset}>
                         <Text style={[base.btnText]}>Cancelar</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[base.button, base.btnSave]}>
+                    <TouchableOpacity style={[base.button, base.btnSave]} onPress={createTransaction}>
                         <Text style={[base.btnText]}>Salvar</Text>
                     </TouchableOpacity>
                 </View>
@@ -259,7 +289,7 @@ interface CategoriesModalProps {
     setIsCategoriesVisible: (visible: boolean) => void;
     category: ICategory | null;
     context: transactionContext
-  }
+}
   
 const CategoriesModal: React.FC<CategoriesModalProps> = ({
     isVisible,
@@ -368,7 +398,7 @@ const NewCategoryModal: React.FC<NewCategoryModalProps> = ({ isVisible, nameNewC
                     <TextInput
                         style={[base.input, { backgroundColor: colors.gray_825 }]}
                         placeholder="Nome"
-                        placeholderTextColor="#F8F1F1"
+                        placeholderTextColor={colors.gray_200}
                         value={nameNewCategory}
                         onChangeText={setNameNewCtg}
                         maxLength={25}

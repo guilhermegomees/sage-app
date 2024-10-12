@@ -1,12 +1,12 @@
 export interface ITransaction {
-    id: number;
+    id: string;
     description: string;
-    date: string;
-    category?: ICategory;
-    icon?: string;
-    isExpense: number;
+    date: Date;
+    category: ICategory;
+    isExpense: boolean;
     value: number;
-    wallet: number;
+    account: number;
+    user: string;
 }
 
 export interface ICategory {
@@ -19,7 +19,7 @@ export interface ICategory {
 }
 
 export interface IGoal {
-    id: number;
+    id: string;
     name: string;
     currentValue: number;
     goalValue: number;

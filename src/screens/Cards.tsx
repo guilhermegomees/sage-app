@@ -7,6 +7,8 @@ import { useNavigation } from '@react-navigation/native';
 import { TypeScreem } from '~/enums/enums';
 import colors from '~/css/colors';
 import base from '~/css/base';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '~/config';
 
 type CardsScreenNavigationProp = StackNavigationProp<any, 'Cards'>;
 
@@ -14,20 +16,41 @@ export default function Cards() {
     const navigation = useNavigation<CardsScreenNavigationProp>();
     const [transactions, setTransactions] = useState<ITransaction[]>([]);
 
-    //TODO: Trazer transações do cartão através do banco e popular o data
-    const data: ITransaction[] = [
-        { id: 1, date: "2024-03-04T03:00:00.000Z", description: "Compra em supermercado", icon: "shopping-cart", isExpense: 1, value: 151.75, wallet: 1 },
-        { id: 2, date: "2024-03-04T03:00:00.000Z", description: "Pagamento de conta de luz", icon: "bolt", isExpense: 1, value: 80.50, wallet: 1 },
-        { id: 3, date: "2024-03-08T03:00:00.000Z", description: "Jantar em restaurante", icon: "utensils", isExpense: 1, value: 65.30, wallet: 1 },
-        { id: 4, date: "2024-03-10T03:00:00.000Z", description: "Compra online", icon: "shopping-bag", isExpense: 1, value: 200.00, wallet: 1 },
-        { id: 5, date: "2024-03-12T03:00:00.000Z", description: "Pagamento de fatura", icon: "credit-card", isExpense: 1, value: 600.00, wallet: 1 },
-        { id: 6, date: "2024-03-12T03:00:00.000Z", description: "Reembolso de compra", icon: "money-check-alt", isExpense: 0, value: 50.00, wallet: 1 },
-        { id: 7, date: "2024-03-12T03:00:00.000Z", description: "Compra em loja de roupas", icon: "tshirt", isExpense: 1, value: 120.00, wallet: 1 },
-        { id: 8, date: "2024-03-15T03:00:00.000Z", description: "Assinatura de serviço online", icon: "star", isExpense: 1, value: 15.99, wallet: 1 }
-    ];
+    const transactionCollectionRef = collection(db, "transaction");
+
+    const convertToDate = (timeObject: { seconds: number; nanoseconds: number }): Date => {
+        const { seconds, nanoseconds } = timeObject;
+        
+        const millisecondsFromSeconds = seconds * 1000;
+        const millisecondsFromNanoseconds = nanoseconds / 1_000_000;
+        const totalMilliseconds = millisecondsFromSeconds + millisecondsFromNanoseconds;
+        
+        return new Date(totalMilliseconds);
+    };
+
+    const fetchTransactions = async (): Promise<void> => {
+        try {
+            const q = query(transactionCollectionRef, where("source", "==", 2));
+            const querySnapshot = await getDocs(q);
+            const data: ITransaction[] = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                description: doc.data().description,
+                date: convertToDate(doc.data().date),
+                category: doc.data().category,
+                isExpense: doc.data().isExpense,
+                value: doc.data().value,
+                account: doc.data().account,
+                user: doc.data().user
+            }));
+
+            setTransactions(data);
+        } catch (error) {
+            console.error("Erro ao buscar transações: ", error);
+        }
+    };
 
     useEffect(() => {
-        setTransactions(data);
+        fetchTransactions();
     }, []);
 
     const handleNavigateToCardDatails = () => {

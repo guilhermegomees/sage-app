@@ -2,28 +2,23 @@ import React, { useState } from 'react';
 import { View, TextInput, StyleSheet } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import colors from '~/css/colors';
+import { FontAwesome6 } from '@expo/vector-icons';
 
 interface SearchBarProps {
-    onSearch: (text: string) => void;
+    searchValue: string; 
+    setSearchValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
-    const [searchText, setSearchText] = useState('');
-
-    const handleSearch = (text: string) => {
-        setSearchText(text);
-        onSearch(text);
-    };
-    
+const SearchBar: React.FC<SearchBarProps> = ({ searchValue, setSearchValue }) => {
     return (
         <View style={[styles.searchSection, {backgroundColor: colors.gray_800}]}>
-            <Ionicons name="search" size={18} color={colors.gray_300} />
+            <FontAwesome6 name="magnifying-glass" size={18} color={colors.gray_300} />
             <TextInput
-                style={[styles.input, { color: colors.gray_300 }]}
-                placeholder="Pesquisa"
+                style={[styles.input, { color: colors.gray_100 }]}
+                placeholder="Pesquisar"
                 placeholderTextColor={colors.gray_300}
-                value={searchText}
-                onChangeText={handleSearch}
+                value={searchValue}
+                onChangeText={setSearchValue}
             />
         </View>
     );
@@ -35,14 +30,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 10,
         paddingHorizontal: 10,
-        height: 35,
-        gap: 7
+        height: 50,
+        gap: 10
     },
     input: {
         fontFamily: 'Outfit_400Regular',
         flex: 1,
         height: '100%',
-        fontSize: 13,
+        fontSize: 15,
         paddingVertical: 0
     },
 });

@@ -14,7 +14,7 @@ interface BottomSheetProps {
 
 const monthNames = monthsList.map(month => month.substring(0, 3));
 
-function formatValue(value: number, isExpense: number): string {
+function formatValue(value: number, isExpense: boolean): string {
     const valueStr = value.toString().replace('.', ',');
     const minus = isExpense ? '- ' : '';
     return `${minus}R$ ${valueStr}`;
@@ -96,7 +96,7 @@ const MainTabNavigator: React.FC<BottomSheetProps> = ({ data, type }) => {
                                         <Text style={[styles.valueTransaction, {
                                             color: totalValue < 0 ? colors.red_500 : colors.green_500
                                         }]}>
-                                            {formatValue(Math.abs(totalValue), totalValue < 0 ? 1 : 0)}
+                                            {formatValue(Math.abs(totalValue), totalValue < 0)}
                                         </Text>
                                     }
                                 </View>
@@ -109,7 +109,7 @@ const MainTabNavigator: React.FC<BottomSheetProps> = ({ data, type }) => {
                                                         <View style={[styles.containerIconTransactions, {
                                                             backgroundColor: transaction.isExpense ? colors.red_500 : colors.green_500
                                                         }]}>
-                                                            <FontAwesome5 name={transaction.icon ?? 'star'} color={colors.gray_900} size={15} />
+                                                            <FontAwesome5 name={transaction.category?.icon ?? 'star'} color={colors.gray_900} size={15} />
                                                         </View>
                                                         <Text style={[styles.textTransaction]}>{transaction.description}</Text>
                                                     </View>

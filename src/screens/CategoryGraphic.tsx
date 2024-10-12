@@ -8,139 +8,15 @@ import { ICategory, ITransaction } from '~/interfaces/interfaces';
 import base from '~/css/base';
 import { charts } from '~/enums/enums';
 import colors from '~/css/colors';
-
-// Categorias
-export const categories: ICategory[] = [
-    {
-        id: "1",
-        user: "user1",
-        icon: "home",
-        name: "Moradia",
-        color: "#FF6347",
-    },
-    {
-        id: "2",
-        user: "user1",
-        icon: "apple-alt",
-        name: "Alimentação",
-        color: "#FFD700",
-    },
-    {
-        id: "3",
-        user: "user2",
-        icon: "car",
-        name: "Transporte",
-        color: "#1E90FF",
-    },
-    {
-        id: "4",
-        user: "user3",
-        icon: "heart",
-        name: "Saúde",
-        color: "#FF1493",
-    },
-    {
-        id: "5",
-        user: "user1",
-        icon: "star",
-        name: "Lazer",
-        color: "#32CD32",
-    },
-    {
-        id: "6",
-        user: "user2",
-        icon: "book",
-        name: "Educação",
-        color: "#8A2BE2",
-    },
-    {
-        id: "7",
-        user: "user1",
-        icon: "briefcase",
-        name: "Salário",
-        color: "#00FF0D",
-    },
-    {
-        id: "8",
-        user: "user2",
-        icon: "hand-holding-heart",
-        name: "Doação",
-        color: "#FF4500",
-    },
-    {
-        id: "9",
-        user: "user3",
-        icon: "shopping-cart",
-        name: "Compras",
-        color: "#FF8C00",
-    },
-    {
-        id: "10",
-        user: "user1",
-        icon: "running",
-        name: "Esportes",
-        color: "#00BFFF",
-    },
-    {
-        id: "11",
-        user: "user2",
-        icon: "cocktail",
-        name: "Bebidas",
-        color: "#DC143C",
-    },
-    {
-        id: "12",
-        user: "user3",
-        icon: "plane",
-        name: "Viagens",
-        color: "#4682B4",
-    },
-    {
-        id: "13",
-        user: "user1",
-        icon: "gift",
-        name: "Presentes",
-        color: "#FF69B4",
-    },
-    {
-        id: "14",
-        user: "user3",
-        icon: "tools",
-        name: "Manutenção",
-        color: "#A52A2A",
-    },
-    {
-        id: "15",
-        user: "user2",
-        icon: "dollar-sign",
-        name: "Investimentos",
-        color: "#228B22",
-    }
-];
-
-// Dados de despesas
-const transactions: ITransaction[] = [
-	{ id: 1, description: "Salário", value: 3000, date: '2024-09-01T03:00:00.000Z', isExpense: 0, wallet: 1, category: categories[6] }, // Salário
-	{ id: 2, description: "Pagamento de aluguel", value: 1200, date: '2024-09-03T03:00:00.000Z', isExpense: 1, wallet: 1, category: categories[0] }, // Moradia
-	{ id: 3, description: "Supermercado", value: 450, date: '2024-09-03T03:00:00.000Z', isExpense: 1, wallet: 1, category: categories[1] }, // Alimentação
-	{ id: 4, description: "Pix - Reembolso", value: 150, date: '2024-09-05T03:00:00.000Z', isExpense: 0, wallet: 1, category: categories[4] }, // Lazer
-	{ id: 5, description: "Restaurante", value: 200, date: '2024-09-05T03:00:00.000Z', isExpense: 1, wallet: 1, category: categories[1] }, // Alimentação
-	{ id: 6, description: "Conta de luz", value: 180, date: '2024-09-08T03:00:00.000Z', isExpense: 1, wallet: 1, category: categories[0] }, // Moradia
-	{ id: 7, description: "Academia", value: 100, date: '2024-09-08T03:00:00.000Z', isExpense: 1, wallet: 1, category: categories[3] }, // Saúde
-	{ id: 8, description: "Pix - Transferência poupança", value: 500, date: '2024-09-10T03:00:00.000Z', isExpense: 1, wallet: 2, category: categories[4] }, // Lazer
-	{ id: 9, description: "Bônus anual", value: 1500, date: '2024-09-10T03:00:00.000Z', isExpense: 0, wallet: 1, category: categories[6] }, // Salário
-	{ id: 10, description: "Manutenção do carro", value: 400, date: '2024-09-12T03:00:00.000Z', isExpense: 1, wallet: 1, category: categories[2] }, // Transporte
-	{ id: 11, description: "Jantar especial", value: 250, date: '2024-09-12T03:00:00.000Z', isExpense: 1, wallet: 1, category: categories[4] }, // Lazer
-	{ id: 12, description: "Consultoria freelance", value: 800, date: '2024-09-15T03:00:00.000Z', isExpense: 0, wallet: 2, category: categories[5] }, // Educação
-	{ id: 13, description: "Doação para caridade", value: 100, date: '2024-09-15T03:00:00.000Z', isExpense: 1, wallet: 1, category: categories[7] }, // Doação
-];
-
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '~/config';
 
 export default function CategoryGraphic() {
 	const currentDate = new Date();
 	const currentMonth = monthsList[currentDate.getMonth()];
 	const currentYear = currentDate.getFullYear();
 
+	const [transactions, setTransactions] = useState<ITransaction[]>([]);
 	const [totalExpenses, setTotalExpenses] = useState<number>(0);
 	const [selected, setSelected] = useState("");
 	const [month, setMonth] = useState(currentMonth);
@@ -148,15 +24,45 @@ export default function CategoryGraphic() {
 	const [data, setData] = useState<CardProps[]>([]);
 	const [filter, setFilter] = useState<'expense' | 'income'>('expense');
 
-	function handleCardOnPress(id: string) {
-		setSelected(prev => prev === id ? "" : id);
-	}
+	const transactionCollectionRef = collection(db, "transaction");
+
+	const convertToDate = (timeObject: { seconds: number; nanoseconds: number }): Date => {
+		const { seconds, nanoseconds } = timeObject;
+
+		const millisecondsFromSeconds = seconds * 1000;
+		const millisecondsFromNanoseconds = nanoseconds / 1_000_000;
+		const totalMilliseconds = millisecondsFromSeconds + millisecondsFromNanoseconds;
+
+		return new Date(totalMilliseconds);
+	};
+
+	const fetchTransactions = async (): Promise<void> => {
+		try {
+			const querySnapshot = await getDocs(transactionCollectionRef);
+			const data: ITransaction[] = querySnapshot.docs.map(doc => ({
+				id: doc.id,
+				description: doc.data().description,
+				date: convertToDate(doc.data().date),
+				category: doc.data().category,
+				isExpense: doc.data().isExpense,
+				value: doc.data().value,
+				account: doc.data().account,
+				user: doc.data().user
+			}));
+
+			setTransactions(data);
+		} catch (error) {
+			console.error("Erro ao buscar transações: ", error);
+		}
+	};
 
 	useEffect(() => {
+		fetchTransactions();
+
 		const filteredTransactions = transactions.filter(transaction => {
 			const transactionMonth = new Date(transaction.date).getMonth();
 			const isCorrectMonth = transactionMonth === monthsList.indexOf(month);
-			const isCorrectType = filter === 'expense' ? transaction.isExpense === 1 : transaction.isExpense === 0;
+			const isCorrectType = filter === 'expense' ? transaction.isExpense : transaction.isExpense === false;
 			return isCorrectMonth && isCorrectType;
 		});
 
@@ -166,7 +72,7 @@ export default function CategoryGraphic() {
 		const mappedData = filteredTransactions.map(transaction => {
 			const percent = ((transaction.value / total) * 100).toFixed(2) + '%';
 			return {
-				id: transaction.id.toString(),
+				id: transaction.id,
 				label: transaction.description,
 				value: transaction.value,
 				color: transaction.category?.color,
@@ -177,6 +83,10 @@ export default function CategoryGraphic() {
 
 		setData(mappedData);
 	}, [month, filter]);
+
+	function handleCardOnPress(id: string) {
+		setSelected(prev => prev === id ? "" : id);
+	}
 
 	function handlePrevPeriod() {
 		setMonth(prevMonth => {

@@ -3,7 +3,7 @@ import { TouchableOpacity, View, Text, StyleSheet, TextInput, ScrollView, Image 
 import Modal from "react-native-modal";
 import base from "~/css/base";
 import colors from "~/css/colors";
-import { FontAwesome5, FontAwesome6, MaterialIcons, Octicons } from "@expo/vector-icons";
+import { FontAwesome6, MaterialIcons, Octicons } from "@expo/vector-icons";
 import { ICategory } from "~/interfaces/interfaces";
 import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "~/config";
@@ -26,7 +26,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
     const [categories, setCategories] = useState<ICategory[]>([]);
     const [nameNewCategory, setNameNewCategory] = useState<string>('');
     const [selectedColor, setSelectedColor] = useState<string>('#FF6347');
-    const [selectedIcon, setSelectedIcon] = useState<string>('home');
+    const [selectedIcon, setSelectedIcon] = useState<string>('apple-whole');
 
     const today = new Date();
     const [selectedDate, setSelectedDate] = useState<string>(today.toISOString().split('T')[0]);
@@ -151,7 +151,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
     const resetNewCategory = (): void => {
         setNameNewCategory('');
         setSelectedColor('#FF6347');
-        setSelectedIcon('home');
+        setSelectedIcon('apple-whole');
     };
 
     const fetchCategories = async (): Promise<void> => {
@@ -212,7 +212,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                     />
                     {/* Data */}
                     <TouchableOpacity style={[base.input, base.gap_5, base.justifyContentStart, { backgroundColor: colors.gray_825 }]} onPress={handleDateClick}>
-                        <FontAwesome6 name="calendar-alt" color={colors.gray_100} size={20} />
+                        <FontAwesome6 name="calendar-day" color={colors.gray_100} size={20} />
                         <Text style={styles.textBtnDate}>{formattedDate}</Text>
                     </TouchableOpacity>
                     {/* Categoria */}
@@ -224,7 +224,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                             }
                             <Text style={base.inputText}>{selectedCategory?.name || "Categoria"}</Text>
                         </View>
-                        <MaterialIcons name="chevron-right" color={colors.gray_100} size={20} />
+                        <FontAwesome6 name="angle-right" color={colors.gray_100} size={15} />
                     </TouchableOpacity>
                 </View>
                 <View style={[base.flexRow, base.justifyContentSpaceBetween, base.mt_30]}>
@@ -332,7 +332,7 @@ const CategoriesModal: React.FC<CategoriesModalProps> = ({
                             <View style={[base.flexRow, base.justifyContentSpaceBetween, base.alignItemsCenter, base.w_100, base.py_18]}>
                                 <View style={[base.flexRow, base.alignItemsCenter, base.gap_15]}>
                                     <View style={[styles.containerIcon, {backgroundColor: ctg.color}]}>
-                                        <FontAwesome5 name={ctg.icon} color={colors.white} size={15}/>
+                                        <FontAwesome6 name={ctg.icon} color={colors.white} size={15}/>
                                     </View>
                                     <Text style={[styles.categorieName]}>{ctg.name}</Text>
                                 </View>
@@ -405,17 +405,17 @@ const NewCategoryModal: React.FC<NewCategoryModalProps> = ({ isVisible, nameNewC
                     />
                     <TouchableOpacity style={[base.input, base.justifyContentSpaceBetween, { backgroundColor: colors.gray_825 }]} onPress={() => setIsColorPickerVisible(true)}>
                         <View style={styles.row}>
-                            <FontAwesome5 name="palette" color={colors.gray_100} size={20}/>
+                            <FontAwesome6 name="palette" color={colors.gray_100} size={20}/>
                             <Text style={base.inputText}>Cor</Text>
                         </View>
                         <View style={[styles.colorCircleCtg, base.m_0, { backgroundColor: selectedColor }]} />
                     </TouchableOpacity>
                     <TouchableOpacity style={[base.input, base.justifyContentSpaceBetween, { backgroundColor: colors.gray_825 }]} onPress={() => setIsIconPickerVisible(true)}>
                         <View style={styles.row}>
-                            <FontAwesome5 name="image" color={colors.gray_100} size={20}/>
+                            <FontAwesome6 name="image" color={colors.gray_100} size={20}/>
                             <Text style={base.inputText}>Ícone</Text>
                         </View>
-                        <FontAwesome5 name={selectedIcon} color={selectedColor} size={20}/>
+                        <FontAwesome6 name={selectedIcon} color={selectedColor} size={20}/>
                     </TouchableOpacity>
                     <View style={[base.flexRow, base.justifyContentSpaceBetween, base.mt_10]}>
                         <TouchableOpacity style={[base.button, base.btnCancel]} onPress={() => setIsNewCategorieVisible(false)}>
@@ -447,15 +447,18 @@ const ColorPickerModal: React.FC<ColorPickerModalProps> = ({ isVisible, handleSe
         >
             <View style={styles.modalColorPicker}>
                 <Text style={[styles.colorPickerTitle, styles.line, base.w_100]}>Selecione uma cor</Text>
-                <View style={styles.colorsContainer}>
-                    {predefinedColors.map((color) => (
-                        <TouchableOpacity
-                            key={color}
-                            style={[styles.colorCircle, { backgroundColor: color }]}
-                            onPress={() => handleSelectColor(color)}
-                        />
-                    ))}
-                </View>
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    <View style={styles.colorsContainer}>
+                        {predefinedColors.map((color) => (
+                            <View key={color} style={[base.alignItemsCenter]}>
+                                <TouchableOpacity
+                                    style={[styles.colorCircle, { backgroundColor: color }]}
+                                    onPress={() => handleSelectColor(color)}
+                                />
+                            </View>
+                        ))}
+                    </View>
+                </ScrollView>
             </View>
         </Modal>
     );
@@ -477,17 +480,21 @@ const IconPickerModal: React.FC<IconPickerModalProps> = ({ isVisible, handleSele
         >
             <View style={styles.modalIconPicker}>
                 <Text style={[styles.iconPickerTitle, styles.line, base.w_100]}>Selecione um ícone</Text>
-                <View style={styles.iconsContainer}>
-                    {predefinedIcons.map((icon) => (
-                    <TouchableOpacity
-                        key={icon}
-                        onPress={() => handleSelectIcon(icon)}
-                        style={[styles.icon]}
-                    >
-                        <FontAwesome5 name={icon} color={colors.gray_100} size={25}/>
-                    </TouchableOpacity>
-                    ))}
-                </View>
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    <View style={styles.iconsContainer}>
+                        {predefinedIcons.map((icon) => (
+                            <TouchableOpacity
+                                key={icon}
+                                onPress={() => handleSelectIcon(icon)}
+                                style={[styles.icon]}
+                            >
+                                <View style={[base.alignItemsCenter]}>
+                                    <FontAwesome6 name={icon} color={colors.gray_100} size={25} />
+                                </View>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </ScrollView>
             </View>
         </Modal>
     );
@@ -608,6 +615,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         flexWrap: "wrap",
         gap: 30,
+        justifyContent: "center"
     },
     colorCircle: {
         width: 40,
@@ -635,6 +643,8 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         flexWrap: "wrap",
         gap: 30,
+        justifyContent: "center",
+        paddingHorizontal: 5,
     },
     icon: {
         width: 40,

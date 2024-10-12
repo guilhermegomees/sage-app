@@ -9,7 +9,7 @@ export type CardProps = {
 	value: number;
 	color: string;
 	percent: string;
-	isExpense: number;
+	isExpense: boolean;
 };
 
 type Props = TouchableOpacityProps & {

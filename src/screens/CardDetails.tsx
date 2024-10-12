@@ -6,7 +6,7 @@ import Overlay from '~/components/Overlay';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import base from '~/css/base';
-import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
+import { FontAwesome6 } from '@expo/vector-icons';
 import colors from '~/css/colors';
 
 const { width, height } = Dimensions.get('window');
@@ -61,9 +61,9 @@ export default function CardDatails() {
             <View style={[base.px_30, base.alignItemsCenter]}>
                 {/* Seta para voltar */}
                 <View style={[styles.containerBack]}>
-                    <TouchableOpacity onPress={handleNavigateToBack}>
-                        <MaterialIcons name="chevron-left" size={30} color={colors.gray_50} />
-                    </TouchableOpacity>
+                    {/* <TouchableOpacity onPress={handleNavigateToBack}>
+                        <FontAwesome6 name="angle-left" size={20} color={colors.gray_50} />
+                    </TouchableOpacity> */}
                     <Text style={[styles.title]}>Detalhes</Text>
                 </View>
                 {/* Card */}
@@ -121,7 +121,7 @@ export default function CardDatails() {
                             placeholder={''}
                             onChange={item => setClosingDay(item)}
                             renderRightIcon={() => (
-                                <FontAwesome5
+                                <FontAwesome6
                                     name="calendar-day"
                                     color={colors.gray_100}
                                     size={20}
@@ -147,7 +147,7 @@ export default function CardDatails() {
                             placeholder={''}
                             onChange={item => setExpirationDay(item)}
                             renderRightIcon={() => (
-                                <FontAwesome5
+                                <FontAwesome6
                                     name="calendar-check"
                                     color={colors.gray_100}
                                     size={20}
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Outfit_600SemiBold',
         color: colors.gray_50,
         fontSize: 20,
-        marginLeft: 10,
+        lineHeight: 24
     },
     card: {
         width: 330,

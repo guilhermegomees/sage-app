@@ -14,6 +14,8 @@ import { ITransaction } from '~/interfaces/interfaces';
 import base from '~/css/base';
 import colors from '~/css/colors';
 import { charts, TypeScreem } from '~/enums/enums';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '~/config';
 
 interface DataItem {
     month: number;
@@ -24,9 +26,8 @@ interface DataItem {
 
 const monthNames = monthsList.map(month => month.substring(0, 3));
 
-function parseDate(date: string): [number, number] {
-    const parsedDate = new Date(date);
-    return [parsedDate.getMonth() + 1, parsedDate.getFullYear()];
+function parseDate(date: Date): [number, number] {
+    return [date.getMonth() + 1, date.getFullYear()];
 }
 
 function mapTransactionsToData(transactions: ITransaction[]): Record<string, DataItem> {
@@ -97,39 +98,44 @@ function filterTransactionsByPeriod(transactions: ITransaction[], [startMonth, e
 }
 
 export default function MonthlyBalance() {
-    // Dados de receitas e despesas
-    const transactions: ITransaction[] = [
-        { id: 1, description: "Salário", value: 5000, date: '2024-09-01T03:00:00.000Z', isExpense: 0, icon: 'briefcase', wallet: 1 },
-        { id: 2, description: "Pagamento de aluguel", value: 1200, date: '2024-09-03T03:00:00.000Z', isExpense: 1, icon: 'home', wallet: 1 },
-        { id: 3, description: "Supermercado", value: 450, date: '2024-09-03T03:00:00.000Z', isExpense: 1, icon: 'shopping-cart', wallet: 1 },
-        { id: 4, description: "Pix - Reembolso", value: 150, date: '2024-09-05T03:00:00.000Z', isExpense: 0, icon: 'dollar-sign', wallet: 1 },
-        { id: 5, description: "Restaurante", value: 200, date: '2024-09-05T03:00:00.000Z', isExpense: 1, icon: 'utensils', wallet: 1 },
-        { id: 6, description: "Conta de luz", value: 180, date: '2024-09-08T03:00:00.000Z', isExpense: 1, icon: 'bolt', wallet: 1 },
-        { id: 7, description: "Academia", value: 100, date: '2024-09-08T03:00:00.000Z', isExpense: 1, icon: 'dumbbell', wallet: 1 },
-        { id: 8, description: "Pix - Transferência poupança", value: 500, date: '2024-09-10T03:00:00.000Z', isExpense: 1, icon: 'piggy-bank', wallet: 2 },
-        { id: 9, description: "Bônus anual", value: 1500, date: '2024-09-10T03:00:00.000Z', isExpense: 0, icon: 'gift', wallet: 1 },
-        { id: 10, description: "Manutenção do carro", value: 400, date: '2024-09-12T03:00:00.000Z', isExpense: 1, icon: 'wrench', wallet: 1 },
-        { id: 11, description: "Jantar especial", value: 250, date: '2024-09-12T03:00:00.000Z', isExpense: 1, icon: 'wine-glass', wallet: 1 },
-        { id: 12, description: "Consultoria freelance", value: 800, date: '2024-09-15T03:00:00.000Z', isExpense: 0, icon: 'laptop', wallet: 2 },
-        { id: 13, description: "Doação para caridade", value: 100, date: '2024-09-15T03:00:00.000Z', isExpense: 1, icon: 'heart', wallet: 1 },
-        { id: 14, description: "Salário", value: 5000, date: '2024-08-01T03:00:00.000Z', isExpense: 0, icon: 'briefcase', wallet: 1 },
-        { id: 15, description: "Pagamento de aluguel", value: 1200, date: '2024-08-03T03:00:00.000Z', isExpense: 1, icon: 'home', wallet: 1 },
-        { id: 16, description: "Compras online", value: 600, date: '2024-08-05T03:00:00.000Z', isExpense: 1, icon: 'shopping-cart', wallet: 1 },
-        { id: 17, description: "Academia", value: 100, date: '2024-08-08T03:00:00.000Z', isExpense: 1, icon: 'dumbbell', wallet: 1 },
-        { id: 18, description: "Supermercado", value: 400, date: '2024-08-08T03:00:00.000Z', isExpense: 1, icon: 'shopping-cart', wallet: 1 },
-        { id: 19, description: "Cinema", value: 80, date: '2024-08-10T03:00:00.000Z', isExpense: 1, icon: 'film', wallet: 1 },
-        { id: 20, description: "Pix - Empréstimo amigo", value: 500, date: '2024-08-12T03:00:00.000Z', isExpense: 1, icon: 'users', wallet: 1 },
-        { id: 21, description: "Salário", value: 5000, date: '2024-07-01T03:00:00.000Z', isExpense: 0, icon: 'briefcase', wallet: 1 },
-        { id: 22, description: "Supermercado", value: 350, date: '2024-07-03T03:00:00.000Z', isExpense: 1, icon: 'shopping-cart', wallet: 1 },
-        { id: 23, description: "Academia", value: 100, date: '2024-07-08T03:00:00.000Z', isExpense: 1, icon: 'dumbbell', wallet: 1 },
-        { id: 24, description: "Restaurante", value: 180, date: '2024-07-08T03:00:00.000Z', isExpense: 1, icon: 'utensils', wallet: 1 },
-        { id: 25, description: "Conta de celular", value: 90, date: '2024-07-12T03:00:00.000Z', isExpense: 1, icon: 'phone', wallet: 1 },
-    ];
-
-    // Iniciar o currentPeriod de acordo com o trimestre atual
+    const [transactions, setTransactions] = useState<ITransaction[]>([]);
     const [currentPeriod, setCurrentPeriod] = useState('');
 
+    const transactionCollectionRef = collection(db, "transaction");
+
+    const convertToDate = (timeObject: { seconds: number; nanoseconds: number }): Date => {
+        const { seconds, nanoseconds } = timeObject;
+
+        const millisecondsFromSeconds = seconds * 1000;
+        const millisecondsFromNanoseconds = nanoseconds / 1_000_000;
+        const totalMilliseconds = millisecondsFromSeconds + millisecondsFromNanoseconds;
+
+        return new Date(totalMilliseconds);
+    };
+
+    const fetchTransactions = async (): Promise<void> => {
+        try {
+            const querySnapshot = await getDocs(transactionCollectionRef);
+            const data: ITransaction[] = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                description: doc.data().description,
+                date: convertToDate(doc.data().date),
+                category: doc.data().category,
+                isExpense: doc.data().isExpense,
+                value: doc.data().value,
+                account: doc.data().account,
+                user: doc.data().user
+            }));
+
+            setTransactions(data);
+        } catch (error) {
+            console.error("Erro ao buscar transações: ", error);
+        }
+    };
+
     useEffect(() => {
+        fetchTransactions();
+
         const now = new Date();
         const currentMonth = now.getMonth() + 1; // getMonth() retorna meses de 0-11
         const currentYear = now.getFullYear();

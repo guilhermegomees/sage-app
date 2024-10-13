@@ -1,57 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, Image, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import BottomSheet from '~/components/BottomSheet';
-import { ITransaction } from '~/interfaces/interfaces';
 import { useNavigation } from '@react-navigation/native';
 import { TypeScreem } from '~/enums/enums';
 import colors from '~/css/colors';
 import base from '~/css/base';
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '~/config';
+import { useTransactions } from '~/context/TransactionContext';
 
 type CardsScreenNavigationProp = StackNavigationProp<any, 'Cards'>;
 
 export default function Cards() {
     const navigation = useNavigation<CardsScreenNavigationProp>();
-    const [transactions, setTransactions] = useState<ITransaction[]>([]);
+    const { transactions } = useTransactions();
 
-    const transactionCollectionRef = collection(db, "transaction");
-
-    const convertToDate = (timeObject: { seconds: number; nanoseconds: number }): Date => {
-        const { seconds, nanoseconds } = timeObject;
-        
-        const millisecondsFromSeconds = seconds * 1000;
-        const millisecondsFromNanoseconds = nanoseconds / 1_000_000;
-        const totalMilliseconds = millisecondsFromSeconds + millisecondsFromNanoseconds;
-        
-        return new Date(totalMilliseconds);
-    };
-
-    const fetchTransactions = async (): Promise<void> => {
-        try {
-            const q = query(transactionCollectionRef, where("source", "==", 2));
-            const querySnapshot = await getDocs(q);
-            const data: ITransaction[] = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                description: doc.data().description,
-                date: convertToDate(doc.data().date),
-                category: doc.data().category,
-                isExpense: doc.data().isExpense,
-                value: doc.data().value,
-                account: doc.data().account,
-                user: doc.data().user
-            }));
-
-            setTransactions(data);
-        } catch (error) {
-            console.error("Erro ao buscar transações: ", error);
-        }
-    };
-
-    useEffect(() => {
-        fetchTransactions();
-    }, []);
+    // Filtra as transações onde source == 2
+    const filteredTransactions = transactions.filter(transaction => transaction.source === 2);
 
     const handleNavigateToCardDatails = () => {
         navigation.navigate('CardDetails');
@@ -107,7 +71,7 @@ export default function Cards() {
                 </View>
             </View>
             {/* Painel de transações */}
-            <BottomSheet data={transactions} type={TypeScreem.Card} />
+            <BottomSheet data={filteredTransactions} type={TypeScreem.Card} />
         </View>
     );
 }

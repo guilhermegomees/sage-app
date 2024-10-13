@@ -4,19 +4,17 @@ import { VictoryPie, VictoryTooltip } from 'victory-native';
 import { CardTransaction, CardProps } from '~/components/CardTransaction';
 import PeriodSelector from '~/components/PeriodSelector';
 import { monthsList } from '~/constants/monthsList';
-import { ICategory, ITransaction } from '~/interfaces/interfaces';
 import base from '~/css/base';
 import { charts } from '~/enums/enums';
 import colors from '~/css/colors';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '~/config';
+import { useTransactions } from '~/context/TransactionContext';
 
 export default function CategoryGraphic() {
 	const currentDate = new Date();
 	const currentMonth = monthsList[currentDate.getMonth()];
 	const currentYear = currentDate.getFullYear();
 
-	const [transactions, setTransactions] = useState<ITransaction[]>([]);
+	const { transactions } = useTransactions();
 	const [totalExpenses, setTotalExpenses] = useState<number>(0);
 	const [selected, setSelected] = useState("");
 	const [month, setMonth] = useState(currentMonth);
@@ -24,41 +22,7 @@ export default function CategoryGraphic() {
 	const [data, setData] = useState<CardProps[]>([]);
 	const [filter, setFilter] = useState<'expense' | 'income'>('expense');
 
-	const transactionCollectionRef = collection(db, "transaction");
-
-	const convertToDate = (timeObject: { seconds: number; nanoseconds: number }): Date => {
-		const { seconds, nanoseconds } = timeObject;
-
-		const millisecondsFromSeconds = seconds * 1000;
-		const millisecondsFromNanoseconds = nanoseconds / 1_000_000;
-		const totalMilliseconds = millisecondsFromSeconds + millisecondsFromNanoseconds;
-
-		return new Date(totalMilliseconds);
-	};
-
-	const fetchTransactions = async (): Promise<void> => {
-		try {
-			const querySnapshot = await getDocs(transactionCollectionRef);
-			const data: ITransaction[] = querySnapshot.docs.map(doc => ({
-				id: doc.id,
-				description: doc.data().description,
-				date: convertToDate(doc.data().date),
-				category: doc.data().category,
-				isExpense: doc.data().isExpense,
-				value: doc.data().value,
-				account: doc.data().account,
-				user: doc.data().user
-			}));
-
-			setTransactions(data);
-		} catch (error) {
-			console.error("Erro ao buscar transações: ", error);
-		}
-	};
-
 	useEffect(() => {
-		fetchTransactions();
-
 		const filteredTransactions = transactions.filter(transaction => {
 			const transactionMonth = new Date(transaction.date).getMonth();
 			const isCorrectMonth = transactionMonth === monthsList.indexOf(month);
@@ -82,7 +46,7 @@ export default function CategoryGraphic() {
 		});
 
 		setData(mappedData);
-	}, [month, filter]);
+	}, [month, filter, transactions]);
 
 	function handleCardOnPress(id: string) {
 		setSelected(prev => prev === id ? "" : id);

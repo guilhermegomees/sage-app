@@ -11,6 +11,7 @@ import { Calendar } from "~/components/Calendar";
 import { transactionContext } from "~/enums/enums";
 import { predefinedColors } from "~/constants/colors";
 import { predefinedIcons } from "~/constants/icons";
+import { useTransactions } from "~/context/TransactionContext";
 
 const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { isModalVisible: boolean, context: transactionContext, onClose: () => void }) => {
     const [isCategoriesVisible, setIsCategoriesVisible] = useState(false);
@@ -29,12 +30,14 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
     const [selectedIcon, setSelectedIcon] = useState<string>('apple-whole');
 
     const today = new Date();
+    today.setHours(today.getHours() - 3);
     const [selectedDate, setSelectedDate] = useState<string>(today.toISOString().split('T')[0]);
     const [selectedTempDate, setSelectedTempDate] = useState<string>(today.toISOString().split('T')[0]);
     const [formattedDate, setFormattedDate] = useState<string>(today.toLocaleDateString('pt-BR'));
-
     const transactionCollectionRef = collection(db, "transaction");
     const categoryCollectionRef = collection(db, "category");
+
+    const { fetchTransactions } = useTransactions();
 
     const formatCurrency = (num: number): string => 
         `R$ ${num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -115,7 +118,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
             }
             
             await addDoc(transactionCollectionRef, newTransactionData);
-    
+            await fetchTransactions();
             handleCloseAndReset();
         } catch (error) {
             console.error("Erro ao criar transação: ", error);

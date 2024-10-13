@@ -1,19 +1,14 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { View, StyleSheet, Text, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
 import BottomSheet from '~/components/BottomSheet';
 import Header from '~/components/Header';
 import { HeaderContext } from '~/context/HeaderContext';
-import { ITransaction } from '~/interfaces/interfaces';
 import base from '~/css/base';
 import { FontAwesome6 } from '@expo/vector-icons';
 import colors from '~/css/colors';
 import { TypeScreem } from '~/enums/enums';
 import FloatingButton from '~/components/FloatingButton';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '~/config';
-//import { FloatingAction } from "react-native-floating-action";
+import { useTransactions } from '~/context/TransactionContext';
 
 // Formatar valores com duas casas decimais
 function formatValue(value: number): string {
@@ -26,44 +21,9 @@ function formatValue(value: number): string {
     return `R$ ${valueStr}`;
 }
 
-type AccountsScreenNavigationProp = StackNavigationProp<any, 'Accounts'>;
-
 export default function Home() {
-    const navigation = useNavigation<AccountsScreenNavigationProp>();
     const { showValues } = useContext(HeaderContext);
-    const [transactions, setTransactions] = useState<ITransaction[]>([]);
-
-    const transactionCollectionRef = collection(db, "transaction");
-
-    const convertToDate = (timeObject: { seconds: number; nanoseconds: number }): Date => {
-        const { seconds, nanoseconds } = timeObject;
-        
-        const millisecondsFromSeconds = seconds * 1000;
-        const millisecondsFromNanoseconds = nanoseconds / 1_000_000;
-        const totalMilliseconds = millisecondsFromSeconds + millisecondsFromNanoseconds;
-        
-        return new Date(totalMilliseconds);
-    };
-
-    const fetchTransactions = async (): Promise<void> => {
-        try {
-            const querySnapshot = await getDocs(transactionCollectionRef);
-            const data: ITransaction[] = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                description: doc.data().description,
-                date: convertToDate(doc.data().date),
-                category: doc.data().category,
-                isExpense: doc.data().isExpense,
-                value: doc.data().value,
-                account: doc.data().account,
-                user: doc.data().user
-            }));
-
-            setTransactions(data);
-        } catch (error) {
-            console.error("Erro ao buscar transações: ", error);
-        }
-    };
+    const { transactions, fetchTransactions } = useTransactions();
 
     useEffect(() => {
         fetchTransactions();
@@ -80,10 +40,6 @@ export default function Home() {
             totalIncome += item.value;
         }
     }
-
-    const handleNavigateToNewTransaction = () => {
-        navigation.navigate('NewTransaction');
-    };
 
     return (
         <>

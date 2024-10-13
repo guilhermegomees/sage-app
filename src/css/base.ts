@@ -566,6 +566,9 @@ export const base = StyleSheet.create({
 	pb_50: {
 		paddingBottom: 50,
 	},
+	pb_60: {
+		paddingBottom: 60,
+	},
 
 	// Paddings Verticais
 	py_0: {

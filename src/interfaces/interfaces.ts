@@ -4,6 +4,7 @@ export interface ITransaction {
     date: Date;
     category: ICategory;
     isExpense: boolean;
+    source: number,
     value: number;
     account: number;
     user: string;

@@ -1,88 +1,47 @@
-import React, { createRef, useState } from "react";
-import { TouchableOpacity, StyleSheet, Text, Modal, TextInput, View, Platform } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { MaterialIcons } from "@expo/vector-icons";
-import base from "~/css/base";
+import { StyleSheet, TextInput, TextInputProps, View } from "react-native";
+import { FontAwesome6 } from "@expo/vector-icons";
 import colors from "~/css/colors";
 
-const Input: React.FC<any> = (props) => {
-    const [modalVisible, setModalVisible] = useState(false);
-    const [overlay, setOverlay] = useState(false);
-    const inputRef = createRef<any>();
+interface InputProps extends TextInputProps {
+    value: string;
+    onChangeText: React.Dispatch<React.SetStateAction<string>>;
+    icon?: string;
+    styleInput?: object;
+    styleTextInput?: object;
+}
 
-    function setVisibility(){
-        setModalVisible(!modalVisible);
-        setOverlay(!overlay);
-        props.overlay(!overlay);
-    }
-
-    function setFocus(){
-        if(Platform.OS === 'android'){
-            setTimeout(() => inputRef.current?.focus(), 100)
-        }
-    }
-
+const Input: React.FC<InputProps> = ({value, onChangeText, icon, styleInput, styleTextInput, ...props}) => {
     return (
-        <TouchableOpacity style={[props.style, props.containerStyle]} activeOpacity={1} onPress={setVisibility}>
-            <Text style={[base.inputText, {color: props.value ? colors.white : colors.gray_200}, props.textStyle]}>
-                {props.value || props.placeholder}
-            </Text>
-            { props.icon && <MaterialIcons name={props.icon} size={20} color={colors.gray_200} /> }
-            <Modal
-                visible={modalVisible} 
-                onRequestClose={setVisibility}
-                onShow={setFocus}
-                animationType="slide"
-                transparent
-            >
-                <SafeAreaView style={[base.flex_1]}>
-                    <TouchableOpacity style={[styles.outside]} onPress={setVisibility}/>
-                    <View 
-                        style={[
-                            styles.inputWrapper,
-                            props.inputWrapperStyle,
-                            {backgroundColor: props.inputWrapperColor ?? colors.gray_800},
-                            {flexDirection: props.icon && 'row'},
-                        ]}
-                    >
-                        <View style={[base.input]}>
-                            <TextInput
-                                {...props}
-                                style={[base.inputText, props.textStyle]}
-                                placeholderTextColor={colors.gray_200}
-                                ref={inputRef}
-                                autoFocus={Platform.OS === 'ios'}
-                                onBlur={setVisibility}
-                                onSubmitEditing={setVisibility}
-                            />
-                            { props.icon && <MaterialIcons name={props.icon} size={20} color={colors.gray_200} /> }
-                        </View>
-                    </View>
-                </SafeAreaView>
-            </Modal>
-        </TouchableOpacity>
+        <View style={[styleInput || styles.input]}>
+            <TextInput
+                style={styleTextInput || styles.inputText}
+                placeholder={props.placeholder}
+                placeholderTextColor={props.placeholderTextColor || colors.gray_200}
+                value={value}
+                onChangeText={onChangeText}
+                keyboardType={props.keyboardType}
+            />
+            {icon && <FontAwesome6 name={icon} size={20} color={colors.gray_200} />}
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
-    inputContainer: {
-        borderRadius: 4,
-        borderColor: '#eee',
-        borderWidth: 1,
-        height: 35,
-        justifyContent: "center",
-        paddingHorizontal: 10
-    },
-    inputWrapper: {
-        flex: Platform.OS === 'ios' ? 1 : 0,
-        paddingTop: 20,
-        paddingBottom: Platform.OS === 'ios' ? 0 : 20,
+    input: {
+        width: '100%',
+        backgroundColor: colors.gray_900,
+        borderRadius: 15,
+        height: 50,
+        alignItems: 'center',
         paddingHorizontal: 15,
-        borderTopLeftRadius: 12,
-        borderTopRightRadius: 12,
+        flexDirection: "row"
     },
-    outside: {
-        flex: 1
+    inputText: {
+        fontFamily: 'Outfit_500Medium',
+        height: 50,
+        color: colors.white,
+        flex: 1,
+        fontSize: 16
     },
 })
 

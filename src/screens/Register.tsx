@@ -1,28 +1,23 @@
 import React, { useState } from 'react';
-import auth from '@react-native-firebase/auth';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
-import { ScrollView, TextInput, TouchableOpacity, View, StyleSheet, Image, Text, Dimensions } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import { ScrollView, TouchableOpacity, View, StyleSheet, Image, Text, Dimensions } from 'react-native';
 import base from '~/css/base';
 import colors from '~/css/colors';
-import Overlay from '~/components/Overlay';
 import { FIREBASE_AUTH } from '~/config';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-
-const { width, height } = Dimensions.get('window');
+import PasswordInput from '~/components/PasswordInput';
+import Input from '~/components/Input';
 
 type RegisterScreenNavigationProp = StackNavigationProp<any, 'Register'>;
 
 const RegisterScreen = () => {
     const navigation = useNavigation<RegisterScreenNavigationProp>();
-    const [name, setName] = useState(''); // Adicionado estado para o nome
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false); // Controlar a visibilidade da senha
     const [errorMessage, setErrorMessage] = useState(''); // Mensagem de erro caso o cadastro falhe
-    const [overlay, setOverley] = useState(false);
     const auth = FIREBASE_AUTH;
 
     const signIn = async () => {
@@ -43,18 +38,6 @@ const RegisterScreen = () => {
         navigation.navigate('Login');
     };
 
-    // const handleRegister = async () => {
-    //     if (password !== confirmPassword) {
-    //         setErrorMessage('As senhas não correspondem.');
-    //         return;
-    //     }
-    // };
-
-    // Alternar entre mostrar e ocultar a senha
-    const toggleShowPassword = () => {
-        setShowPassword(!showPassword);
-    };
-
     return (
         <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
             <View style={[base.flex_1]}>
@@ -63,61 +46,28 @@ const RegisterScreen = () => {
                 <View style={styles.halfContainer}>
                     <Text style={styles.title}>Seja bem-vindo(a)</Text>
                     <View style={styles.inputsContainer}>
-                        <View style={[styles.input, base.flexRowReverse]}>
-                            <MaterialIcons name="person" size={20} color={colors.gray_200} />
-                            <TextInput
-                                style={styles.inputText}
-                                placeholder="Nome"
-                                placeholderTextColor={colors.gray_200}
-                                value={name}
-                                onChangeText={setName}
-                            />
-                        </View>
-                        <View style={[styles.input, base.flexRowReverse]}>
-                            <MaterialIcons name="email" size={20} color={colors.gray_200} />
-                            <TextInput
-                                style={styles.inputText}
-                                placeholder="E-mail"
-                                placeholderTextColor={colors.gray_200}
-                                value={email}
-                                onChangeText={setEmail}
-                                keyboardType="email-address"
-                            />
-                        </View>
-                        <View style={[styles.input, base.flexRow]}>
-                            <TextInput
-                                style={styles.inputText}
-                                placeholder="Senha"
-                                placeholderTextColor={colors.gray_200}
-                                secureTextEntry={!showPassword}
-                                value={password}
-                                onChangeText={setPassword}
-                            />
-                            <TouchableOpacity onPress={toggleShowPassword}>
-                                <MaterialIcons
-                                    name={showPassword ? 'visibility-off' : 'visibility'}
-                                    size={20}
-                                    color={colors.gray_200}
-                                />
-                            </TouchableOpacity>
-                        </View>
-                        <View style={[styles.input, base.flexRow]}>
-                            <TextInput
-                                style={styles.inputText}
-                                placeholder="Confirmar senha"
-                                placeholderTextColor={colors.gray_200}
-                                secureTextEntry={!showPassword}
-                                value={confirmPassword}
-                                onChangeText={setConfirmPassword}
-                            />
-                            <TouchableOpacity onPress={toggleShowPassword}>
-                                <MaterialIcons
-                                    name={showPassword ? 'visibility-off' : 'visibility'}
-                                    size={20}
-                                    color={colors.gray_200}
-                                />
-                            </TouchableOpacity>
-                        </View>
+                        <Input
+                            placeholder='Nome'
+                            value={name}
+                            onChangeText={setName}
+                            icon='user'
+                        />
+                        <Input
+                            placeholder='E-mail'
+                            value={email}
+                            onChangeText={setEmail}
+                            icon='envelope'
+                            keyboardType='email-address'
+                        />
+                        <PasswordInput
+                            value={password}
+                            onChangeText={setPassword}
+                        />
+                        <PasswordInput
+                            placeholder='Confirmar senha'
+                            value={confirmPassword}
+                            onChangeText={setConfirmPassword}
+                        />
                         {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
                     </View>
                     <TouchableOpacity style={styles.loginBtn} onPress={signIn}>
@@ -131,7 +81,6 @@ const RegisterScreen = () => {
                     </View>
                 </View>
             </View>
-            {overlay && <Overlay style={[styles.overlay]} />}
         </ScrollView>
     );
 };
@@ -207,12 +156,12 @@ const styles = StyleSheet.create({
     },
     signUpText: {
         fontFamily: 'Outfit_500Medium',
-        fontSize: 15,
+        fontSize: 16,
         color: colors.gray_50,
     },
     signUpTextLink: {
         fontFamily: 'Outfit_500Medium',
-        fontSize: 15,
+        fontSize: 16,
         color: colors.blue_300,
         textDecorationLine: 'underline'
     },
@@ -220,10 +169,6 @@ const styles = StyleSheet.create({
         color: 'red',
         marginTop: 10,
         textAlign: 'center',
-    },
-    overlay: {
-        width,
-        height
     },
 });
 

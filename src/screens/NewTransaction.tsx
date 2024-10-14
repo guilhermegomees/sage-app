@@ -223,7 +223,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                         <View style={styles.row}>
                             {selectedCategory
                                 ? <FontAwesome6 name={selectedCategory.icon} color={selectedCategory.color} size={20}/>
-                                : <MaterialIcons name="more-horiz" color={colors.gray_100} size={20} style={styles.iconCtgEmpty}/>
+                                : <FontAwesome6 name="ellipsis" color={colors.gray_100} size={20} style={styles.iconCtgEmpty}/>
                             }
                             <Text style={base.inputText}>{selectedCategory?.name || "Categoria"}</Text>
                         </View>

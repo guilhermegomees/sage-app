@@ -128,9 +128,9 @@ export default function Goals() {
                                     <Text style={styles.text}>{goal.name}</Text>
                                 </View>
                                 <TouchableOpacity onPress={() => toggleTooltip(goal.id)} style={{marginBottom: 5}}>
-                                    <MaterialIcons
-                                        name="more-vert"
-                                        size={19}
+                                    <FontAwesome6
+                                        name="ellipsis-vertical"
+                                        size={20}
                                         color={colors.gray_300}
                                     />
                                 </TouchableOpacity>

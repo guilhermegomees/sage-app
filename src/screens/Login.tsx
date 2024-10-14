@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
-import { Dimensions, ScrollView, View, Image, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { ScrollView, View, Image, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import Input from '~/components/Input';
-import Overlay from '~/components/Overlay';
 import PasswordInput from '~/components/PasswordInput';
 import base from '~/css/base';
 import colors from '~/css/colors';
 import { FIREBASE_AUTH } from '~/config';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-
-const { width, height } = Dimensions.get('window');
 
 type LoginScreenNavigationProp = StackNavigationProp<any, 'Login'>;
 
@@ -18,7 +15,6 @@ const LoginScreen = () => {
     const navigation = useNavigation<LoginScreenNavigationProp>();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [overlay, setOverley] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const auth = FIREBASE_AUTH;
 
@@ -53,21 +49,15 @@ const LoginScreen = () => {
                     <View style={styles.inputsContainer}>
                         {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
                         <Input
-                            style={[base.input]}
-                            placeholder="E-mail"
-                            placeholderTextColor={colors.gray_200}
-                            onChangeText={(name: string) => setEmail(name)}
+                            placeholder='E-mail'
                             value={email}
-                            icon="email"
-                            overlay={(value: boolean) => setOverley(value)}
+                            onChangeText={setEmail}
+                            icon='envelope'
+                            keyboardType='email-address'
                         />
                         <PasswordInput
-                            style={[base.input]}
-                            placeholder="Senha"
-                            placeholderTextColor={colors.gray_200}
-                            onChangeText={(name: string) => setPassword(name)}
                             value={password}
-                            overlay={(value: boolean) => setOverley(value)}
+                            onChangeText={setPassword}
                         />
                     </View>
                     <TouchableOpacity style={styles.loginBtn} onPress={signIn}>
@@ -81,7 +71,6 @@ const LoginScreen = () => {
                     </View>
                 </View>
             </View>
-            {overlay && <Overlay style={[styles.overlay]} />}
         </ScrollView>
     );
 };
@@ -148,18 +137,14 @@ const styles = StyleSheet.create({
     },
     signUpText: {
         fontFamily: 'Outfit_500Medium',
-        fontSize: 15,
+        fontSize: 16,
         color: colors.gray_50,
     },
     signUpTextLink: {
         fontFamily: 'Outfit_500Medium',
-        fontSize: 15,
+        fontSize: 16,
         color: colors.blue_300,
         textDecorationLine: 'underline'
-    },
-    overlay: {
-        width,
-        height
     },
 });
 

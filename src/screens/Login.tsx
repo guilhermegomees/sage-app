@@ -7,6 +7,8 @@ import Overlay from '~/components/Overlay';
 import PasswordInput from '~/components/PasswordInput';
 import base from '~/css/base';
 import colors from '~/css/colors';
+import { FIREBASE_AUTH } from '~/config';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 const { width, height } = Dimensions.get('window');
 
@@ -14,17 +16,32 @@ type LoginScreenNavigationProp = StackNavigationProp<any, 'Login'>;
 
 const LoginScreen = () => {
     const navigation = useNavigation<LoginScreenNavigationProp>();
-    const [email, setEmail] = useState<string>();
-    const [password, setPassword] = useState<string>();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [overlay, setOverley] = useState(false);
-
-    const handleLogin = () => {
-        navigation.navigate('Main');
-    };
+    const [errorMessage, setErrorMessage] = useState('');
+    const auth = FIREBASE_AUTH;
 
     const handleRegister = () => {
         navigation.navigate('Register');
     };
+
+    const signIn = async () => {
+        try{
+            const response = await signInWithEmailAndPassword(auth, email, password);
+            console.log(response);
+            navigation.navigate('Main');
+        } catch (error: any){
+            console.log(error);
+            if(error.message = 'auth/missing-password'){
+                setErrorMessage('Por favor insira sua senha.');
+            }if(error.message = 'auth/invalid-email'){
+                setErrorMessage('E-mail inválido.');
+            }if(error.message = 'auth/invalid-credential'){
+                setErrorMessage('E-mail ou Senha incorretos.')
+            }
+        }
+    }
 
     return (
         <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
@@ -34,6 +51,7 @@ const LoginScreen = () => {
                 <View style={styles.halfContainer}>
                     <Text style={styles.title}>Bem-vindo(a) de volta</Text>
                     <View style={styles.inputsContainer}>
+                        {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
                         <Input
                             style={[base.input]}
                             placeholder="E-mail"
@@ -52,7 +70,7 @@ const LoginScreen = () => {
                             overlay={(value: boolean) => setOverley(value)}
                         />
                     </View>
-                    <TouchableOpacity style={styles.loginBtn} onPress={handleLogin}>
+                    <TouchableOpacity style={styles.loginBtn} onPress={signIn}>
                         <Text style={styles.loginBtnText}>Entrar</Text>
                     </TouchableOpacity>
                     <View style={[base.flexRow, base.gap_4, base.mb_10]}>
@@ -88,6 +106,11 @@ const styles = StyleSheet.create({
         color: colors.gray_50,
         textAlign: 'center',
         marginBottom: 90
+    },
+    errorText: {
+        color: 'red',
+        marginTop: 10,
+        textAlign: 'center',
     },
     halfContainer: {
         flex: 1,

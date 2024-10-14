@@ -7,6 +7,8 @@ import { MaterialIcons } from '@expo/vector-icons';
 import base from '~/css/base';
 import colors from '~/css/colors';
 import Overlay from '~/components/Overlay';
+import { FIREBASE_AUTH } from '~/config';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 const { width, height } = Dimensions.get('window');
 
@@ -21,25 +23,32 @@ const RegisterScreen = () => {
     const [showPassword, setShowPassword] = useState(false); // Controlar a visibilidade da senha
     const [errorMessage, setErrorMessage] = useState(''); // Mensagem de erro caso o cadastro falhe
     const [overlay, setOverley] = useState(false);
+    const auth = FIREBASE_AUTH;
 
-    const handleLogin = () => {
-        navigation.navigate('Login');
-    };
-
-    const handleRegister = async () => {
+    const signIn = async () => {
         if (password !== confirmPassword) {
             setErrorMessage('As senhas não correspondem.');
             return;
         }
-
-        try {
-            // Criação de usuário com email e senha no Firebase
-            await auth().createUserWithEmailAndPassword(email, password);
-            navigation.navigate('Home'); // Navega para a tela Home após o registro bem-sucedido
-        } catch (error: any) {
-            setErrorMessage(error.message); // Exibe a mensagem de erro
+        try{
+            const response = await createUserWithEmailAndPassword(auth, email, password);
+            console.log(response);
+            navigation.navigate('Main');
+        } catch (error: any){
+            console.log(error);
+            setErrorMessage('Sign in failed: ' + error.message);
         }
+    }
+    const handleLogin = () => {
+        navigation.navigate('Login');
     };
+
+    // const handleRegister = async () => {
+    //     if (password !== confirmPassword) {
+    //         setErrorMessage('As senhas não correspondem.');
+    //         return;
+    //     }
+    // };
 
     // Alternar entre mostrar e ocultar a senha
     const toggleShowPassword = () => {
@@ -111,7 +120,7 @@ const RegisterScreen = () => {
                         </View>
                         {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
                     </View>
-                    <TouchableOpacity style={styles.loginBtn} onPress={handleRegister}>
+                    <TouchableOpacity style={styles.loginBtn} onPress={signIn}>
                         <Text style={styles.loginBtnText}>Criar conta</Text>
                     </TouchableOpacity>
                     <View style={[base.flexRow, base.gap_4, base.mb_10]}>

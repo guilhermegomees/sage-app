@@ -4,10 +4,11 @@ import { useNavigation } from '@react-navigation/native';
 import { ScrollView, TouchableOpacity, View, StyleSheet, Image, Text, Dimensions } from 'react-native';
 import base from '~/css/base';
 import colors from '~/css/colors';
-import { FIREBASE_AUTH } from '~/config';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth, db } from '~/config';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import PasswordInput from '~/components/PasswordInput';
 import Input from '~/components/Input';
+import { doc, setDoc } from 'firebase/firestore';
 
 type RegisterScreenNavigationProp = StackNavigationProp<any, 'Register'>;
 
@@ -18,19 +19,30 @@ const RegisterScreen = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState(''); // Mensagem de erro caso o cadastro falhe
-    const auth = FIREBASE_AUTH;
 
     const signIn = async () => {
         if (password !== confirmPassword) {
             setErrorMessage('As senhas não correspondem.');
             return;
         }
+
         try{
             const response = await createUserWithEmailAndPassword(auth, email, password);
-            console.log(response);
+
+            if (response.user) {
+                await updateProfile(response.user, { displayName: name });
+                
+                // Armazenar informações do usuário no Firestore
+                await setDoc(doc(db, 'users', response.user.uid), {
+                    uid: response.user.uid,
+                    name: name,
+                    email: email,
+                    // Adicione outros campos que desejar
+                });
+            }
+
             navigation.navigate('Main');
         } catch (error: any){
-            console.log(error);
             setErrorMessage('Sign in failed: ' + error.message);
         }
     }

@@ -12,8 +12,11 @@ import { transactionContext } from "~/enums/enums";
 import { predefinedColors } from "~/constants/colors";
 import { predefinedIcons } from "~/constants/icons";
 import { useTransactions } from "~/context/TransactionContext";
+import useUser from "~/hooks/useUser";
 
 const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { isModalVisible: boolean, context: transactionContext, onClose: () => void }) => {
+    const user = useUser();
+
     const [isCategoriesVisible, setIsCategoriesVisible] = useState(false);
     const [isNewCategorieVisible, setIsNewCategorieVisible] = useState(false);
     const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
@@ -114,11 +117,11 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                 isExpense: context != transactionContext.revenue,
                 source: context === transactionContext.cardExpense ? 2 : 1,
                 account: "Nubank", // TODO: conta do usuário
-                user: "user1", // TODO: ID do usuário logado
+                uid: user?.uid,
             }
             
             await addDoc(transactionCollectionRef, newTransactionData);
-            await fetchTransactions();
+            await fetchTransactions(user);
             handleCloseAndReset();
         } catch (error) {
             console.error("Erro ao criar transação: ", error);

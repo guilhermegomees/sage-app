@@ -1,45 +1,54 @@
-import React, { useContext, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useContext } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { HeaderContext } from '~/context/HeaderContext';
-import NewTransaction from '~/screens/NewTransaction';
-import { MaterialIcons } from '@expo/vector-icons';
+import { FontAwesome6 } from '@expo/vector-icons';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { useNavigation } from '@react-navigation/native';
 import base from '~/css/base';
 import colors from '~/css/colors';
+import useUser from '~/hooks/useUser';
+
+type HeaderNavigationProp = StackNavigationProp<any, 'Header'>;
 
 export default function Header() {
+    const navigation = useNavigation<HeaderNavigationProp>();
+    const user = useUser();
     const { showValues, setShowValues } = useContext(HeaderContext);
-    const [isModalVisible, setModalVisible] = useState<boolean>(false);
-    
-    const toggleModal = () => {
-        setModalVisible(!isModalVisible);
-    };
 
     const toggleShowValues = () => {
         setShowValues(!showValues);
     }
 
+    const handleNavigateToProfile = () => {
+        navigation.navigate('Profile');
+    }
+
     return (
-        <>
-            <View style={[base.flexRow, base.flexSpaceBetween, base.alignItemsCenter, base.px_30, styles.container]}>
-                <View style={[base.flexRow, base.alignItemsCenter, base.gap_12]}>
-                    <View style={[base.gap_4]}>
-                        <Text style={styles.name}>Olá [Nome]</Text>
+        <View style={[base.flexRow, base.flexSpaceBetween, base.alignItemsCenter, base.px_30, styles.container]}>
+            <View style={[base.flexRow, base.alignItemsCenter, base.gap_15]}>
+                <TouchableOpacity onPress={handleNavigateToProfile}>
+                    <View style={[styles.containerPhoto]}>
+                        {user?.photoURL
+                            ? <Image source={{ uri: user?.photoURL }} style={[styles.userPhoto]}/>
+                            : <Image source={require("./../assets/images/logo.png")} style={[styles.userPhoto]}/>
+                        }
                     </View>
-                </View>
-                <View style={[base.flexRow, base.gap_20]}>
-                    <TouchableOpacity onPress={toggleShowValues}>
-                        <MaterialIcons
-                            name={showValues ? 'visibility' : 'visibility-off'}
-                            size={28}
-                            color={colors.gray_50} />
-                    </TouchableOpacity>
-                    {/* <TouchableOpacity onPress={toggleModal}>
-                        <MaterialIcons name='add' size={28} color={colors.gray_50} />
-                    </TouchableOpacity> */}
+                </TouchableOpacity>
+                <View style={[base.gap_2]}>
+                    <Text style={styles.textHello}>Olá,</Text>
+                    <Text style={styles.userName}>{user?.name}</Text>
                 </View>
             </View>
-            {/* <NewTransaction isModalVisible={isModalVisible} onClose={toggleModal} /> */}
-        </>
+            <View style={[styles.containerEye]}>
+                <TouchableOpacity onPress={toggleShowValues}>
+                    <FontAwesome6
+                        name={!showValues ? 'eye-slash' : 'eye'}
+                        size={21}
+                        color={colors.gray_50}
+                    />
+                </TouchableOpacity>
+            </View>
+        </View>
     );
 }
 
@@ -48,9 +57,27 @@ const styles = StyleSheet.create({
         backgroundColor: colors.gray_900,
         paddingTop: 25,
     },
-    name: {
+    containerPhoto: {
+        backgroundColor: colors.gray_600,
+        borderRadius: 100,
+    },
+    userPhoto: {
+        width: 50,
+        height: 50,
+        borderRadius: 50,
+    },
+    textHello: {
         fontFamily: 'Outfit_500Medium',
         color: colors.gray_50,
-        fontSize: 16,
+        fontSize: 15,
+    },
+    userName: {
+        fontFamily: 'Outfit_600SemiBold',
+        color: colors.gray_50,
+        fontSize: 17,
+    },
+    containerEye: {
+        width: 35,
+        alignItems: 'center',
     },
 });

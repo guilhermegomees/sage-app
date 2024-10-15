@@ -1,12 +1,12 @@
-// TransactionContext.tsx
-import React, { createContext, useContext, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
-import { ITransaction } from '~/interfaces/interfaces';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { ITransaction, IUser } from '~/interfaces/interfaces';
 import { db } from '~/config';
+import useUser from '~/hooks/useUser';
 
 type TransactionContextType = {
     transactions: ITransaction[];
-    fetchTransactions: () => Promise<void>;
+    fetchTransactions: (user: IUser | null) => Promise<void>;
 };
 
 const TransactionContext = createContext<TransactionContextType | null>(null);
@@ -26,9 +26,10 @@ export const TransactionProvider = ({ children } : { children: React.ReactNode }
         return new Date(totalMilliseconds);
     };
 
-    const fetchTransactions = async (): Promise<void> => {
+    const fetchTransactions = async (user: IUser | null): Promise<void> => {
         try {
-            const querySnapshot = await getDocs(transactionCollectionRef);
+            const q = query(transactionCollectionRef, where("uid", "==", user?.uid));
+            const querySnapshot = await getDocs(q);
             const data: ITransaction[] = querySnapshot.docs.map(doc => ({
                 id: doc.id,
                 description: doc.data().description,
@@ -38,9 +39,9 @@ export const TransactionProvider = ({ children } : { children: React.ReactNode }
                 source: doc.data().source,
                 value: doc.data().value,
                 account: doc.data().account,
-                user: doc.data().user
+                uid: doc.data().uid
             }));
-
+            
             setTransactions(data);
         } catch (error) {
             console.error("Erro ao buscar transações: ", error);

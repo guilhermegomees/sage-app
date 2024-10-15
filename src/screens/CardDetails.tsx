@@ -11,10 +11,10 @@ import colors from '~/css/colors';
 
 const { width, height } = Dimensions.get('window');
 
-type CardDatailsScreenNavigationProp = StackNavigationProp<any, 'CardDatails'>;
+type CardDetailsScreenNavigationProp = StackNavigationProp<any, 'CardDetails'>;
 
 export default function CardDatails() {
-    const navigation = useNavigation<CardDatailsScreenNavigationProp>();
+    const navigation = useNavigation<CardDetailsScreenNavigationProp>();
     const [cardName, setCardName] = useState("Cartão 1"); // TODO: Trazer nome do cartão do banco de dados
     const [limit, setLimit] = useState<number>();
     const [closingDay, setClosingDay] = useState<{ label: string; value: number }>({ label: '1', value: 1 });

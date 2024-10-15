@@ -7,7 +7,7 @@ export interface ITransaction {
     source: number,
     value: number;
     account: number;
-    user: string;
+    uid: string;
 }
 
 export interface ICategory {
@@ -26,4 +26,11 @@ export interface IGoal {
     goalValue: number;
     icon: any;
     isCompleted: boolean;
+}
+
+export interface IUser {
+    uid: string;
+    name: string;
+    email: string;
+    photoURL: string;
 }

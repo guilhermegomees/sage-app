@@ -9,6 +9,7 @@ import colors from '~/css/colors';
 import { TypeScreem } from '~/enums/enums';
 import FloatingButton from '~/components/FloatingButton';
 import { useTransactions } from '~/context/TransactionContext';
+import useUser from '~/hooks/useUser';
 
 // Formatar valores com duas casas decimais
 function formatValue(value: number): string {
@@ -24,10 +25,12 @@ function formatValue(value: number): string {
 export default function Home() {
     const { showValues } = useContext(HeaderContext);
     const { transactions, fetchTransactions } = useTransactions();
+    const user = useUser();
 
+    // Carregar transações somente quando user estiver disponível
     useEffect(() => {
-        fetchTransactions();
-    }, []);
+        if(user) fetchTransactions(user);
+    }, [user]);
 
     // TODO: Calcular o total de entradas e saídas para a wallet específica
     let totalExpenses = 0;

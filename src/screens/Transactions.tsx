@@ -8,14 +8,16 @@ import { useTransactions } from '~/context/TransactionContext';
 import base from '~/css/base';
 import colors from '~/css/colors';
 import { TypeScreem } from '~/enums/enums';
+import useUser from '~/hooks/useUser';
 
 export default function Transactions() {
+    const user = useUser();
     const [searchTransaction, setSearchTransaction] = useState<string>('');
     const { transactions, fetchTransactions } = useTransactions();
 
     useEffect(() => {
-        fetchTransactions();
-    }, []);
+        fetchTransactions(user);
+    }, [user]);
 
     const filteredTransactions = transactions.filter(transaction => 
         transaction.description.toLowerCase().includes(searchTransaction.toLowerCase())

@@ -6,7 +6,7 @@ import Input from '~/components/Input';
 import PasswordInput from '~/components/PasswordInput';
 import base from '~/css/base';
 import colors from '~/css/colors';
-import { FIREBASE_AUTH } from '~/config';
+import { auth } from '~/config';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 
 type LoginScreenNavigationProp = StackNavigationProp<any, 'Login'>;
@@ -16,7 +16,6 @@ const LoginScreen = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const auth = FIREBASE_AUTH;
 
     const handleRegister = () => {
         navigation.navigate('Register');
@@ -25,7 +24,6 @@ const LoginScreen = () => {
     const signIn = async () => {
         try{
             const response = await signInWithEmailAndPassword(auth, email, password);
-            console.log(response);
             navigation.navigate('Main');
         } catch (error: any){
             console.log(error);

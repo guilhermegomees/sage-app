@@ -104,9 +104,12 @@ const Profile: React.FC = () => {
                 </View>
                 <View style={[base.alignItemsCenter, base.gap_10]}>
                     <TouchableOpacity onPress={handleImagePick}>
-                        {profileImage && (
-                            <Image source={{ uri: profileImage }} style={styles.image} />
-                        )}
+                        <Image 
+                            source={profileImage 
+                                ? { uri: profileImage } 
+                                : require("./../assets/images/user-circle.png")}
+                            style={styles.image} 
+                        />
                     </TouchableOpacity>
                     <Text style={[styles.userName]}>{user?.name}</Text>
                     <Text style={[styles.userEmail]}>{user?.email}</Text>
@@ -172,8 +175,8 @@ const styles = StyleSheet.create({
         marginBottom: 25,
     },
     image: {
-        width: 100,
-        height: 100,
+        width: 80,
+        height: 80,
         borderRadius: 100,
     },
     userName: {

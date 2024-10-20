@@ -6,7 +6,7 @@ import useUser from '~/hooks/useUser';
 
 type TransactionContextType = {
     transactions: ITransaction[];
-    fetchTransactions: (user: IUser | null) => Promise<void>;
+    fetchTransactions: (user: IUser) => Promise<void>;
 };
 
 const TransactionContext = createContext<TransactionContextType | null>(null);
@@ -26,9 +26,9 @@ export const TransactionProvider = ({ children } : { children: React.ReactNode }
         return new Date(totalMilliseconds);
     };
 
-    const fetchTransactions = async (user: IUser | null): Promise<void> => {
+    const fetchTransactions = async (user: IUser): Promise<void> => {
         try {
-            const q = query(transactionCollectionRef, where("uid", "==", user?.uid));
+            const q = query(transactionCollectionRef, where("uid", "==", user.uid));
             const querySnapshot = await getDocs(q);
             const data: ITransaction[] = querySnapshot.docs.map(doc => ({
                 id: doc.id,

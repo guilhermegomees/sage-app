@@ -15,6 +15,7 @@ import base from '~/css/base';
 import colors from '~/css/colors';
 import { charts, TypeScreem } from '~/enums/enums';
 import { useTransactions } from '~/context/TransactionContext';
+import useUser from '~/hooks/useUser';
 
 interface DataItem {
     month: number;
@@ -97,11 +98,12 @@ function filterTransactionsByPeriod(transactions: ITransaction[], [startMonth, e
 }
 
 export default function MonthlyBalance() {
+    const user = useUser();
     const { transactions, fetchTransactions } = useTransactions();
     const [currentPeriod, setCurrentPeriod] = useState('');
 
     useEffect(() => {
-        fetchTransactions();
+        if (user) fetchTransactions(user);
 
         const now = new Date();
         const currentMonth = now.getMonth() + 1; // getMonth() retorna meses de 0-11
@@ -127,7 +129,7 @@ export default function MonthlyBalance() {
 
         // Atualizar o estado com o formato 'YYYY-MM - YYYY-MM'
         setCurrentPeriod(`${currentYear}-${startMonth} - ${currentYear}-${endMonth}`);
-    }, []);
+    }, [user]);
 
     const handlePeriodChange = (direction: 'prev' | 'next') => {
         const [startMonth, , year] = getPeriodLimits(currentPeriod);

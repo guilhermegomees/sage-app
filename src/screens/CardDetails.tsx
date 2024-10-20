@@ -34,7 +34,7 @@ export default function CardDatails() {
 
     // formatar valor do input
     const formatValueInput = (value: any) => {
-        if (!value) return;
+        if (!value) return '';
 
         const parsedValue = parseFloat(value.toString().replace(/[^0-9]/g, ''));
         return `R$ ${!isNaN(parsedValue) ? parsedValue.toLocaleString('pt-BR') : ''}`;
@@ -89,20 +89,18 @@ export default function CardDatails() {
                         style={styles.input}
                         placeholder="Nome do cartão"
                         placeholderTextColor="#F8F1F1"
-                        onChangeText={(name: string) => setCardName(name)}
+                        onChangeText={setCardName}
                         value={cardName}
                         maxLength={25}
-                        overlay={(value: boolean) => setOverley(value)}
                     />
                     <Input
                         style={styles.input}
                         keyboardType="numeric"
                         placeholder="Limite do cartão"
                         placeholderTextColor="#F8F1F1"
-                        onChangeText={(limit: number) => setLimit(limit)}
+                        onChangeText={setLimit}
                         value={formatValueInput(limit)}
                         maxLength={14}
-                        overlay={(value: boolean) => setOverley(value)}
                     />
                     <TouchableOpacity style={styles.dropdown} activeOpacity={1} onPress={expandClosingDropdown}>
                         <Text style={[styles.inputText]}>Dia do fechamento</Text>

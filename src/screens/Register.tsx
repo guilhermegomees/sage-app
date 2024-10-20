@@ -33,11 +33,10 @@ const RegisterScreen = () => {
                 await updateProfile(response.user, { displayName: name });
                 
                 // Armazenar informações do usuário no Firestore
-                await setDoc(doc(db, 'users', response.user.uid), {
+                await setDoc(doc(db, 'user', response.user.uid), {
                     uid: response.user.uid,
                     name: name,
                     email: email,
-                    // Adicione outros campos que desejar
                 });
             }
 

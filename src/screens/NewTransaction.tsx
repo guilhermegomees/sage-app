@@ -104,25 +104,27 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
             alert("Por favor, preencha todos os campos antes de continuar.");
             return;
         }
-    
-        try {
-            const date = new Date(selectedDate);
-            date.setHours(date.getHours() + 3);
 
-            const newTransactionData = {
-                value: valueTransaction,
-                description: description,
-                date: date,
-                category: selectedCategory,
-                isExpense: context != transactionContext.revenue,
-                source: context === transactionContext.cardExpense ? 2 : 1,
-                account: "Nubank", // TODO: conta do usuário
-                uid: user?.uid,
+        try {
+            if (user) {
+                const date = new Date(selectedDate);
+                date.setHours(date.getHours() + 3);
+
+                const newTransactionData = {
+                    value: valueTransaction,
+                    description: description,
+                    date: date,
+                    category: selectedCategory,
+                    isExpense: context != transactionContext.revenue,
+                    source: context === transactionContext.cardExpense ? 2 : 1,
+                    account: "Nubank", // TODO: conta do usuário
+                    uid: user.uid,
+                }
+                
+                await addDoc(transactionCollectionRef, newTransactionData);
+                await fetchTransactions(user);
+                handleCloseAndReset();
             }
-            
-            await addDoc(transactionCollectionRef, newTransactionData);
-            await fetchTransactions(user);
-            handleCloseAndReset();
         } catch (error) {
             console.error("Erro ao criar transação: ", error);
         }
@@ -135,20 +137,22 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
         }
 
         try {
-            const newCategoryData = {
-                name: nameNewCategory,
-                color: selectedColor,
-                icon: selectedIcon,
-                user: "user1", // TODO: ID do usuário logado
-                context: context === transactionContext.revenue ? 1 : 2
+            if (user) {
+                const newCategoryData = {
+                    name: nameNewCategory,
+                    color: selectedColor,
+                    icon: selectedIcon,
+                    user: user.uid,
+                    context: context === transactionContext.revenue ? 1 : 2
+                }
+
+                const docRef = await addDoc(categoryCollectionRef, newCategoryData);
+
+                setSelectedCategory({ id: docRef.id, ...newCategoryData });
+
+                resetNewCategory();
+                setIsNewCategorieVisible(false);
             }
-            
-            const docRef = await addDoc(categoryCollectionRef, newCategoryData);
-
-            setSelectedCategory({ id: docRef.id, ...newCategoryData });
-
-            resetNewCategory();
-            setIsNewCategorieVisible(false);
         } catch (error) {
             console.error("Erro ao criar categoria: ", error);
         }

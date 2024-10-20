@@ -14,7 +14,7 @@ export default function Transactions() {
     const { transactions, fetchTransactions } = useTransactions();
 
     useEffect(() => {
-        fetchTransactions(user);
+        if (user) fetchTransactions(user);
     }, [user]);
 
     const filteredTransactions = transactions.filter(transaction => 

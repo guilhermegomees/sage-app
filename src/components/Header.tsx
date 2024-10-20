@@ -28,10 +28,12 @@ export default function Header() {
             <View style={[base.flexRow, base.alignItemsCenter, base.gap_15]}>
                 <TouchableOpacity onPress={handleNavigateToProfile}>
                     <View style={[styles.containerPhoto]}>
-                        {user?.photoURL
-                            ? <Image source={{ uri: user?.photoURL }} style={[styles.userPhoto]}/>
-                            : <Image source={require("./../assets/images/logo.png")} style={[styles.userPhoto]}/>
-                        }
+                        <Image 
+                            source={user?.photoURL
+                                ? { uri: user?.photoURL }
+                                : require("./../assets/images/user-circle.png")}
+                            style={[styles.userPhoto]}
+                        />
                     </View>
                 </TouchableOpacity>
                 <View style={[base.gap_2]}>
@@ -58,7 +60,6 @@ const styles = StyleSheet.create({
         paddingTop: 25,
     },
     containerPhoto: {
-        backgroundColor: colors.gray_600,
         borderRadius: 100,
     },
     userPhoto: {

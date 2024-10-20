@@ -3,8 +3,8 @@ import { FontAwesome6 } from "@expo/vector-icons";
 import colors from "~/css/colors";
 
 interface InputProps extends TextInputProps {
-    value: string;
-    onChangeText: React.Dispatch<React.SetStateAction<string>>;
+    value: any;
+    onChangeText: React.Dispatch<React.SetStateAction<any>>;
     icon?: string;
     styleInput?: object;
     styleTextInput?: object;

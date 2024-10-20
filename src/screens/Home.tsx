@@ -13,13 +13,7 @@ import useUser from '~/hooks/useUser';
 
 // Formatar valores com duas casas decimais
 function formatValue(value: number): string {
-    const valueStr = value.toFixed(2).replace('.', ',');
-
-    if (value < 0) {
-        return `- R$ ${Math.abs(value).toFixed(2).replace('.', ',')}`;
-    }
-
-    return `R$ ${valueStr}`;
+    return value.toFixed(2).replace('.', ',');
 }
 
 export default function Home() {
@@ -58,16 +52,16 @@ export default function Home() {
                 </View>
                 {/* Valores */}
                 <View style={[base.flexColumn, base.alignItemsCenter, base.justifyContentCenter, base.gap_8, base.mb_10]}>
-                    {/* TODO: Aplicar valor da conta vindo do data */}
-                    <Text style={[styles.textValue, !showValues && styles.hideValues]}> {formatValue(totalIncome - totalExpenses)} </Text>
+                    {/* TODO: Trazer valores de acordo com o mês atual */}
+                    <Text style={[styles.textValue, !showValues && styles.hideValues]}>R$ {formatValue(totalIncome - totalExpenses)}</Text>
                     <View style={[base.alignItemsCenter, base.justifyContentCenter, base.flexRow, base.gap_15]}>
                         <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_5]}>
                             <FontAwesome6 name='caret-up' color={colors.green_500} size={20} />
-                            <Text style={[styles.textValueEntrance, !showValues && styles.hideValues, styles.shortText]}>{formatValue(totalIncome)}</Text>
+                            <Text style={[styles.textValueEntrance, !showValues && styles.hideValues, styles.shortText]}>R$ {formatValue(totalIncome)}</Text>
                         </View>
                         <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_5]}>
                             <FontAwesome6 name='caret-down' color={colors.red_500} size={20} />
-                            <Text style={[styles.textValueOutPut, !showValues && styles.hideValues, styles.shortText]}>{formatValue(totalExpenses)}</Text>
+                            <Text style={[styles.textValueOutPut, !showValues && styles.hideValues, styles.shortText]}>R$ {formatValue(totalExpenses)}</Text>
                         </View>
                     </View>
                 </View>
@@ -227,10 +221,10 @@ const styles = StyleSheet.create({
         textShadowRadius: 20,
     },
     hideValues: {
-        textShadowColor: colors.gray_900,
+        textShadowColor: colors.gray_700,
         textShadowOffset: { width: 0, height: 0 },
         textShadowRadius: 40,
-        backgroundColor: colors.gray_500,
+        backgroundColor: colors.gray_600,
         borderRadius: 5,
         color: 'transparent'
     },

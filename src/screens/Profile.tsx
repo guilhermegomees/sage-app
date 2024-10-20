@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import useUser from '~/hooks/useUser';
 import colors from '~/css/colors';
-import { app } from '~/config';
+import { app } from '~/config/firebase';
 import { FontAwesome6 } from '@expo/vector-icons';
 import base from '~/css/base';
 

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { ITransaction, IUser } from '~/interfaces/interfaces';
-import { db } from '~/config';
+import { db } from '~/config/firebase';
 import useUser from '~/hooks/useUser';
 
 type TransactionContextType = {

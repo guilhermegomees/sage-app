@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
-import { ScrollView, TouchableOpacity, View, StyleSheet, Image, Text, Dimensions } from 'react-native';
+import { ScrollView, TouchableOpacity, View, StyleSheet, Image, Text } from 'react-native';
 import base from '~/css/base';
 import colors from '~/css/colors';
-import { auth, db } from '~/config';
+import { auth, db } from '~/config/firebase';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import PasswordInput from '~/components/PasswordInput';
 import Input from '~/components/Input';

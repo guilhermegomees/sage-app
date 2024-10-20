@@ -1,9 +1,7 @@
-import { collection, getDocs } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import BottomSheet from '~/components/BottomSheet';
 import SearchBar from '~/components/SearchBar';
-import { db } from '~/config';
 import { useTransactions } from '~/context/TransactionContext';
 import base from '~/css/base';
 import colors from '~/css/colors';

@@ -6,7 +6,7 @@ import colors from "~/css/colors";
 import { FontAwesome6, MaterialIcons, Octicons } from "@expo/vector-icons";
 import { ICategory } from "~/interfaces/interfaces";
 import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "~/config";
+import { db } from "~/config/firebase";
 import { Calendar } from "~/components/Calendar";
 import { transactionContext } from "~/enums/enums";
 import { predefinedColors } from "~/constants/colors";

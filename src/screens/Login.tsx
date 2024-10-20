@@ -6,7 +6,7 @@ import Input from '~/components/Input';
 import PasswordInput from '~/components/PasswordInput';
 import base from '~/css/base';
 import colors from '~/css/colors';
-import { auth } from '~/config';
+import { auth } from '~/config/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 
 type LoginScreenNavigationProp = StackNavigationProp<any, 'Login'>;

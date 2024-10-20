@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { db, auth } from '~/config';
+import { db, auth } from '~/config/firebase';
 import { IUser } from '~/interfaces/interfaces';
 
 const useUser = () => {

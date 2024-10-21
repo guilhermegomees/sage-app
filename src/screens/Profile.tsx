@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Image, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { getAuth, updateProfile } from 'firebase/auth';
+import { getAuth, signOut, updateProfile } from 'firebase/auth';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
@@ -22,7 +22,7 @@ const Profile: React.FC = () => {
     const auth = getAuth(app);
     const storage = getStorage(app);
     const firestore = getFirestore(app);
-
+    
     useEffect(() => {
         const fetchUserProfile = async () => {
             if (user) {
@@ -94,6 +94,15 @@ const Profile: React.FC = () => {
         navigation.goBack();
     };
 
+    const signOutUser = async () => {
+        try {
+            await signOut(auth);
+            navigation.navigate('Login'); // Redirecione para a tela de login ou onde preferir
+        } catch (error) {
+            console.log("Erro ao deslogar:", error);
+        }
+    };    
+    
     return (
         <View style={[base.flex_1, { backgroundColor: colors.gray_900 }]}>
             <View style={styles.container}>
@@ -102,7 +111,7 @@ const Profile: React.FC = () => {
                         <FontAwesome6 name="angle-left" size={20} color={colors.gray_50} />
                     </TouchableOpacity>
                 </View>
-                <View style={[base.alignItemsCenter, base.gap_10]}>
+                <View style={[base.alignItemsCenter, base.gap_8]}>
                     <TouchableOpacity onPress={handleImagePick}>
                         <Image 
                             source={profileImage 
@@ -155,6 +164,17 @@ const Profile: React.FC = () => {
                     </View>
                     <FontAwesome6 name="angle-right" size={20} color={colors.gray_100}/>
                 </View>
+                <View style={[styles.line]} />
+                <View style={[styles.containerMenu]}>
+                    <TouchableOpacity onPress={signOutUser}>
+                        <View style={[base.flexRow, base.gap_18, base.alignItemsCenter]}>
+                            <View style={[styles.containerIcon]}>
+                                <FontAwesome6 name="arrow-right-from-bracket" size={23} color={colors.gray_100}/>
+                            </View>
+                            <Text style={[styles.menuText]}>Sair</Text>
+                        </View>
+                    </TouchableOpacity>
+                </View>
             </View>
         </View>
     );
@@ -181,13 +201,15 @@ const styles = StyleSheet.create({
     },
     userName: {
         fontFamily: 'Outfit_600SemiBold',
-        fontSize: 20,
-        color: colors.gray_50
+        fontSize: 22,
+        color: colors.gray_50,
+        lineHeight: 22,
     },
     userEmail: {
         fontFamily: 'Outfit_400Regular',
-        fontSize: 16,
-        color: colors.gray_50
+        fontSize: 18,
+        color: colors.gray_50,
+        lineHeight: 18,
     },
     bottomMenu: {
         backgroundColor: colors.gray_800,

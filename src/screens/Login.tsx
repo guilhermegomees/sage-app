@@ -23,7 +23,7 @@ const LoginScreen = () => {
 
     const signIn = async () => {
         try{
-            const response = await signInWithEmailAndPassword(auth, email, password);
+            await signInWithEmailAndPassword(auth, email, password);
             navigation.navigate('Main');
         } catch (error: any){
             console.log(error);

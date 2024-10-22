@@ -6,13 +6,13 @@
     "web": {
       "bundler": "metro",
       "output": "server",
-      "favicon": "./src/assets/images/favicon.png"
+      "favicon": "./src/assets/images/sage.png"
     },
     "experiments": {
       "tsconfigPaths": true
     },
     "orientation": "portrait",
-    "icon": "./src/assets/images/icon.png",
+    "icon": "./src/assets/images/sage.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./src/assets/images/load.png",
@@ -27,7 +27,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/images/adaptive-icon.png",
+        "foregroundImage": "./src/assets/images/sage.png",
         "backgroundColor": "#ffffff"
       }
     },

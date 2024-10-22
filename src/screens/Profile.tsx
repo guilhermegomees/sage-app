@@ -85,7 +85,7 @@ const Profile: React.FC = () => {
     
                 setProfileImage(imageUrl);
             } catch (error) {
-                console.error("Erro ao fazer upload da imagem:", error);  // Log detalhado do erro
+                console.error("Erro ao fazer upload da imagem:", error);
             }
         }
     };
@@ -97,7 +97,7 @@ const Profile: React.FC = () => {
     const signOutUser = async () => {
         try {
             await signOut(auth);
-            navigation.navigate('Login'); // Redirecione para a tela de login ou onde preferir
+            navigation.navigate('Login');
         } catch (error) {
             console.log("Erro ao deslogar:", error);
         }
@@ -111,17 +111,19 @@ const Profile: React.FC = () => {
                         <FontAwesome6 name="angle-left" size={20} color={colors.gray_50} />
                     </TouchableOpacity>
                 </View>
-                <View style={[base.alignItemsCenter, base.gap_8]}>
+                <View style={[base.alignItemsCenter, base.gap_20]}>
                     <TouchableOpacity onPress={handleImagePick}>
                         <Image 
                             source={profileImage 
                                 ? { uri: profileImage } 
-                                : require("./../assets/images/user-circle.png")}
+                                : require("./../assets/images/blank-profile-picture.png")}
                             style={styles.image} 
                         />
                     </TouchableOpacity>
-                    <Text style={[styles.userName]}>{user?.name}</Text>
-                    <Text style={[styles.userEmail]}>{user?.email}</Text>
+                    <View style={[base.gap_8]}>
+                        <Text style={[styles.userName]}>{user?.name}</Text>
+                        <Text style={[styles.userEmail]}>{user?.email}</Text>
+                    </View>
                 </View>
             </View>
             <View style={[styles.bottomMenu]}>

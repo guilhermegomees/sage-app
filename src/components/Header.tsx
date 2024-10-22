@@ -25,13 +25,13 @@ export default function Header() {
 
     return (
         <View style={[base.flexRow, base.flexSpaceBetween, base.alignItemsCenter, base.px_30, styles.container]}>
-            <View style={[base.flexRow, base.alignItemsCenter, base.gap_15]}>
+            <View style={[base.flexRow, base.alignItemsCenter, base.gap_10]}>
                 <TouchableOpacity onPress={handleNavigateToProfile}>
                     <View style={[styles.containerPhoto]}>
                         <Image 
                             source={user?.photoURL
                                 ? { uri: user?.photoURL }
-                                : require("./../assets/images/user-circle.png")}
+                                : require("./../assets/images/blank-profile-picture.png")}
                             style={[styles.userPhoto]}
                         />
                     </View>

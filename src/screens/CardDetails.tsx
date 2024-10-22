@@ -88,7 +88,7 @@ export default function CardDatails() {
                     <Input 
                         style={styles.input}
                         placeholder="Nome do cartão"
-                        placeholderTextColor="#F8F1F1"
+                        placeholderTextColor={colors.gray_50}
                         onChangeText={setCardName}
                         value={cardName}
                         maxLength={25}
@@ -97,7 +97,7 @@ export default function CardDatails() {
                         style={styles.input}
                         keyboardType="numeric"
                         placeholder="Limite do cartão"
-                        placeholderTextColor="#F8F1F1"
+                        placeholderTextColor={colors.gray_50}
                         onChangeText={setLimit}
                         value={formatValueInput(limit)}
                         maxLength={14}
@@ -165,10 +165,6 @@ export default function CardDatails() {
                     </TouchableOpacity>
                 </View>
             </View>
-            {/* <Image
-                source={require('../assets/images/imgFooter.png')}
-                style={styles.backgroundImage}
-            /> */}
             {overlay && <Overlay style={[styles.overlay]} />}
         </View>
     );

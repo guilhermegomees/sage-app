@@ -7,6 +7,7 @@ import { TypeScreem } from '~/enums/enums';
 import colors from '~/css/colors';
 import base from '~/css/base';
 import { useTransactions } from '~/context/TransactionContext';
+import { FontAwesome6 } from '@expo/vector-icons';
 
 type CardsScreenNavigationProp = StackNavigationProp<any, 'Cards'>;
 
@@ -46,29 +47,27 @@ export default function Cards() {
                             <Image source={require('./../assets/images/card-recive.png')} style={styles.iconButtonAction} />
                         </View>
                     </TouchableOpacity>
-                    <Text style={[styles.textBtnsActions]}>Transação</Text>
+                    <Text style={[styles.textBtnsActions]}>Despesa cartão</Text>
                 </View>
                 <View style={[base.alignItemsCenter, base.justifyContentCenter, base.gap_8]}>
                     <TouchableOpacity onPress={handleNavigateToCardDatails}>
                         <View style={[styles.buttonsActions]}>
-                            <Image source={require('./../assets/images/edit.png')} style={styles.iconButtonActionEdit} />
+                            <FontAwesome6 name="pen" color={colors.gray_100} size={20}/>
                         </View>
                     </TouchableOpacity>
                     <Text style={[styles.textBtnsActions]}>Editar</Text>
                 </View>
-                <View style={[base.alignItemsCenter, base.justifyContentCenter, base.gap_8]}>
+                {/* <View style={[base.alignItemsCenter, base.justifyContentCenter, base.gap_8]}>
                     <TouchableOpacity>
                         <View style={[styles.buttonsActions]}>
                             <View style={[base.flexColumn, base.alignItemsCenter]}>
-                                {/* TODO: Aplicar data de vencimento definida no cartão e implementar
-                                função para mostrar um mês em diante depois do dia definido */}
                                 <Text style={[styles.dueDate]}>10</Text>
                                 <Text style={[styles.dueMonth]}>Abr</Text>
                             </View>
                         </View>
                     </TouchableOpacity>
                     <Text style={[styles.textBtnsActions]}>Vencimento</Text>
-                </View>
+                </View> */}
             </View>
             {/* Painel de transações */}
             <BottomSheet data={filteredTransactions} type={TypeScreem.Card} />

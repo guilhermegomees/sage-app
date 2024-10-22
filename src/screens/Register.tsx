@@ -52,7 +52,7 @@ const RegisterScreen = () => {
     return (
         <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
             <View style={[base.flex_1]}>
-                <Image source={require('../assets/images/logo.png')} style={styles.logo} />
+                <Image source={require('../assets/images/sage.png')} style={styles.logo} />
                 <Text style={styles.nameCompany}>Sage</Text>
                 <View style={styles.halfContainer}>
                     <Text style={styles.title}>Seja bem-vindo(a)</Text>

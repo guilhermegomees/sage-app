@@ -662,6 +662,9 @@ export const base = StyleSheet.create({
 	justifyContentSpaceBetween: {
 		justifyContent: 'space-between',
 	},
+	justifyContentSpaceAround: {
+		justifyContent: 'space-around',
+	},
 	alignItemsCenter: {
 		alignItems: 'center',
 	},
@@ -876,6 +879,17 @@ export const base = StyleSheet.create({
 	},
 	gap_50: {
 		gap: 50
+	},
+
+	//Position
+	position_absolute: {
+		position: 'absolute'
+	},
+	position_relative: {
+		position: 'relative'
+	},
+	position_static: {
+		position: 'static'
 	},
 
 	// Flex

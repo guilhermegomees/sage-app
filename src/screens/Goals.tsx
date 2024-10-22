@@ -8,40 +8,40 @@ import { IGoal } from '~/interfaces/interfaces';
 
 export default function Goals() {
     const [filter, setFilter] = useState<'all' | 'completed' | 'incomplete'>('all');
-    const [selectedGoal, setSelectedGoal] = useState<number | null>(null);
+    const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-    const [goalToDelete, setGoalToDelete] = useState<number | null>(null);
+    const [goalToDelete, setGoalToDelete] = useState<string | null>(null);
     
     const goalsData : IGoal[] = [{
-        id: 1,
+        id: "1",
         name: "Viagem",
         currentValue: 6000,
         goalValue: 6000,
         icon: "airplanemode-active",
         isCompleted: false
     },{
-        id: 2,
+        id: "2",
         name: "Comprar um carro",
         currentValue: 25000,
         goalValue: 30000,
         icon: "directions-car",
         isCompleted: false
     },{
-        id: 3,
+        id: "3",
         name: "Reformar a casa",
         currentValue: 12200,
         goalValue: 20000,
         icon: "home",
         isCompleted: false
     },{
-        id: 4,
+        id: "4",
         name: "Abrir um negócio",
         currentValue: 50000,
         goalValue: 100000,
         icon: "store",
         isCompleted: false
     },{
-        id: 5,
+        id: "5",
         name: "Abrir um negócio",
         currentValue: 50000,
         goalValue: 100000,
@@ -56,7 +56,7 @@ export default function Goals() {
         return true; // 'all' mostra todas as metas
     });
 
-    const toggleTooltip = (id: number) => {
+    const toggleTooltip = (id: string) => {
         if (selectedGoal === id) {
             setSelectedGoal(null); // Fecha a tooltip se já estiver aberta
         } else {
@@ -64,12 +64,12 @@ export default function Goals() {
         }
     };
 
-    const handleEdit = (id: number) => {
+    const handleEdit = (id: string) => {
         console.log(`Editar meta com id: ${id}`);
         setSelectedGoal(null);
     };
 
-    const handleDelete = (id: number) => {
+    const handleDelete = (id: string) => {
         setGoalToDelete(id);
         setIsModalVisible(true);
         setSelectedGoal(null);

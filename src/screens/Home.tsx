@@ -42,14 +42,6 @@ export default function Home() {
         <>
             <Header />
             <View style={[styles.container, base.flex_1, base.alignItemsCenter, base.pt_10, base.gap_10]}>
-                {/* Conta */}
-                <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_8]}>
-                    {/* TODO: Aplicar nome da carteira vindo do data */}
-                    <Text style={[styles.textWallet]}>[Wallet]</Text>
-                    <View style={[styles.containerRetweet, base.alignItemsCenter, base.justifyContentCenter]}>
-                        <FontAwesome6 name='repeat' color={colors.white} size={12} />
-                    </View>
-                </View>
                 {/* Valores */}
                 <View style={[base.flexColumn, base.alignItemsCenter, base.justifyContentCenter, base.gap_8, base.mb_10]}>
                     {/* TODO: Trazer valores de acordo com o mês atual */}
@@ -65,25 +57,6 @@ export default function Home() {
                         </View>
                     </View>
                 </View>
-                {/* Botões de ação */}
-                {/* <View style={[styles.buttonsActionsContainer]}>
-                    <View style={[styles.buttonAction]}>
-                        <TouchableOpacity onPress={handleNavigateToNewTransaction}>
-                            <View style={[styles.button]}>
-                                <Image source={require('./../assets/images/dolar.png')} style={styles.iconButtonAction} />
-                            </View>
-                        </TouchableOpacity>
-                        <Text style={[styles.textBtnsActions]}>Registrar</Text>
-                    </View>
-                    <View style={[styles.buttonAction]}>
-                        <TouchableOpacity>
-                            <View style={[styles.button]}>
-                                <Image source={require('./../assets/images/balance.png')} style={[styles.iconBalanceButtonAction]} />
-                            </View>
-                        </TouchableOpacity>
-                        <Text style={[styles.textBtnsActions]}>Balancear</Text>
-                    </View>
-                </View> */}
                 {/* Painel de transações */}
                 <BottomSheet data={transactions} type={TypeScreem.Account} />
             </View>

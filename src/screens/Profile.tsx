@@ -11,6 +11,7 @@ import colors from '~/css/colors';
 import { app } from '~/config/firebase';
 import { FontAwesome6 } from '@expo/vector-icons';
 import base from '~/css/base';
+import { Circle } from 'react-native-progress';
 
 type ProfileScreenNavigationProp = StackNavigationProp<any, 'Profile'>;
 
@@ -120,9 +121,26 @@ const Profile: React.FC = () => {
                             style={styles.image} 
                         />
                     </TouchableOpacity>
-                    <View style={[base.gap_8]}>
+                    <View style={[base.alignItemsCenter, base.gap_8]}>
                         <Text style={[styles.userName]}>{user?.name}</Text>
                         <Text style={[styles.userEmail]}>{user?.email}</Text>
+                    </View>
+                </View>
+            </View>
+            <View style={[base.px_30, base.py_25]}>
+                <Text style={[styles.balance]}>Saldo</Text>
+                <View style={[base.flexRow, base.justifyContentSpaceAround, base.mt_15]}>
+                    <View style={[base.flexRow, base.gap_5, base.alignItemsCenter]}>
+                        <FontAwesome6 name='caret-up' color={colors.green_500} size={20} />
+                        <Text style={[styles.valueBalance, styles.entrance]}>R$ 3.625,47</Text>
+                    </View>
+                    <View style={[base.flexRow, base.gap_5, base.alignItemsCenter]}>
+                        <FontAwesome6 name='caret-down' color={colors.red_500} size={20} />
+                        <Text style={[styles.valueBalance, styles.exits]}>R$ 2.082,95</Text>
+                    </View>
+                    <View style={[base.flexRow, base.gap_5, base.alignItemsCenter]}>
+                        <FontAwesome6 name='caret-right' color={colors.blue_300} size={20} />
+                        <Text style={[styles.valueBalance, styles.remainder]}>R$ 1.542,52</Text>
                     </View>
                 </View>
             </View>
@@ -173,7 +191,7 @@ const Profile: React.FC = () => {
                             <View style={[styles.containerIcon]}>
                                 <FontAwesome6 name="arrow-right-from-bracket" size={23} color={colors.gray_100}/>
                             </View>
-                            <Text style={[styles.menuText]}>Sair</Text>
+                            <Text style={[styles.menuText]}>Encerrar sessão</Text>
                         </View>
                     </TouchableOpacity>
                 </View>
@@ -203,19 +221,37 @@ const styles = StyleSheet.create({
     },
     userName: {
         fontFamily: 'Outfit_600SemiBold',
-        fontSize: 22,
+        fontSize: 24,
         color: colors.gray_50,
-        lineHeight: 22,
+        lineHeight: 24,
     },
     userEmail: {
         fontFamily: 'Outfit_400Regular',
         fontSize: 18,
-        color: colors.gray_50,
+        color: colors.gray_200,
         lineHeight: 18,
+    },
+    balance: {
+        fontFamily: 'Outfit_500Medium',
+        fontSize: 20,
+        color: colors.gray_100
+    },
+    entrance: {
+        color: colors.green_500,
+    },
+    exits: {
+        color: colors.red_500,
+    },
+    remainder: {
+        color: colors.blue_300,
+    },
+    valueBalance: {
+        fontFamily: 'Outfit_500Medium',
+        fontSize: 18,
     },
     bottomMenu: {
         backgroundColor: colors.gray_800,
-        height: '50%',
+        height: '63%',
         width: '100%',
         borderTopRightRadius: 30,
         borderTopLeftRadius: 30,

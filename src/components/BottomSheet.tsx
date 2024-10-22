@@ -199,8 +199,8 @@ const styles = StyleSheet.create({
     panelTransactions: {
         flex: 1,
         width: '100%',
-        borderTopLeftRadius: 25,
-        borderTopRightRadius: 25,
+        height: 600,
+        borderRadius: 15
     },
     latestTransactions: {
         fontFamily: 'Outfit_600SemiBold',

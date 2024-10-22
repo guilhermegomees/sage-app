@@ -1,5 +1,5 @@
-import React, { useContext, useEffect } from 'react';
-import { View, StyleSheet, Text, Image } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { View, StyleSheet, Text, Image, ScrollView } from 'react-native';
 import BottomSheet from '~/components/BottomSheet';
 import Header from '~/components/Header';
 import { HeaderContext } from '~/context/HeaderContext';
@@ -10,6 +10,10 @@ import { TypeScreem } from '~/enums/enums';
 import FloatingButton from '~/components/FloatingButton';
 import { useTransactions } from '~/context/TransactionContext';
 import useUser from '~/hooks/useUser';
+import { IAccount, IUser } from '~/interfaces/interfaces';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '~/config/firebase';
+import { banks } from '~/constants/banks';
 
 // Formatar valores com duas casas decimais
 function formatValue(value: number): string {
@@ -21,9 +25,51 @@ export default function Home() {
     const { transactions, fetchTransactions } = useTransactions();
     const user = useUser();
 
+    const [accounts, setAccounts] = useState<IAccount[]>([]);
+    const accountCollectionRef = collection(db, "account");
+
+    const [totalValueAccounts, setTotalValueAccounts] = useState<string>('0,00');
+
+    const fetchAcounts = async (user: IUser): Promise<void> => {
+        try {
+            const q = query(accountCollectionRef, where("uid", "==", user.uid));
+            const querySnapshot = await getDocs(q);
+            const data: IAccount[] = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                uid: doc.data().uid,
+                name: doc.data().name,
+                bankName: doc.data().bankName,
+                value: doc.data().value,
+                includeInSum: doc.data().includeInSum
+            }));
+
+            // Filtra as contas em que includeInSum é true e soma os valores
+            const totalValue = data
+                .filter(account => account.includeInSum)
+                .reduce((acc, account) => {
+                    // Substitui vírgula por ponto antes de converter
+                    const numericValue = parseFloat(account.value.replace(',', '.'));
+                    return acc + numericValue;
+                }, 0);
+
+            const formattedTotalValue = totalValue.toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            });
+
+            setTotalValueAccounts(formattedTotalValue);
+            setAccounts(data);
+        } catch (error) {
+            console.error("Erro ao buscar contas: ", error);
+        }
+    };
+
     // Carregar transações somente quando user estiver disponível
     useEffect(() => {
-        if(user) fetchTransactions(user);
+        if(user) {
+            fetchTransactions(user);
+            fetchAcounts(user);
+        };
     }, [user]);
 
     // TODO: Calcular o total de entradas e saídas para a wallet específica
@@ -38,28 +84,54 @@ export default function Home() {
         }
     }
 
+    const getLogo = (bankName: string) => {
+        return banks[bankName] || require('../assets/images/banks/default.png');
+    };
+
     return (
         <>
             <Header />
-            <View style={[styles.container, base.flex_1, base.alignItemsCenter, base.pt_10, base.gap_10]}>
-                {/* Valores */}
-                <View style={[base.flexColumn, base.alignItemsCenter, base.justifyContentCenter, base.gap_8, base.mb_10]}>
-                    {/* TODO: Trazer valores de acordo com o mês atual */}
-                    <Text style={[styles.textValue, !showValues && styles.hideValues]}>R$ {formatValue(totalIncome - totalExpenses)}</Text>
-                    <View style={[base.alignItemsCenter, base.justifyContentCenter, base.flexRow, base.gap_15]}>
-                        <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_5]}>
-                            <FontAwesome6 name='caret-up' color={colors.green_500} size={20} />
-                            <Text style={[styles.textValueEntrance, !showValues && styles.hideValues, styles.shortText]}>R$ {formatValue(totalIncome)}</Text>
-                        </View>
-                        <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_5]}>
-                            <FontAwesome6 name='caret-down' color={colors.red_500} size={20} />
-                            <Text style={[styles.textValueOutPut, !showValues && styles.hideValues, styles.shortText]}>R$ {formatValue(totalExpenses)}</Text>
+            <ScrollView style={[base.flex_1]}>
+                <View style={[styles.container, base.flex_1, base.alignItemsCenter, base.pt_5, base.gap_25, base.pb_90]}>
+                    <View style={[base.flexColumn, base.alignItemsCenter, base.justifyContentCenter, base.gap_8, base.mb_10]}>
+                        <Text style={[styles.valueBalance, styles.remainder, !showValues && styles.hideValues]}>R$ {formatValue(totalIncome - totalExpenses)}</Text>
+                        <View style={[base.alignItemsCenter, base.justifyContentCenter, base.flexRow, base.gap_15]}>
+                            <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_5]}>
+                                <FontAwesome6 name='caret-up' color={colors.green_500} size={20} />
+                                <Text style={[styles.valueBalance, styles.entrance, !showValues && styles.hideValues, styles.shortText]}>R$ {formatValue(totalIncome)}</Text>
+                            </View>
+                            <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_5]}>
+                                <FontAwesome6 name='caret-down' color={colors.red_500} size={20} />
+                                <Text style={[styles.valueBalance, styles.exits, !showValues && styles.hideValues, styles.shortText]}>R$ {formatValue(totalExpenses)}</Text>
+                            </View>
                         </View>
                     </View>
+                    <View style={[styles.accounts]}>
+                        <View style={[styles.lineBottom, base.mb_15, base.pb_15]}>
+                            <Text style={[styles.title]}>Contas</Text>
+                        </View>
+                        <View style={[base.gap_20]}>
+                            {accounts.map((account: IAccount)=>{
+                                return (
+                                    <View key={account.id} style={[styles.account]}>
+                                        <Image source={getLogo(account.bankName)} style={[styles.accountIcon]}/>
+                                        <View style={[base.gap_5]}>
+                                            <Text style={[styles.accountText]}>{account.name}</Text>
+                                            <Text style={[styles.accountValue, {color: parseFloat(account.value) < 0 ? colors.red_500 : colors.green_500}]}>R$ {account.value}</Text>
+                                        </View>
+                                    </View>
+                                )
+                            })}
+                        </View>
+                        <View style={[styles.lineTop, base.mt_15, base.pt_15, base.flexRow, base.justifyContentSpaceBetween]}>
+                            <Text style={[styles.title]}>Total</Text>
+                            <Text style={[styles.title]}>R$ {totalValueAccounts}</Text>
+                        </View>
+                    </View>
+                    {/* Painel de transações */}
+                    <BottomSheet data={transactions} type={TypeScreem.Account} />
                 </View>
-                {/* Painel de transações */}
-                <BottomSheet data={transactions} type={TypeScreem.Account} />
-            </View>
+            </ScrollView>
             <FloatingButton/>
         </>
     );
@@ -68,35 +140,21 @@ export default function Home() {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: colors.gray_900,
+        paddingHorizontal: 15
     },
-    textWallet: {
-        fontFamily: 'Outfit_500Medium',
-        color: colors.gray_400,
-        fontSize: 16,
-        lineHeight: 22
+    entrance: {
+        color: colors.green_500,
     },
-    containerRetweet: {
-        backgroundColor: colors.gray_800,
-        borderRadius: 3,
-        width: 18,
-        height: 14
+    exits: {
+        color: colors.red_500,
     },
-    textValue: {
-        fontFamily: 'Outfit_500Medium',
+    remainder: {
         color: colors.gray_100,
         fontSize: 40,
     },
-    textValueEntrance: {
+    valueBalance: {
         fontFamily: 'Outfit_500Medium',
-        color: colors.green_500,
-        fontSize: 14,
-        lineHeight: 22
-    },
-    textValueOutPut: {
-        fontFamily: 'Outfit_500Medium',
-        color: colors.red_500,
-        fontSize: 14,
-        lineHeight: 22
+        fontSize: 18,
     },
     buttonsActionsContainer: {
         flexDirection: 'row',
@@ -150,12 +208,6 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         color: colors.gray_50
     },
-    line: {
-        width: 207,
-        height: 3,
-        backgroundColor: colors.gray_850,
-        borderRadius: 100
-    },
     containerIconTransactions: {
         alignItems: 'center',
         justifyContent: 'center',
@@ -200,5 +252,44 @@ const styles = StyleSheet.create({
         backgroundColor: colors.gray_600,
         borderRadius: 5,
         color: 'transparent'
+    },
+    accounts: {
+        backgroundColor: colors.gray_800,
+        width: '100%',
+        padding: 20,
+        borderRadius: 15
+    },
+    title: {
+        fontFamily: 'Outfit_600SemiBold',
+        fontSize: 18,
+        color: colors.gray_50
+    },
+    account: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 15,
+    },
+    accountIcon: {
+        borderRadius: 50,
+        width: 45,
+        height: 45
+    },
+    accountText: {
+        fontFamily: "Outfit_500Medium",
+        fontSize: 18,
+        color: colors.gray_50
+    },
+    accountValue: {
+        fontFamily: "Outfit_500Medium",
+        fontSize: 15,
+        color: colors.gray_50
+    },
+    lineBottom: {
+        borderBottomWidth: 1,
+        borderBottomColor: colors.gray_700,
+    },
+    lineTop: {
+        borderTopWidth: 1,
+        borderTopColor: colors.gray_700,
     },
 })

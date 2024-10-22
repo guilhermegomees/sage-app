@@ -34,3 +34,12 @@ export interface IUser {
     email: string;
     photoURL: string;
 }
+
+export interface IAccount {
+    id: string,
+    uid: string;
+    name: string;
+    bankName: string;
+    value: string;
+    includeInSum: boolean;
+}

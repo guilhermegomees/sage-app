@@ -58,6 +58,7 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: colors.gray_900,
         paddingTop: 25,
+        paddingBottom: 15
     },
     containerPhoto: {
         borderRadius: 100,

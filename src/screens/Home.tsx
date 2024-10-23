@@ -4,7 +4,7 @@ import BottomSheet from '~/components/BottomSheet';
 import Header from '~/components/Header';
 import { HeaderContext } from '~/context/HeaderContext';
 import base from '~/css/base';
-import { FontAwesome6 } from '@expo/vector-icons';
+import { FontAwesome6, MaterialIcons } from '@expo/vector-icons';
 import colors from '~/css/colors';
 import { TypeScreem } from '~/enums/enums';
 import FloatingButton from '~/components/FloatingButton';
@@ -28,62 +28,68 @@ export default function Home() {
     const [accounts, setAccounts] = useState<IAccount[]>([]);
     const accountCollectionRef = collection(db, "account");
 
-    const [totalValueAccounts, setTotalValueAccounts] = useState<string>('0,00');
+    const [formattedTotalValueAccounts, setFormattedTotalValueAccounts] = useState<string>('0,00');
+    const [totalValueAccounts, setTotalValueAccounts] = useState<number>(0);
 
     const fetchAcounts = async (user: IUser): Promise<void> => {
         try {
             const q = query(accountCollectionRef, where("uid", "==", user.uid));
             const querySnapshot = await getDocs(q);
-            const data: IAccount[] = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                uid: doc.data().uid,
-                name: doc.data().name,
-                bankName: doc.data().bankName,
-                value: doc.data().value,
-                includeInSum: doc.data().includeInSum
-            }));
+            const data: IAccount[] = querySnapshot.docs.map(doc => {
+                const accountData = doc.data();
+                return {
+                    id: doc.id,
+                    uid: accountData.uid,
+                    name: accountData.name,
+                    bankName: accountData.bankName,
+                    value: accountData.value,
+                    includeInSum: accountData.includeInSum
+                };
+            });
 
-            // Filtra as contas em que includeInSum é true e soma os valores
+            // Filtra as contas que devem ser incluídas no total e soma seus valores
             const totalValue = data
                 .filter(account => account.includeInSum)
                 .reduce((acc, account) => {
-                    // Substitui vírgula por ponto antes de converter
                     const numericValue = parseFloat(account.value.replace(',', '.'));
                     return acc + numericValue;
                 }, 0);
 
+            // Formata o valor total com duas casas decimais e vírgula como separador decimal
             const formattedTotalValue = totalValue.toLocaleString('pt-BR', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
             });
 
-            setTotalValueAccounts(formattedTotalValue);
+            setTotalValueAccounts(totalValue);
+            setFormattedTotalValueAccounts(formattedTotalValue);
             setAccounts(data);
         } catch (error) {
             console.error("Erro ao buscar contas: ", error);
         }
     };
 
-    // Carregar transações somente quando user estiver disponível
     useEffect(() => {
-        if(user) {
+        if (user) {
             fetchTransactions(user);
             fetchAcounts(user);
-        };
+        }
     }, [user]);
 
-    // TODO: Calcular o total de entradas e saídas para a wallet específica
-    let totalExpenses = 0;
-    let totalIncome = 0;
-
-    for (const item of transactions) {
+    // Calcular total de despesas e receitas
+    const { totalExpenses, totalIncome } = transactions.reduce((totals, item) => {
         if (item.isExpense) {
-            totalExpenses += item.value;
+            totals.totalExpenses += item.value;
         } else {
-            totalIncome += item.value;
+            totals.totalIncome += item.value;
         }
-    }
+        return totals;
+    }, { totalExpenses: 0, totalIncome: 0 });
 
+    // Calcular saldo final
+    const remainder = totalIncome - totalExpenses + totalValueAccounts;
+
+    // Função para obter o logo do banco
     const getLogo = (bankName: string) => {
         return banks[bankName] || require('../assets/images/banks/default.png');
     };
@@ -94,7 +100,7 @@ export default function Home() {
             <ScrollView style={[base.flex_1]}>
                 <View style={[styles.container, base.flex_1, base.alignItemsCenter, base.pt_5, base.gap_25, base.pb_90]}>
                     <View style={[base.flexColumn, base.alignItemsCenter, base.justifyContentCenter, base.gap_8, base.mb_10]}>
-                        <Text style={[styles.valueBalance, styles.remainder, !showValues && styles.hideValues]}>R$ {formatValue(totalIncome - totalExpenses)}</Text>
+                        <Text style={[styles.valueBalance, styles.remainder, !showValues && styles.hideValues]}>R$ {formatValue(remainder)}</Text>
                         <View style={[base.alignItemsCenter, base.justifyContentCenter, base.flexRow, base.gap_15]}>
                             <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_5]}>
                                 <FontAwesome6 name='caret-up' color={colors.green_500} size={20} />
@@ -125,7 +131,30 @@ export default function Home() {
                         </View>
                         <View style={[styles.lineTop, base.mt_15, base.pt_15, base.flexRow, base.justifyContentSpaceBetween]}>
                             <Text style={[styles.title]}>Total</Text>
-                            <Text style={[styles.title]}>R$ {totalValueAccounts}</Text>
+                            <Text style={[styles.title]}>R$ {formattedTotalValueAccounts}</Text>
+                        </View>
+                    </View>
+                    <View style={[styles.cards]}>
+                        <View style={[styles.lineBottom, base.mb_15, base.pb_15]}>
+                            <Text style={[styles.title]}>Cartões</Text>
+                        </View>
+                        <View style={[base.gap_20]}>
+                            <View style={[styles.card]}>
+                                <View style={[base.flexRow, base.justifyContentSpaceBetween, base.alignItemsCenter]}>
+                                    <Image source={getLogo("Santander")} style={[styles.cardIcon]} />
+                                    <FontAwesome6 name="angle-right" size={15} color={colors.gray_200} />
+                                </View>
+                                <View style={[base.gap_5]}>
+                                    <View style={[base.flexRow, base.justifyContentSpaceBetween]}>
+                                        <Text style={[styles.cardText]}>Santander</Text>
+                                        <Text style={[styles.cardValue]}>R$ 0,00</Text>
+                                    </View>
+                                    <View style={[base.w_100, base.justifyContentEnd, base.alignItemsCenter, base.gap_4, base.flexRow]}>
+                                        <MaterialIcons name={'circle'} color={colors.blue_300} size={7} />
+                                        <Text style={[styles.invoiceStatus, { color: colors.blue_300 }]}>Aberta</Text>
+                                    </View>
+                                </View>
+                            </View>
                         </View>
                     </View>
                     {/* Painel de transações */}
@@ -150,7 +179,7 @@ const styles = StyleSheet.create({
     },
     remainder: {
         color: colors.gray_100,
-        fontSize: 40,
+        fontSize: 35,
     },
     valueBalance: {
         fontFamily: 'Outfit_500Medium',
@@ -261,7 +290,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontFamily: 'Outfit_600SemiBold',
-        fontSize: 18,
+        fontSize: 17,
         color: colors.gray_50
     },
     account: {
@@ -271,17 +300,17 @@ const styles = StyleSheet.create({
     },
     accountIcon: {
         borderRadius: 50,
-        width: 45,
-        height: 45
+        width: 40,
+        height: 40
     },
     accountText: {
         fontFamily: "Outfit_500Medium",
-        fontSize: 18,
+        fontSize: 17,
         color: colors.gray_50
     },
     accountValue: {
         fontFamily: "Outfit_500Medium",
-        fontSize: 15,
+        fontSize: 14,
         color: colors.gray_50
     },
     lineBottom: {
@@ -291,5 +320,36 @@ const styles = StyleSheet.create({
     lineTop: {
         borderTopWidth: 1,
         borderTopColor: colors.gray_700,
+    },
+    invoiceStatus: {
+        fontFamily: "Outfit_500Medium",
+        fontSize: 14
+    },
+    cards: {
+        backgroundColor: colors.gray_800,
+        width: '100%',
+        padding: 20,
+        borderRadius: 15
+    },
+    card: {
+        gap: 15,
+        backgroundColor: colors.gray_875,
+        padding: 20,
+        borderRadius: 15
+    },
+    cardIcon: {
+        borderRadius: 50,
+        width: 40,
+        height: 40
+    },
+    cardText: {
+        fontFamily: "Outfit_500Medium",
+        fontSize: 15,
+        color: colors.gray_50
+    },
+    cardValue: {
+        fontFamily: "Outfit_500Medium",
+        fontSize: 15,
+        color: colors.gray_50
     },
 })

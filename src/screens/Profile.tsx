@@ -105,7 +105,7 @@ const Profile: React.FC = () => {
     };    
     
     return (
-        <View style={[base.flex_1, { backgroundColor: colors.gray_900 }]}>
+        <View style={[base.flex_1, base.gap_50, { backgroundColor: colors.gray_900 }]}>
             <View style={styles.container}>
                 <View style={[styles.containerBack]}>
                     <TouchableOpacity onPress={handleNavigateToBack}>
@@ -124,23 +124,6 @@ const Profile: React.FC = () => {
                     <View style={[base.alignItemsCenter, base.gap_8]}>
                         <Text style={[styles.userName]}>{user?.name}</Text>
                         <Text style={[styles.userEmail]}>{user?.email}</Text>
-                    </View>
-                </View>
-            </View>
-            <View style={[base.px_30, base.py_25]}>
-                <Text style={[styles.balance]}>Saldo</Text>
-                <View style={[base.flexRow, base.justifyContentSpaceAround, base.mt_15]}>
-                    <View style={[base.flexRow, base.gap_5, base.alignItemsCenter]}>
-                        <FontAwesome6 name='caret-up' color={colors.green_500} size={20} />
-                        <Text style={[styles.valueBalance, styles.entrance]}>R$ 3.625,47</Text>
-                    </View>
-                    <View style={[base.flexRow, base.gap_5, base.alignItemsCenter]}>
-                        <FontAwesome6 name='caret-down' color={colors.red_500} size={20} />
-                        <Text style={[styles.valueBalance, styles.exits]}>R$ 2.082,95</Text>
-                    </View>
-                    <View style={[base.flexRow, base.gap_5, base.alignItemsCenter]}>
-                        <FontAwesome6 name='caret-right' color={colors.blue_300} size={20} />
-                        <Text style={[styles.valueBalance, styles.remainder]}>R$ 1.542,52</Text>
                     </View>
                 </View>
             </View>
@@ -202,7 +185,6 @@ const Profile: React.FC = () => {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         alignItems: 'center',
         paddingHorizontal: 30
     },
@@ -251,7 +233,8 @@ const styles = StyleSheet.create({
     },
     bottomMenu: {
         backgroundColor: colors.gray_800,
-        height: '63%',
+        //height: '63%',
+        flex: 1,
         width: '100%',
         borderTopRightRadius: 30,
         borderTopLeftRadius: 30,

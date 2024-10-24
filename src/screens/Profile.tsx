@@ -4,14 +4,13 @@ import * as ImagePicker from 'expo-image-picker';
 import { getAuth, signOut, updateProfile } from 'firebase/auth';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
-import { useNavigation } from '@react-navigation/native';
+import { CommonActions, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import useUser from '~/hooks/useUser';
 import colors from '~/css/colors';
 import { app } from '~/config/firebase';
 import { FontAwesome6 } from '@expo/vector-icons';
 import base from '~/css/base';
-import { Circle } from 'react-native-progress';
 
 type ProfileScreenNavigationProp = StackNavigationProp<any, 'Profile'>;
 
@@ -98,7 +97,12 @@ const Profile: React.FC = () => {
     const signOutUser = async () => {
         try {
             await signOut(auth);
-            navigation.navigate('Login');
+            navigation.dispatch(
+                CommonActions.reset({
+                    index: 0,
+                    routes: [{ name: 'Login' }],
+                })
+            );
         } catch (error) {
             console.log("Erro ao deslogar:", error);
         }

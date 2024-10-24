@@ -31,7 +31,7 @@ export default function Home() {
     const [formattedTotalValueAccounts, setFormattedTotalValueAccounts] = useState<string>('0,00');
     const [totalValueAccounts, setTotalValueAccounts] = useState<number>(0);
 
-    const fetchAcounts = async (user: IUser): Promise<void> => {
+    const fetchAccounts = async (user: IUser): Promise<void> => {
         try {
             const q = query(accountCollectionRef, where("uid", "==", user.uid));
             const querySnapshot = await getDocs(q);
@@ -72,7 +72,7 @@ export default function Home() {
     useEffect(() => {
         if (user) {
             fetchTransactions(user);
-            fetchAcounts(user);
+            fetchAccounts(user);
         }
     }, [user]);
 
@@ -167,6 +167,15 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
+    modalExit: {
+        backgroundColor: colors.gray_800,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        padding: 20,
+        width: "100%",
+        height: "20%",
+        alignItems: "center",
+    },
     container: {
         backgroundColor: colors.gray_900,
         paddingHorizontal: 15

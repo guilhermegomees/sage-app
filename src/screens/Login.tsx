@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ScrollView, View, Image, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { StackActions } from '@react-navigation/native';
 import Input from '~/components/Input';
 import PasswordInput from '~/components/PasswordInput';
 import base from '~/css/base';
@@ -24,7 +25,9 @@ const LoginScreen = () => {
     const signIn = async () => {
         try{
             await signInWithEmailAndPassword(auth, email, password);
-            navigation.navigate('Main');
+            navigation.dispatch(
+                StackActions.replace('Main')
+            );
         } catch (error: any){
             console.log(error);
             if(error.message = 'auth/missing-password'){

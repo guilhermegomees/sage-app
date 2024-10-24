@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useNavigation } from '@react-navigation/native';
+import { StackActions, useNavigation } from '@react-navigation/native';
 import { ScrollView, TouchableOpacity, View, StyleSheet, Image, Text } from 'react-native';
 import base from '~/css/base';
 import colors from '~/css/colors';
@@ -40,7 +40,9 @@ const RegisterScreen = () => {
                 });
             }
 
-            navigation.navigate('Main');
+            navigation.dispatch(
+                StackActions.replace('Main')
+            );
         } catch (error: any){
             setErrorMessage('Sign in failed: ' + error.message);
         }

@@ -14,6 +14,7 @@ import { IAccount, IUser } from '~/interfaces/interfaces';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '~/config/firebase';
 import { banks } from '~/constants/banks';
+import { getBankLogo } from '~/utils/utils';
 
 // Formatar valores com duas casas decimais
 function formatValue(value: number): string {
@@ -89,11 +90,6 @@ export default function Home() {
     // Calcular saldo final
     const remainder = totalIncome - totalExpenses + totalValueAccounts;
 
-    // Função para obter o logo do banco
-    const getLogo = (bankName: string) => {
-        return banks[bankName] || require('../assets/images/banks/default.png');
-    };
-
     return (
         <>
             <Header />
@@ -120,7 +116,7 @@ export default function Home() {
                             {accounts.map((account: IAccount)=>{
                                 return (
                                     <View key={account.id} style={[styles.account]}>
-                                        <Image source={getLogo(account.bankName)} style={[styles.accountIcon]}/>
+                                        <Image source={getBankLogo(account.bankName)} style={[styles.accountIcon]}/>
                                         <View style={[base.gap_5]}>
                                             <Text style={[styles.accountText]}>{account.name}</Text>
                                             <Text style={[styles.accountValue, {color: parseFloat(account.value) < 0 ? colors.red_500 : colors.green_500}]}>R$ {account.value}</Text>
@@ -141,7 +137,7 @@ export default function Home() {
                         <View style={[base.gap_20]}>
                             <View style={[styles.card]}>
                                 <View style={[base.flexRow, base.justifyContentSpaceBetween, base.alignItemsCenter]}>
-                                    <Image source={getLogo("Santander")} style={[styles.cardIcon]} />
+                                    <Image source={getBankLogo("Santander")} style={[styles.cardIcon]} />
                                     <FontAwesome6 name="angle-right" size={15} color={colors.gray_200} />
                                 </View>
                                 <View style={[base.gap_5]}>

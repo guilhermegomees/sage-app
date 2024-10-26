@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { TouchableOpacity, View, Text, StyleSheet, TextInput, ScrollView, Image } from "react-native";
+import { TouchableOpacity, View, Text, StyleSheet, TextInput, ScrollView, Image, ImageSourcePropType } from "react-native";
 import Modal from "react-native-modal";
 import base from "~/css/base";
 import colors from "~/css/colors";
 import { FontAwesome6, MaterialIcons, Octicons } from "@expo/vector-icons";
-import { ICategory } from "~/interfaces/interfaces";
+import { IAccount, ICategory, IUser } from "~/interfaces/interfaces";
 import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "~/config/firebase";
 import { Calendar } from "~/components/Calendar";
@@ -13,15 +13,17 @@ import { predefinedColors } from "~/constants/colors";
 import { predefinedIcons } from "~/constants/icons";
 import { useTransactions } from "~/context/TransactionContext";
 import useUser from "~/hooks/useUser";
+import { getBankLogo } from "~/utils/utils";
 
 const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { isModalVisible: boolean, context: transactionContext, onClose: () => void }) => {
     const user = useUser();
-
+    
     const [isCategoriesVisible, setIsCategoriesVisible] = useState(false);
     const [isNewCategorieVisible, setIsNewCategorieVisible] = useState(false);
     const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
     const [isIconPickerVisible, setIsIconPickerVisible] = useState(false);
     const [isCalendarVisible, setIsCalendarVisible] = useState(false);
+    const [isAccountsVisible, setIsAccountsVisible] = useState(false);
 
     const [valueTransaction, setValueTransaction] = useState<number>(0);
     const [description, setDescription] = useState<string>('');
@@ -37,8 +39,14 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
     const [selectedDate, setSelectedDate] = useState<string>(today.toISOString().split('T')[0]);
     const [selectedTempDate, setSelectedTempDate] = useState<string>(today.toISOString().split('T')[0]);
     const [formattedDate, setFormattedDate] = useState<string>(today.toLocaleDateString('pt-BR'));
+    
+    const [accounts, setAccounts] = useState<IAccount[]>([]);
+    const [selectedAccount, setSelectedAccount] = useState<IAccount | null>(null);
+    const [searchAccount, setSearchAccount] = useState<string>('');
+
     const transactionCollectionRef = collection(db, "transaction");
     const categoryCollectionRef = collection(db, "category");
+    const accountCollectionRef = collection(db, "account");
 
     const { fetchTransactions } = useTransactions();
 
@@ -67,13 +75,27 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
     const handleDateClick = (): void => setIsCalendarVisible(true);
 
     const openCategoryModal = async (): Promise<void> => {
-        await fetchCategories();
-        setIsCategoriesVisible(true);
+        if(user){
+            await fetchCategories(user);
+            setIsCategoriesVisible(true);
+        }
+    }
+
+    const openAccountModal = async (): Promise<void> => {
+        if(user){
+            await fetchAccounts(user);
+            setIsAccountsVisible(true);
+        }
     }
 
     const handleSelectCategory = (category: ICategory): void => {
         setSelectedCategory(category);
         setIsCategoriesVisible(false);
+    };
+
+    const handleSelectAccount = (account: IAccount): void => {
+        setSelectedAccount(account);
+        setIsAccountsVisible(false);
     };
 
     const handleCloseAndReset = (): void => {
@@ -100,7 +122,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
     };
 
     const createTransaction = async (): Promise<void> => {
-        if (!valueTransaction || !description || !selectedDate || !selectedCategory) {
+        if (!valueTransaction || !description || !selectedDate || !selectedCategory || !selectedAccount) {
             alert("Por favor, preencha todos os campos antes de continuar.");
             return;
         }
@@ -117,7 +139,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                     category: selectedCategory,
                     isExpense: context != transactionContext.revenue,
                     source: context === transactionContext.cardExpense ? 2 : 1,
-                    account: "Nubank", // TODO: conta do usuário
+                    account: selectedAccount,
                     uid: user.uid,
                 }
                 
@@ -164,9 +186,13 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
         setSelectedIcon('apple-whole');
     };
 
-    const fetchCategories = async (): Promise<void> => {
+    const fetchCategories = async (user: IUser): Promise<void> => {
         try {
-            const q = query(categoryCollectionRef, where("context", "==", context === transactionContext.revenue ? 1 : 2));
+            const q = query(
+                categoryCollectionRef, 
+                where("context", "==", context === transactionContext.revenue ? 1 : 2),
+                where("user", "==", user.uid)
+            );
             const querySnapshot = await getDocs(q);
             const data: ICategory[] = querySnapshot.docs.map(doc => ({
                 id: doc.id,
@@ -176,18 +202,47 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                 color: doc.data().color,
                 context: doc.data().context
             }));
-
+            
             setCategories(data);
         } catch (error) {
             console.error("Erro ao buscar categorias: ", error);
         }
     };
 
+    const fetchAccounts = async (user: IUser): Promise<void> => {
+        try {
+            const q = query(accountCollectionRef, where("uid", "==", user.uid));
+            const querySnapshot = await getDocs(q);
+            const data: IAccount[] = querySnapshot.docs.map(doc => {
+                const accountData = doc.data();
+                return {
+                    id: doc.id,
+                    uid: accountData.uid,
+                    name: accountData.name,
+                    bankName: accountData.bankName,
+                    value: accountData.value,
+                    includeInSum: accountData.includeInSum
+                };
+            });
+            
+            setAccounts(data);
+        } catch (error) {
+            console.error("Erro ao buscar contas: ", error);
+        }
+    };
+
     useEffect(() => {
-        fetchCategories();
-    }, []);
+        if(user) {
+            fetchCategories(user);
+            fetchAccounts(user);
+        }
+    }, [user]);
 
     const filteredCategories = categories.filter(ctg => 
+        ctg.name.toLowerCase().includes(searchCategory.toLowerCase())
+    );
+
+    const filteredAccounts = accounts.filter(ctg => 
         ctg.name.toLowerCase().includes(searchCategory.toLowerCase())
     );
     
@@ -236,6 +291,17 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                         </View>
                         <FontAwesome6 name="angle-right" color={colors.gray_100} size={15} />
                     </TouchableOpacity>
+                    {/* Conta */}
+                    <TouchableOpacity style={[base.input, { backgroundColor: colors.gray_825 }]} onPress={openAccountModal}>
+                        <View style={styles.row}>
+                            {selectedAccount
+                                ? <Image source={getBankLogo(selectedAccount.bankName)} style={[styles.accountIcon]}/>
+                                : <FontAwesome6 name="ellipsis" color={colors.gray_100} size={20} style={styles.iconCtgEmpty}/>
+                            }
+                            <Text style={base.inputText}>{selectedAccount?.name || "Conta"}</Text>
+                        </View>
+                        <FontAwesome6 name="angle-right" color={colors.gray_100} size={15} />
+                    </TouchableOpacity>
                 </View>
                 <View style={[base.flexRow, base.justifyContentSpaceBetween, base.mt_30]}>
                     <TouchableOpacity style={[base.button, base.btnCancel]} onPress={handleCloseAndReset}>
@@ -253,7 +319,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                 handleSelectDate={handleSelectDate}
                 handleCancelCalendar={handleCancelCalendar}
             />
-            <CategoriesModal
+            {/* <CategoriesModal
                 isVisible={isCategoriesVisible}
                 filteredCategories={filteredCategories}
                 searchCategory={searchCategory}
@@ -263,6 +329,32 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                 setIsCategoriesVisible={setIsCategoriesVisible}
                 category={selectedCategory}
                 context={context}
+            /> */}
+            <GenericModal
+                isVisible={isCategoriesVisible}
+                filteredItems={filteredCategories}
+                searchItem={searchCategory}
+                setSearchItem={setSearchCategory}
+                handleSelectItem={handleSelectCategory}
+                handleNewItem={handleNewCategory}
+                setIsVisible={setIsCategoriesVisible}
+                selectedItem={selectedCategory}
+                contextLabel="categoria"
+                getItemIcon={(category) => category.icon}
+                getItemColor={(category) => category.color}
+                getItemName={(category) => category.name}
+            />
+            <GenericModal
+                isVisible={isAccountsVisible}
+                filteredItems={filteredAccounts}
+                searchItem={searchAccount}
+                setSearchItem={setSearchAccount}
+                handleSelectItem={handleSelectAccount}
+                setIsVisible={setIsAccountsVisible}
+                selectedItem={selectedAccount}
+                contextLabel="conta"
+                getItemIcon={(account) => getBankLogo(account.bankName)}
+                getItemName={(account) => account.name}
             />
             <NewCategoryModal
                 isVisible={isNewCategorieVisible}
@@ -375,6 +467,110 @@ const CategoriesModal: React.FC<CategoriesModalProps> = ({
                             <FontAwesome6 name="plus" color={colors.white} size={15}/>
                         </View>
                         <Text style={[styles.textCreateCtg]}>Criar nova categoria</Text>
+                    </View>
+                </TouchableOpacity>
+            </ScrollView>
+        </View>
+    </Modal>
+);
+
+interface ModalProps<T> {
+    isVisible: boolean;
+    filteredItems: T[];
+    searchItem: string;
+    setSearchItem: (text: string) => void;
+    handleSelectItem: (item: T) => void;
+    handleNewItem?: () => void;
+    setIsVisible: (visible: boolean) => void;
+    selectedItem: T | null;
+    contextLabel: string;
+    getItemIcon: (item: T) => string | ImageSourcePropType; // Agora aceita tanto string quanto imagem
+    getItemColor?: (item: T) => string; // O item de cor é opcional
+    getItemName: (item: T) => string;
+}
+
+const GenericModal = <T extends { id: string }>({
+    isVisible,
+    filteredItems,
+    searchItem,
+    setSearchItem,
+    handleSelectItem,
+    handleNewItem,
+    setIsVisible,
+    selectedItem,
+    contextLabel,
+    getItemIcon,
+    getItemColor,
+    getItemName
+}: ModalProps<T>) => (
+    <Modal
+        isVisible={isVisible}
+        onBackdropPress={() => setIsVisible(false)}
+        backdropOpacity={0.4}
+        style={[base.justifyContentEnd, base.m_0]}
+    >
+        <View style={[styles.categoriesContainer]}>
+            <View style={[base.px_20]}>
+                {/* Barra de pesquisa */}
+                <View style={[base.flexRow, base.alignItemsCenter, base.gap_15, base.py_18, styles.line]}>
+                    <View style={[styles.containerIcon, { backgroundColor: colors.gray_600 }]}>
+                        <FontAwesome6 name="magnifying-glass" color={colors.white} size={15} />
+                    </View>
+                    <TextInput
+                        placeholder={`Pesquisar ${contextLabel}`}
+                        placeholderTextColor={colors.gray_300}
+                        style={[styles.searchBar]}
+                        value={searchItem}
+                        onChangeText={setSearchItem}
+                    />
+                </View>
+            </View>
+            <ScrollView showsVerticalScrollIndicator={false}>
+                {filteredItems.map((item) => {
+                    const isSelected = selectedItem?.id === item.id;
+                    const itemColor = getItemColor ? getItemColor(item) : colors.gray_600; // Cor padrão
+                    const itemIcon = getItemIcon(item);
+
+                    return (
+                        <TouchableOpacity key={item.id} style={[base.px_20]} onPress={() => handleSelectItem(item)}>
+                            <View style={[base.flexRow, base.justifyContentSpaceBetween, base.alignItemsCenter, base.w_100, base.py_18]}>
+                                <View style={[base.flexRow, base.alignItemsCenter, base.gap_15]}>
+                                    {typeof itemIcon === 'string' ? (
+                                        <View style={[styles.containerIcon, { backgroundColor: itemColor }]}>
+                                            <FontAwesome6 name={itemIcon} color={colors.white} size={15} />
+                                        </View>
+                                    ) : (
+                                        <Image source={itemIcon} style={{ width: 40, height: 40, borderRadius: 50 }} />
+                                    )}
+                                    <Text style={[styles.categorieName]}>{getItemName(item)}</Text>
+                                </View>
+                                <Octicons
+                                    name={isSelected ? "check-circle-fill" : "circle"}
+                                    size={20}
+                                    color={isSelected ? colors.blue_300 : colors.gray_600}
+                                />
+                            </View>
+                            <View style={[styles.line]} />
+                        </TouchableOpacity>
+                    );
+                })}
+                {filteredItems.length === 0 && (
+                    <View style={[base.justifyContentCenter, base.alignItemsCenter, base.flex_1, base.pt_25, base.pb_10, base.px_25]}>
+                        <View style={[base.justifyContentCenter, base.alignItemsCenter, base.gap_15]}>
+                            <Image source={require('./../assets/images/empty-folder.png')} tintColor={colors.gray_100} style={{ width: 65, height: 65 }} />
+                            <Text style={base.emptyMessage}>
+                                Você ainda não tem {contextLabel}. Comece criando uma em "Criar nova {contextLabel}".
+                            </Text>
+                        </View>
+                    </View>
+                )}
+                {/* Nova categoria ou conta */}
+                <TouchableOpacity style={[base.px_20, base.pb_10]} onPress={handleNewItem}>
+                    <View style={[base.flexRow, base.alignItemsCenter, base.gap_15, base.py_18]}>
+                        <View style={[styles.containerIcon, { backgroundColor: colors.gray_600 }]}>
+                            <FontAwesome6 name="plus" color={colors.white} size={15} />
+                        </View>
+                        <Text style={[styles.textCreateCtg]}>Criar nova {contextLabel}</Text>
                     </View>
                 </TouchableOpacity>
             </ScrollView>
@@ -659,7 +855,12 @@ const styles = StyleSheet.create({
     icon: {
         width: 40,
         height: 40,
-    }
+    },
+    accountIcon: {
+        borderRadius: 50,
+        width: 25,
+        height: 25
+    },
 });
 
 export default NewTransaction;

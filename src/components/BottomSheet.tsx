@@ -31,7 +31,7 @@ function formatDate(dateStr: string, type: TypeScreem): any {
     return `${day}/${month}/${year}`;
 }
 
-const MainTabNavigator: React.FC<BottomSheetProps> = ({ data, type }) => {
+const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
     // Agrupar transações por data
     const groupedTransactions: Record<string, ITransaction[]> = data.reduce((acc, transaction) => {
         let date: string;
@@ -268,4 +268,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default MainTabNavigator;
+export default BottomSheet;

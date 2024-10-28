@@ -13,7 +13,6 @@ import useUser from '~/hooks/useUser';
 import { IAccount, IUser } from '~/interfaces/interfaces';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '~/config/firebase';
-import { banks } from '~/constants/banks';
 import { getBankLogo } from '~/utils/utils';
 
 // Formatar valores com duas casas decimais
@@ -43,7 +42,7 @@ export default function Home() {
                     uid: accountData.uid,
                     name: accountData.name,
                     bankName: accountData.bankName,
-                    value: accountData.value,
+                    balance: accountData.balance,
                     includeInSum: accountData.includeInSum
                 };
             });
@@ -52,7 +51,7 @@ export default function Home() {
             const totalValue = data
                 .filter(account => account.includeInSum)
                 .reduce((acc, account) => {
-                    const numericValue = parseFloat(account.value.replace(',', '.'));
+                    const numericValue = account.balance;
                     return acc + numericValue;
                 }, 0);
 
@@ -119,7 +118,7 @@ export default function Home() {
                                         <Image source={getBankLogo(account.bankName)} style={[styles.accountIcon]}/>
                                         <View style={[base.gap_5]}>
                                             <Text style={[styles.accountText]}>{account.name}</Text>
-                                            <Text style={[styles.accountValue, {color: parseFloat(account.value) < 0 ? colors.red_500 : colors.green_500}]}>R$ {account.value}</Text>
+                                            <Text style={[styles.accountValue, { color: account.balance < 0 ? colors.red_500 : colors.green_500 }]}>R$ {formatValue(account.balance)}</Text>
                                         </View>
                                     </View>
                                 )

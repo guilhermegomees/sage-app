@@ -3,9 +3,9 @@ import { TouchableOpacity, View, Text, StyleSheet, TextInput, ScrollView, Image,
 import Modal from "react-native-modal";
 import base from "~/css/base";
 import colors from "~/css/colors";
-import { FontAwesome6, MaterialIcons, Octicons } from "@expo/vector-icons";
+import { FontAwesome6, Octicons } from "@expo/vector-icons";
 import { IAccount, ICategory, IUser } from "~/interfaces/interfaces";
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, getDocs, query, runTransaction, where } from "firebase/firestore";
 import { db } from "~/config/firebase";
 import { Calendar } from "~/components/Calendar";
 import { transactionContext } from "~/enums/enums";
@@ -25,7 +25,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
     const [isCalendarVisible, setIsCalendarVisible] = useState(false);
     const [isAccountsVisible, setIsAccountsVisible] = useState(false);
 
-    const [valueTransaction, setValueTransaction] = useState<number>(0);
+    const [transactionValue, setTransactionValue] = useState<number>(0);
     const [description, setDescription] = useState<string>('');
     const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(null);
     const [searchCategory, setSearchCategory] = useState<string>('');
@@ -55,7 +55,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
 
     const handleChange = (text: string): void => {
         const numericValue = parseFloat(text.replace(/[^\d]/g, '')) / 100;
-        setValueTransaction(numericValue);
+        setTransactionValue(numericValue);
     };
 
     const handleSelectTempDate = (date: string): void => setSelectedTempDate(date);
@@ -100,7 +100,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
 
     const handleCloseAndReset = (): void => {
         onClose();
-        setValueTransaction(0);
+        setTransactionValue(0);
         setDescription('');
         setSelectedDate(today.toISOString().split('T')[0]);
         setSelectedCategory(null);
@@ -122,7 +122,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
     };
 
     const createTransaction = async (): Promise<void> => {
-        if (!valueTransaction || !description || !selectedDate || !selectedCategory || !selectedAccount) {
+        if (!transactionValue || !description || !selectedDate || !selectedCategory || !selectedAccount) {
             alert("Por favor, preencha todos os campos antes de continuar.");
             return;
         }
@@ -132,25 +132,48 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                 const date = new Date(selectedDate);
                 date.setHours(date.getHours() + 3);
 
+                const isExpense = context != transactionContext.revenue;
+                const updatedValue = isExpense ? -transactionValue : transactionValue;
+
+                // Cria os dados da nova transação
                 const newTransactionData = {
-                    value: valueTransaction,
+                    value: transactionValue,
                     description: description,
                     date: date,
-                    category: selectedCategory,
-                    isExpense: context != transactionContext.revenue,
+                    category: {
+                        id: selectedCategory.id,
+                        color: selectedCategory.color,
+                        icon: selectedCategory.icon,
+                    },
+                    isExpense: isExpense,
                     source: context === transactionContext.cardExpense ? 2 : 1,
-                    account: selectedAccount,
+                    account: selectedAccount.id,
                     uid: user.uid,
-                }
-                
+                };
+
+                // Adiciona a nova transação
                 await addDoc(transactionCollectionRef, newTransactionData);
+
+                // Atualiza o valor da conta no Firestore
+                const accountRef = doc(db, 'account', selectedAccount.id);
+                await runTransaction(db, async (transaction) => {
+                    const accountDoc = await getDoc(accountRef);
+                    if (accountDoc.exists()) {
+                        const currentBalance = accountDoc.data().balance || 0;
+                        const newBalance = parseFloat(currentBalance) + updatedValue;
+
+                        transaction.update(accountRef, { balance: newBalance });
+                    }
+                });
+
+                // Busca as transações atualizadas e fecha o modal
                 await fetchTransactions(user);
                 handleCloseAndReset();
             }
         } catch (error) {
             console.error("Erro ao criar transação: ", error);
         }
-    };    
+    };
 
     const createCategory = async (): Promise<void> => {
         if (!nameNewCategory || !selectedColor || !selectedIcon) {
@@ -220,7 +243,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                     uid: accountData.uid,
                     name: accountData.name,
                     bankName: accountData.bankName,
-                    value: accountData.value,
+                    balance: accountData.balance,
                     includeInSum: accountData.includeInSum
                 };
             });
@@ -254,15 +277,15 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
             style={[base.justifyContentEnd, base.m_0]}
         >
             <View style={styles.modal}>
-                <View style={styles.containerValueTransaction}>
+                <View style={styles.containertransactionValue}>
                     <Text style={styles.label}>Valor</Text>
                     <TextInput 
-                        style={[styles.valueTransaction, { color: context === transactionContext.revenue ? colors.green_500 : colors.red_500 }]}
+                        style={[styles.transactionValue, { color: context === transactionContext.revenue ? colors.green_500 : colors.red_500 }]}
                         placeholder={'R$ 0.00'}
                         placeholderTextColor={context === transactionContext.revenue ? colors.green_500 : colors.red_500}
                         keyboardType="numeric"
                         onChangeText={handleChange}
-                        value={formatCurrency(valueTransaction)}
+                        value={formatCurrency(transactionValue)}
                     />
                 </View>
                 <View style={[base.gap_18, base.mt_20]}>
@@ -714,12 +737,12 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 20,
         padding: 20,
     },
-    containerValueTransaction: {
+    containertransactionValue: {
         paddingBottom: 5,
         borderBottomWidth: 1,
         borderBottomColor: colors.gray_600
     },
-    valueTransaction: {
+    transactionValue: {
         height: 40,
         fontSize: 28,
         fontFamily: 'Outfit_600SemiBold',

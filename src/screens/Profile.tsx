@@ -8,7 +8,7 @@ import { CommonActions, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import useUser from '~/hooks/useUser';
 import colors from '~/css/colors';
-import { app } from '~/config/firebase';
+import { app, db } from '~/config/firebase';
 import { FontAwesome6 } from '@expo/vector-icons';
 import base from '~/css/base';
 
@@ -20,13 +20,12 @@ const Profile: React.FC = () => {
     const [profileImage, setProfileImage] = useState<string | null>(null);
     
     const auth = getAuth(app);
-    const storage = getStorage(app);
-    const firestore = getFirestore(app);
+    const storage = getStorage(app)
     
     useEffect(() => {
         const fetchUserProfile = async () => {
             if (user) {
-                const userDocRef = doc(firestore, 'users', user.uid);
+                const userDocRef = doc(db, 'users', user.uid);
                 const userDoc = await getDoc(userDocRef);
                 if (userDoc.exists()) {
                     const photoURL = userDoc.data()?.photoURL as string;
@@ -36,7 +35,7 @@ const Profile: React.FC = () => {
         };
 
         fetchUserProfile();
-    }, [user, firestore]);
+    }, [user, db]);
 
     const uploadImage = async (uri: string): Promise<string> => {
         if (!user?.uid) throw new Error("Usuário não autenticado");
@@ -80,7 +79,7 @@ const Profile: React.FC = () => {
                 }
     
                 // Salvar a URL da imagem no Firestore
-                const userDocRef = doc(firestore, 'users', user?.uid || '');
+                const userDocRef = doc(db, 'users', user?.uid || '');
                 await setDoc(userDocRef, { photoURL: imageUrl }, { merge: true });
     
                 setProfileImage(imageUrl);

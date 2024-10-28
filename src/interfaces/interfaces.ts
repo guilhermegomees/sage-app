@@ -40,6 +40,6 @@ export interface IAccount {
     uid: string;
     name: string;
     bankName: string;
-    value: string;
+    balance: number;
     includeInSum: boolean;
 }

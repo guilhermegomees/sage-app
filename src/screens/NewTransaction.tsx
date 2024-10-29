@@ -14,6 +14,11 @@ import { predefinedIcons } from "~/constants/icons";
 import { useTransactions } from "~/context/TransactionContext";
 import useUser from "~/hooks/useUser";
 import { getBankLogo } from "~/utils/utils";
+import { useAccounts } from "~/context/AccountContext";
+import { SelectionModal } from "~/components/SelectionModal";
+import { NewCategoryModal } from "~/components/NewCategoryModal";
+import { ColorPickerModal } from "~/components/ColorPickerModal";
+import { IconPickerModal } from "~/components/IconPickerModal";
 
 const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { isModalVisible: boolean, context: transactionContext, onClose: () => void }) => {
     const user = useUser();
@@ -40,15 +45,14 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
     const [selectedTempDate, setSelectedTempDate] = useState<string>(today.toISOString().split('T')[0]);
     const [formattedDate, setFormattedDate] = useState<string>(today.toLocaleDateString('pt-BR'));
     
-    const [accounts, setAccounts] = useState<IAccount[]>([]);
     const [selectedAccount, setSelectedAccount] = useState<IAccount | null>(null);
     const [searchAccount, setSearchAccount] = useState<string>('');
 
     const transactionCollectionRef = collection(db, "transaction");
     const categoryCollectionRef = collection(db, "category");
-    const accountCollectionRef = collection(db, "account");
 
     const { fetchTransactions } = useTransactions();
+    const { accounts, fetchAccounts } = useAccounts();
 
     const formatCurrency = (num: number): string => 
         `R$ ${num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -104,6 +108,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
         setDescription('');
         setSelectedDate(today.toISOString().split('T')[0]);
         setSelectedCategory(null);
+        setSelectedAccount(null);
     };
 
     const handleNewCategory = (): void => {
@@ -168,6 +173,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
 
                 // Busca as transações atualizadas e fecha o modal
                 await fetchTransactions(user);
+                await fetchAccounts(user);
                 handleCloseAndReset();
             }
         } catch (error) {
@@ -232,34 +238,18 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
         }
     };
 
-    const fetchAccounts = async (user: IUser): Promise<void> => {
-        try {
-            const q = query(accountCollectionRef, where("uid", "==", user.uid));
-            const querySnapshot = await getDocs(q);
-            const data: IAccount[] = querySnapshot.docs.map(doc => {
-                const accountData = doc.data();
-                return {
-                    id: doc.id,
-                    uid: accountData.uid,
-                    name: accountData.name,
-                    bankName: accountData.bankName,
-                    balance: accountData.balance,
-                    includeInSum: accountData.includeInSum
-                };
-            });
-            
-            setAccounts(data);
-        } catch (error) {
-            console.error("Erro ao buscar contas: ", error);
-        }
-    };
-
     useEffect(() => {
         if(user) {
             fetchCategories(user);
             fetchAccounts(user);
         }
     }, [user]);
+
+    useEffect(() => {
+        if (accounts.length > 0 && isModalVisible) {
+            setSelectedAccount(accounts[0]);
+        }
+    }, [isModalVisible]);
 
     const filteredCategories = categories.filter(ctg => 
         ctg.name.toLowerCase().includes(searchCategory.toLowerCase())
@@ -306,10 +296,12 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                     {/* Categoria */}
                     <TouchableOpacity style={[base.input, { backgroundColor: colors.gray_825 }]} onPress={openCategoryModal}>
                         <View style={styles.row}>
-                            {selectedCategory
-                                ? <FontAwesome6 name={selectedCategory.icon} color={selectedCategory.color} size={20}/>
-                                : <FontAwesome6 name="ellipsis" color={colors.gray_100} size={20} style={styles.iconCtgEmpty}/>
-                            }
+                            <View style={[base.alignItemsCenter, {width: 20}]}>
+                                {selectedCategory
+                                    ? <FontAwesome6 name={selectedCategory.icon} color={selectedCategory.color} size={20}/>
+                                    : <FontAwesome6 name="ellipsis" color={colors.gray_100} size={20} style={styles.iconCtgEmpty}/>
+                                }
+                            </View>
                             <Text style={base.inputText}>{selectedCategory?.name || "Categoria"}</Text>
                         </View>
                         <FontAwesome6 name="angle-right" color={colors.gray_100} size={15} />
@@ -317,10 +309,12 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                     {/* Conta */}
                     <TouchableOpacity style={[base.input, { backgroundColor: colors.gray_825 }]} onPress={openAccountModal}>
                         <View style={styles.row}>
-                            {selectedAccount
-                                ? <Image source={getBankLogo(selectedAccount.bankName)} style={[styles.accountIcon]}/>
-                                : <FontAwesome6 name="ellipsis" color={colors.gray_100} size={20} style={styles.iconCtgEmpty}/>
-                            }
+                            <View style={[base.alignItemsCenter, {width: 20}]}>
+                                {selectedAccount
+                                    ? <Image source={getBankLogo(selectedAccount.bankName)} style={[styles.accountIcon]}/>
+                                    : <FontAwesome6 name="ellipsis" color={colors.gray_100} size={20} style={styles.iconCtgEmpty}/>
+                                }
+                            </View>
                             <Text style={base.inputText}>{selectedAccount?.name || "Conta"}</Text>
                         </View>
                         <FontAwesome6 name="angle-right" color={colors.gray_100} size={15} />
@@ -342,18 +336,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                 handleSelectDate={handleSelectDate}
                 handleCancelCalendar={handleCancelCalendar}
             />
-            {/* <CategoriesModal
-                isVisible={isCategoriesVisible}
-                filteredCategories={filteredCategories}
-                searchCategory={searchCategory}
-                setSearchCategory={setSearchCategory}
-                handleSelectCategory={handleSelectCategory}
-                handleNewCategory={handleNewCategory}
-                setIsCategoriesVisible={setIsCategoriesVisible}
-                category={selectedCategory}
-                context={context}
-            /> */}
-            <GenericModal
+            <SelectionModal
                 isVisible={isCategoriesVisible}
                 filteredItems={filteredCategories}
                 searchItem={searchCategory}
@@ -367,7 +350,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                 getItemColor={(category) => category.color}
                 getItemName={(category) => category.name}
             />
-            <GenericModal
+            <SelectionModal
                 isVisible={isAccountsVisible}
                 filteredItems={filteredAccounts}
                 searchItem={searchAccount}
@@ -403,331 +386,6 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
         </Modal>
     );
 }
-
-interface CategoriesModalProps {
-    isVisible: boolean;
-    filteredCategories: ICategory[];
-    searchCategory: string;
-    setSearchCategory: (text: string) => void;
-    handleSelectCategory: (ctg: ICategory) => void;
-    handleNewCategory: () => void;
-    setIsCategoriesVisible: (visible: boolean) => void;
-    category: ICategory | null;
-    context: transactionContext
-}
-  
-const CategoriesModal: React.FC<CategoriesModalProps> = ({
-    isVisible,
-    filteredCategories,
-    searchCategory,
-    setSearchCategory,
-    handleSelectCategory,
-    handleNewCategory,
-    setIsCategoriesVisible,
-    category,
-    context
-}) => (
-    <Modal
-        isVisible={isVisible}
-        onBackdropPress={() => setIsCategoriesVisible(false)}
-        backdropOpacity={0.4}
-        style={[base.justifyContentEnd, base.m_0]}
-    >
-        <View style={[styles.categoriesContainer]}>
-            <View style={[base.px_20]}>
-                {/* Barra de pesquisa */}
-                <View style={[base.flexRow, base.alignItemsCenter, base.gap_15, base.py_18, styles.line]}>
-                    <View style={[styles.containerIcon, {backgroundColor: colors.gray_600}]}>
-                        <FontAwesome6 name="magnifying-glass" color={colors.white} size={15}/>
-                    </View>
-                    <TextInput
-                        placeholder="Pesquisar categoria"
-                        placeholderTextColor={colors.gray_300}
-                        style={[styles.searchBar]}
-                        value={searchCategory}
-                        onChangeText={setSearchCategory}
-                    />
-                </View>
-            </View>
-            <ScrollView showsVerticalScrollIndicator={false}>
-                {filteredCategories.map((ctg) => {
-                    const isSelected = category?.id === ctg.id;
-                    return (
-                        <TouchableOpacity key={ctg.id} style={[base.px_20]} onPress={() => handleSelectCategory(ctg)}>
-                            <View style={[base.flexRow, base.justifyContentSpaceBetween, base.alignItemsCenter, base.w_100, base.py_18]}>
-                                <View style={[base.flexRow, base.alignItemsCenter, base.gap_15]}>
-                                    <View style={[styles.containerIcon, {backgroundColor: ctg.color}]}>
-                                        <FontAwesome6 name={ctg.icon} color={colors.white} size={15}/>
-                                    </View>
-                                    <Text style={[styles.categorieName]}>{ctg.name}</Text>
-                                </View>
-                                <Octicons
-                                    name={isSelected ? "check-circle-fill" : "circle"}
-                                    size={20}
-                                    color={isSelected ? colors.blue_300 : colors.gray_600}
-                                />
-                            </View>
-                            <View style={[styles.line]}/>
-                        </TouchableOpacity>
-                    )
-                })}
-                {Object.keys(filteredCategories).length === 0 && (
-                    <View style={[base.justifyContentCenter, base.alignItemsCenter, base.flex_1, base.pt_25, base.pb_10, base.px_25]}>
-                        <View style={[base.justifyContentCenter, base.alignItemsCenter, base.gap_15]}>
-                            <Image source={require('./../assets/images/empty-folder.png')} tintColor={colors.gray_100} style={{ width: 65, height: 65 }} />
-                            <Text style={base.emptyMessage}>
-                                Você ainda não tem categorias de
-                                {context === transactionContext.revenue ? ' receitas' : ' despesas'}. 
-                                Comece criando uma em "Criar nova categoria".
-                            </Text>
-                        </View>
-                    </View>
-                )}
-                {/* Nova categoria */}
-                <TouchableOpacity style={[base.px_20, base.pb_10]} onPress={handleNewCategory}>
-                    <View style={[base.flexRow, base.alignItemsCenter, base.gap_15, base.py_18]}>
-                        <View style={[styles.containerIcon, {backgroundColor: colors.gray_600}]}>
-                            <FontAwesome6 name="plus" color={colors.white} size={15}/>
-                        </View>
-                        <Text style={[styles.textCreateCtg]}>Criar nova categoria</Text>
-                    </View>
-                </TouchableOpacity>
-            </ScrollView>
-        </View>
-    </Modal>
-);
-
-interface ModalProps<T> {
-    isVisible: boolean;
-    filteredItems: T[];
-    searchItem: string;
-    setSearchItem: (text: string) => void;
-    handleSelectItem: (item: T) => void;
-    handleNewItem?: () => void;
-    setIsVisible: (visible: boolean) => void;
-    selectedItem: T | null;
-    contextLabel: string;
-    getItemIcon: (item: T) => string | ImageSourcePropType; // Agora aceita tanto string quanto imagem
-    getItemColor?: (item: T) => string; // O item de cor é opcional
-    getItemName: (item: T) => string;
-}
-
-const GenericModal = <T extends { id: string }>({
-    isVisible,
-    filteredItems,
-    searchItem,
-    setSearchItem,
-    handleSelectItem,
-    handleNewItem,
-    setIsVisible,
-    selectedItem,
-    contextLabel,
-    getItemIcon,
-    getItemColor,
-    getItemName
-}: ModalProps<T>) => (
-    <Modal
-        isVisible={isVisible}
-        onBackdropPress={() => setIsVisible(false)}
-        backdropOpacity={0.4}
-        style={[base.justifyContentEnd, base.m_0]}
-    >
-        <View style={[styles.categoriesContainer]}>
-            <View style={[base.px_20]}>
-                {/* Barra de pesquisa */}
-                <View style={[base.flexRow, base.alignItemsCenter, base.gap_15, base.py_18, styles.line]}>
-                    <View style={[styles.containerIcon, { backgroundColor: colors.gray_600 }]}>
-                        <FontAwesome6 name="magnifying-glass" color={colors.white} size={15} />
-                    </View>
-                    <TextInput
-                        placeholder={`Pesquisar ${contextLabel}`}
-                        placeholderTextColor={colors.gray_300}
-                        style={[styles.searchBar]}
-                        value={searchItem}
-                        onChangeText={setSearchItem}
-                    />
-                </View>
-            </View>
-            <ScrollView showsVerticalScrollIndicator={false}>
-                {filteredItems.map((item) => {
-                    const isSelected = selectedItem?.id === item.id;
-                    const itemColor = getItemColor ? getItemColor(item) : colors.gray_600; // Cor padrão
-                    const itemIcon = getItemIcon(item);
-
-                    return (
-                        <TouchableOpacity key={item.id} style={[base.px_20]} onPress={() => handleSelectItem(item)}>
-                            <View style={[base.flexRow, base.justifyContentSpaceBetween, base.alignItemsCenter, base.w_100, base.py_18]}>
-                                <View style={[base.flexRow, base.alignItemsCenter, base.gap_15]}>
-                                    {typeof itemIcon === 'string' ? (
-                                        <View style={[styles.containerIcon, { backgroundColor: itemColor }]}>
-                                            <FontAwesome6 name={itemIcon} color={colors.white} size={15} />
-                                        </View>
-                                    ) : (
-                                        <Image source={itemIcon} style={{ width: 40, height: 40, borderRadius: 50 }} />
-                                    )}
-                                    <Text style={[styles.categorieName]}>{getItemName(item)}</Text>
-                                </View>
-                                <Octicons
-                                    name={isSelected ? "check-circle-fill" : "circle"}
-                                    size={20}
-                                    color={isSelected ? colors.blue_300 : colors.gray_600}
-                                />
-                            </View>
-                            <View style={[styles.line]} />
-                        </TouchableOpacity>
-                    );
-                })}
-                {filteredItems.length === 0 && (
-                    <View style={[base.justifyContentCenter, base.alignItemsCenter, base.flex_1, base.pt_25, base.pb_10, base.px_25]}>
-                        <View style={[base.justifyContentCenter, base.alignItemsCenter, base.gap_15]}>
-                            <Image source={require('./../assets/images/empty-folder.png')} tintColor={colors.gray_100} style={{ width: 65, height: 65 }} />
-                            <Text style={base.emptyMessage}>
-                                Você ainda não tem {contextLabel}. Comece criando uma em "Criar nova {contextLabel}".
-                            </Text>
-                        </View>
-                    </View>
-                )}
-                {/* Nova categoria ou conta */}
-                <TouchableOpacity style={[base.px_20, base.pb_10]} onPress={handleNewItem}>
-                    <View style={[base.flexRow, base.alignItemsCenter, base.gap_15, base.py_18]}>
-                        <View style={[styles.containerIcon, { backgroundColor: colors.gray_600 }]}>
-                            <FontAwesome6 name="plus" color={colors.white} size={15} />
-                        </View>
-                        <Text style={[styles.textCreateCtg]}>Criar nova {contextLabel}</Text>
-                    </View>
-                </TouchableOpacity>
-            </ScrollView>
-        </View>
-    </Modal>
-);
-
-interface NewCategoryModalProps {
-    isVisible: boolean;
-    nameNewCategory: string | any;
-    selectedColor: string;
-    selectedIcon: string;
-    setIsNewCategorieVisible: (visible: boolean) => void;
-    setNameNewCtg: (desc: string) => void;
-    setIsColorPickerVisible: (visible: boolean) => void;
-    setIsIconPickerVisible: (visible: boolean) => void;
-    createCategory: () => void;
-}
-
-const NewCategoryModal: React.FC<NewCategoryModalProps> = ({ isVisible, nameNewCategory, selectedColor, selectedIcon, setIsNewCategorieVisible, setNameNewCtg, setIsColorPickerVisible, setIsIconPickerVisible, createCategory }) => (
-    <Modal
-        isVisible={isVisible}
-        onBackdropPress={() => setIsNewCategorieVisible(false)}
-        backdropOpacity={0.4}
-        style={[base.justifyContentEnd, base.m_0]}
-    >
-        <View style={[styles.newCategorieContainer]}>
-            <Text style={styles.createNewCtg}>Criar nova categoria</Text>
-            <ScrollView showsVerticalScrollIndicator={false}>
-                <View style={[base.gap_15]}>
-                    <TextInput
-                        style={[base.input, { backgroundColor: colors.gray_825 }]}
-                        placeholder="Nome"
-                        placeholderTextColor={colors.gray_200}
-                        value={nameNewCategory}
-                        onChangeText={setNameNewCtg}
-                        maxLength={25}
-                    />
-                    <TouchableOpacity style={[base.input, base.justifyContentSpaceBetween, { backgroundColor: colors.gray_825 }]} onPress={() => setIsColorPickerVisible(true)}>
-                        <View style={styles.row}>
-                            <FontAwesome6 name="palette" color={colors.gray_100} size={20}/>
-                            <Text style={base.inputText}>Cor</Text>
-                        </View>
-                        <View style={[styles.colorCircleCtg, base.m_0, { backgroundColor: selectedColor }]} />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[base.input, base.justifyContentSpaceBetween, { backgroundColor: colors.gray_825 }]} onPress={() => setIsIconPickerVisible(true)}>
-                        <View style={styles.row}>
-                            <FontAwesome6 name="image" color={colors.gray_100} size={20}/>
-                            <Text style={base.inputText}>Ícone</Text>
-                        </View>
-                        <FontAwesome6 name={selectedIcon} color={selectedColor} size={20}/>
-                    </TouchableOpacity>
-                    <View style={[base.flexRow, base.justifyContentSpaceBetween, base.mt_10]}>
-                        <TouchableOpacity style={[base.button, base.btnCancel]} onPress={() => setIsNewCategorieVisible(false)}>
-                            <Text style={[base.btnText]}>Cancelar</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[base.button, base.btnSave]} onPress={createCategory}>
-                            <Text style={[base.btnText]}>Salvar</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </ScrollView>
-        </View>
-    </Modal>
-);
-
-interface ColorPickerModalProps {
-    isVisible: boolean;
-    handleSelectColor: (color: string) => void;
-    setIsColorPickerVisible: (visible: boolean) => void;
-}
-  
-const ColorPickerModal: React.FC<ColorPickerModalProps> = ({ isVisible, handleSelectColor, setIsColorPickerVisible }) => {
-    return (
-        <Modal
-            isVisible={isVisible}
-            onBackdropPress={() => setIsColorPickerVisible(false)}
-            backdropOpacity={0}
-            style={[base.justifyContentEnd, base.m_0]}
-        >
-            <View style={styles.modalColorPicker}>
-                <Text style={[styles.colorPickerTitle, styles.line, base.w_100]}>Selecione uma cor</Text>
-                <ScrollView showsVerticalScrollIndicator={false}>
-                    <View style={styles.colorsContainer}>
-                        {predefinedColors.map((color) => (
-                            <View key={color} style={[base.alignItemsCenter]}>
-                                <TouchableOpacity
-                                    style={[styles.colorCircle, { backgroundColor: color }]}
-                                    onPress={() => handleSelectColor(color)}
-                                />
-                            </View>
-                        ))}
-                    </View>
-                </ScrollView>
-            </View>
-        </Modal>
-    );
-};
-
-interface IconPickerModalProps {
-    isVisible: boolean;
-    handleSelectIcon: (icon: string) => void;
-    setIsIconPickerVisible: (visible: boolean) => void;
-}
-  
-const IconPickerModal: React.FC<IconPickerModalProps> = ({ isVisible, handleSelectIcon, setIsIconPickerVisible }) => {
-    return (
-        <Modal
-            isVisible={isVisible}
-            onBackdropPress={() => setIsIconPickerVisible(false)}
-            backdropOpacity={0}
-            style={[base.justifyContentEnd, base.m_0]}
-        >
-            <View style={styles.modalIconPicker}>
-                <Text style={[styles.iconPickerTitle, styles.line, base.w_100]}>Selecione um ícone</Text>
-                <ScrollView showsVerticalScrollIndicator={false}>
-                    <View style={styles.iconsContainer}>
-                        {predefinedIcons.map((icon) => (
-                            <TouchableOpacity
-                                key={icon}
-                                onPress={() => handleSelectIcon(icon)}
-                                style={[styles.icon]}
-                            >
-                                <View style={[base.alignItemsCenter]}>
-                                    <FontAwesome6 name={icon} color={colors.gray_100} size={25} />
-                                </View>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                </ScrollView>
-            </View>
-        </Modal>
-    );
-};
 
 const styles = StyleSheet.create({
     modal: {
@@ -765,119 +423,6 @@ const styles = StyleSheet.create({
         fontFamily: 'Outfit_500Medium',
         color: colors.gray_100,
         marginLeft: 10,
-    },
-    categoriesContainer: {
-        backgroundColor: colors.gray_875,
-        height: '80%',
-        width: '100%',
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-    },
-    createNewCtg: {
-        fontFamily: 'Outfit_400Regular',
-        fontSize: 18,
-		color: colors.white,
-        marginBottom: 5
-    },
-    line: {
-        borderBottomWidth: 1,
-        borderBottomColor: colors.gray_700
-    },
-    containerIcon: {
-        borderRadius: 50,
-        padding: 10,
-        width: 38,
-        height: 38,
-        justifyContent: "center",
-        alignItems: "center"
-    },
-    categorieName: {
-        color: colors.gray_100,
-        fontSize: 15,
-        fontFamily: 'Outfit_500Medium',
-        lineHeight: 18
-    },
-    textCreateCtg: {
-        color: colors.gray_200,
-        fontSize: 15,
-        fontFamily: 'Outfit_500Medium'
-    },
-    searchBar: {
-        fontFamily: 'Outfit_500Medium',
-        fontSize: 15,
-        color: colors.gray_200
-    },
-
-    // Nova Categoria
-    newCategorieContainer: {
-        backgroundColor: colors.gray_875,
-        width: '100%',
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        padding: 20,
-        paddingBottom: 30,
-        gap: 15
-    },
-    colorCircleCtg: {
-        width: 22,
-        height: 22,
-        borderRadius: 25,
-    },
-    // Color Picker
-    modalColorPicker: {
-        backgroundColor: colors.gray_800,
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        padding: 20,
-        width: "100%",
-        height: "50%",
-        alignItems: "center",
-    },
-    colorPickerTitle: {
-        fontFamily: "Outfit_400Regular",
-        color: colors.white,
-        fontSize: 18,
-        marginBottom: 20,
-        paddingBottom: 10
-    },
-    colorsContainer: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        gap: 30,
-        justifyContent: "center"
-    },
-    colorCircle: {
-        width: 40,
-        height: 40,
-        borderRadius: 25, 
-    },
-    // Icon Picker
-    modalIconPicker: {
-        backgroundColor: colors.gray_800,
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        padding: 20,
-        width: "100%",
-        height: "50%",
-        alignItems: "center",
-    },
-    iconPickerTitle: {
-        fontFamily: "Outfit_400Regular",
-        color: colors.white,
-        fontSize: 18,
-        marginBottom: 20,
-        paddingBottom: 10
-    },
-    iconsContainer: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        gap: 30,
-        justifyContent: "center",
-        paddingHorizontal: 5,
-    },
-    icon: {
-        width: 40,
-        height: 40,
     },
     accountIcon: {
         borderRadius: 50,

@@ -10,10 +10,9 @@ import { TypeScreem } from '~/enums/enums';
 import FloatingButton from '~/components/FloatingButton';
 import { useTransactions } from '~/context/TransactionContext';
 import useUser from '~/hooks/useUser';
-import { IAccount, IUser } from '~/interfaces/interfaces';
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '~/config/firebase';
+import { IAccount } from '~/interfaces/interfaces';
 import { getBankLogo } from '~/utils/utils';
+import { useAccounts } from '~/context/AccountContext';
 
 // Formatar valores com duas casas decimais
 function formatValue(value: number): string {
@@ -23,51 +22,8 @@ function formatValue(value: number): string {
 export default function Home() {
     const { showValues } = useContext(HeaderContext);
     const { transactions, fetchTransactions } = useTransactions();
+    const { accounts, totalValue, fetchAccounts } = useAccounts();
     const user = useUser();
-
-    const [accounts, setAccounts] = useState<IAccount[]>([]);
-    const accountCollectionRef = collection(db, "account");
-
-    const [formattedTotalValueAccounts, setFormattedTotalValueAccounts] = useState<string>('0,00');
-    const [totalValueAccounts, setTotalValueAccounts] = useState<number>(0);
-
-    const fetchAccounts = async (user: IUser): Promise<void> => {
-        try {
-            const q = query(accountCollectionRef, where("uid", "==", user.uid));
-            const querySnapshot = await getDocs(q);
-            const data: IAccount[] = querySnapshot.docs.map(doc => {
-                const accountData = doc.data();
-                return {
-                    id: doc.id,
-                    uid: accountData.uid,
-                    name: accountData.name,
-                    bankName: accountData.bankName,
-                    balance: accountData.balance,
-                    includeInSum: accountData.includeInSum
-                };
-            });
-
-            // Filtra as contas que devem ser incluídas no total e soma seus valores
-            const totalValue = data
-                .filter(account => account.includeInSum)
-                .reduce((acc, account) => {
-                    const numericValue = account.balance;
-                    return acc + numericValue;
-                }, 0);
-
-            // Formata o valor total com duas casas decimais e vírgula como separador decimal
-            const formattedTotalValue = totalValue.toLocaleString('pt-BR', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-            });
-
-            setTotalValueAccounts(totalValue);
-            setFormattedTotalValueAccounts(formattedTotalValue);
-            setAccounts(data);
-        } catch (error) {
-            console.error("Erro ao buscar contas: ", error);
-        }
-    };
 
     useEffect(() => {
         if (user) {
@@ -76,7 +32,7 @@ export default function Home() {
         }
     }, [user]);
 
-    // Calcular total de despesas e receitas
+    // Calcular despesas e receitas
     const { totalExpenses, totalIncome } = transactions.reduce((totals, item) => {
         if (item.isExpense) {
             totals.totalExpenses += item.value;
@@ -86,16 +42,13 @@ export default function Home() {
         return totals;
     }, { totalExpenses: 0, totalIncome: 0 });
 
-    // Calcular saldo final
-    const remainder = totalIncome - totalExpenses + totalValueAccounts;
-
     return (
         <>
             <Header />
             <ScrollView style={[base.flex_1]}>
                 <View style={[styles.container, base.flex_1, base.alignItemsCenter, base.pt_5, base.gap_25, base.pb_90]}>
                     <View style={[base.flexColumn, base.alignItemsCenter, base.justifyContentCenter, base.gap_8, base.mb_10]}>
-                        <Text style={[styles.valueBalance, styles.remainder, !showValues && styles.hideValues]}>R$ {formatValue(remainder)}</Text>
+                        <Text style={[styles.valueBalance, styles.remainder, !showValues && styles.hideValues]}>R$ {formatValue(totalValue)}</Text>
                         <View style={[base.alignItemsCenter, base.justifyContentCenter, base.flexRow, base.gap_15]}>
                             <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_5]}>
                                 <FontAwesome6 name='caret-up' color={colors.green_500} size={20} />
@@ -126,7 +79,7 @@ export default function Home() {
                         </View>
                         <View style={[styles.lineTop, base.mt_15, base.pt_15, base.flexRow, base.justifyContentSpaceBetween]}>
                             <Text style={[styles.title]}>Total</Text>
-                            <Text style={[styles.title]}>R$ {formattedTotalValueAccounts}</Text>
+                            <Text style={[styles.title]}>R$ {formatValue(totalValue)}</Text>
                         </View>
                     </View>
                     <View style={[styles.cards]}>

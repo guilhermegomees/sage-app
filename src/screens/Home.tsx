@@ -10,9 +10,10 @@ import { TypeScreem } from '~/enums/enums';
 import FloatingButton from '~/components/FloatingButton';
 import { useTransactions } from '~/context/TransactionContext';
 import useUser from '~/hooks/useUser';
-import { IAccount } from '~/interfaces/interfaces';
+import { IAccount, ICreditCard } from '~/interfaces/interfaces';
 import { getBankLogo } from '~/utils/utils';
 import { useAccounts } from '~/context/AccountContext';
+import { useCreditCards } from '~/context/CreditCardContext';
 
 // Formatar valores com duas casas decimais
 function formatValue(value: number): string {
@@ -23,12 +24,14 @@ export default function Home() {
     const { showValues } = useContext(HeaderContext);
     const { transactions, fetchTransactions } = useTransactions();
     const { accounts, totalValue, fetchAccounts } = useAccounts();
+    const { creditCards, fetchCreditCards } = useCreditCards();
     const user = useUser();
 
     useEffect(() => {
         if (user) {
             fetchTransactions(user);
             fetchAccounts(user);
+            fetchCreditCards(user);
         }
     }, [user]);
 
@@ -41,6 +44,26 @@ export default function Home() {
         }
         return totals;
     }, { totalExpenses: 0, totalIncome: 0 });
+
+    const getCurrentInvoice = (closingDay: number) => {
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        const currentMonth = today.getMonth() + 1;
+    
+        // Crie uma data para o dia de fechamento do mês atual
+        const closingDateThisMonth = new Date(currentYear, currentMonth - 1, closingDay);
+        console.log(closingDateThisMonth);
+        // Verifique se a data de fechamento já ocorreu
+        if (today > closingDateThisMonth) {
+            // Se já passou do fechamento, retorna o mês atual menos um
+            const previousMonth = currentMonth - 1 <= 0 ? 12 : currentMonth - 1;
+            const previousYear = previousMonth === 12 ? currentYear - 1 : currentYear;
+            return `${previousYear}-${previousMonth.toString().padStart(2, '0')}`;
+        } else {
+            // Caso contrário, retorna o mês atual
+            return `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
+        }
+    };
 
     return (
         <>
@@ -87,22 +110,41 @@ export default function Home() {
                             <Text style={[styles.title]}>Cartões</Text>
                         </View>
                         <View style={[base.gap_20]}>
-                            <View style={[styles.card]}>
-                                <View style={[base.flexRow, base.justifyContentSpaceBetween, base.alignItemsCenter]}>
-                                    <Image source={getBankLogo("Santander")} style={[styles.cardIcon]} />
-                                    <FontAwesome6 name="angle-right" size={15} color={colors.gray_200} />
-                                </View>
-                                <View style={[base.gap_5]}>
-                                    <View style={[base.flexRow, base.justifyContentSpaceBetween]}>
-                                        <Text style={[styles.cardText]}>Santander</Text>
-                                        <Text style={[styles.cardValue]}>R$ 0,00</Text>
+                            {creditCards.map((creditCard: ICreditCard)=>{
+                                const closingDay = creditCard.closingDay; // Suponha que seja um número (1-31)
+                                const currentInvoice = getCurrentInvoice(closingDay); // Obtenha a fatura atual
+                                // console.log(currentInvoice);
+                                const currentInvoiceValue = creditCard.invoices.find(invoice => invoice.totalAmount);
+                                const invoiceValue = formatValue(currentInvoiceValue?.totalAmount ?? 0);
+
+                                const [invoiceYear, invoiceMonth] = currentInvoice.split('-').map(Number);
+                                const closingDate = new Date(invoiceYear, invoiceMonth - 1, closingDay); // Mês é zero-indexed
+                                const today = new Date();
+                                
+                                // Verifique se a fatura está fechada ou aberta
+                                const isClosed = today > closingDate;
+
+                                return (
+                                    <View key={creditCard.id} style={[styles.card]}>
+                                        <View style={[base.flexRow, base.justifyContentSpaceBetween, base.alignItemsCenter]}>
+                                            <Image source={getBankLogo(creditCard.bankName)} style={[styles.cardIcon]} />
+                                            <FontAwesome6 name="angle-right" size={15} color={colors.gray_200} />
+                                        </View>
+                                        <View style={[base.gap_5]}>
+                                            <View style={[base.flexRow, base.justifyContentSpaceBetween]}>
+                                                <Text style={[styles.cardText]}>{creditCard.name}</Text>
+                                                <Text style={[styles.cardValue]}>R$ {invoiceValue}</Text>
+                                            </View>
+                                            <View style={[base.w_100, base.justifyContentEnd, base.alignItemsCenter, base.gap_4, base.flexRow]}>
+                                                <MaterialIcons name={'circle'} color={isClosed ? colors.red_500 : colors.blue_300} size={7} />
+                                                <Text style={[styles.invoiceStatus, { color: isClosed ? colors.red_500 : colors.blue_300 }]}>
+                                                    {isClosed ? "Fechada" : "Aberta"}
+                                                </Text>
+                                            </View>
+                                        </View>
                                     </View>
-                                    <View style={[base.w_100, base.justifyContentEnd, base.alignItemsCenter, base.gap_4, base.flexRow]}>
-                                        <MaterialIcons name={'circle'} color={colors.blue_300} size={7} />
-                                        <Text style={[styles.invoiceStatus, { color: colors.blue_300 }]}>Aberta</Text>
-                                    </View>
-                                </View>
-                            </View>
+                                )
+                            })}
                         </View>
                     </View>
                     {/* Painel de transações */}

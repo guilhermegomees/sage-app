@@ -36,10 +36,30 @@ export interface IUser {
 }
 
 export interface IAccount {
-    id: string,
+    id: string;
     uid: string;
     name: string;
     bankName: string;
     balance: number;
     includeInSum: boolean;
+}
+
+export interface ICreditCard {
+    id: string;
+    uid: string;
+    name: string;
+    bankName: string;
+    limit: number;
+    availableLimit: number;
+    closingDay: number;
+    dueDay: number;
+    invoices: IInvoice[];
+}
+
+export interface IInvoice {
+    id: string;
+    isPaid: boolean;
+    month: string;
+    totalAmount: number;
+    paymentDate: Date | null;
 }

@@ -51,8 +51,8 @@ export default function Home() {
         const currentMonth = today.getMonth() + 1;
     
         // Crie uma data para o dia de fechamento do mês atual
-        const closingDateThisMonth = new Date(currentYear, currentMonth - 1, closingDay);
-        console.log(closingDateThisMonth);
+        const closingDateThisMonth = new Date(currentYear, currentMonth, closingDay);
+        
         // Verifique se a data de fechamento já ocorreu
         if (today > closingDateThisMonth) {
             // Se já passou do fechamento, retorna o mês atual menos um
@@ -111,19 +111,15 @@ export default function Home() {
                         </View>
                         <View style={[base.gap_20]}>
                             {creditCards.map((creditCard: ICreditCard)=>{
-                                const closingDay = creditCard.closingDay; // Suponha que seja um número (1-31)
-                                const currentInvoice = getCurrentInvoice(closingDay); // Obtenha a fatura atual
-                                // console.log(currentInvoice);
-                                const currentInvoiceValue = creditCard.invoices.find(invoice => invoice.totalAmount);
-                                const invoiceValue = formatValue(currentInvoiceValue?.totalAmount ?? 0);
+                                // Calcule o valor da fatura atual
+                                const currentInvoice = creditCard.invoices.find(invoice => !invoice.isPaid);
+                                const invoiceValue = formatValue(currentInvoice ? currentInvoice.totalAmount : 0);
 
-                                const [invoiceYear, invoiceMonth] = currentInvoice.split('-').map(Number);
-                                const closingDate = new Date(invoiceYear, invoiceMonth - 1, closingDay); // Mês é zero-indexed
+                                // Verifique a data atual em relação à data de fechamento
                                 const today = new Date();
-                                
-                                // Verifique se a fatura está fechada ou aberta
+                                const closingDate = new Date(today.getFullYear(), today.getMonth() + 1, creditCard.closingDay);
                                 const isClosed = today > closingDate;
-
+                                
                                 return (
                                     <View key={creditCard.id} style={[styles.card]}>
                                         <View style={[base.flexRow, base.justifyContentSpaceBetween, base.alignItemsCenter]}>

@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
-import { TouchableOpacity, View, Text, StyleSheet, TextInput, ScrollView, Image, ImageSourcePropType } from "react-native";
+import { TouchableOpacity, View, Text, StyleSheet, TextInput, Image } from "react-native";
 import Modal from "react-native-modal";
 import base from "~/css/base";
 import colors from "~/css/colors";
 import { FontAwesome6, Octicons } from "@expo/vector-icons";
-import { IAccount, ICategory, IUser } from "~/interfaces/interfaces";
+import { IAccount, ICategory, ICreditCard, IUser } from "~/interfaces/interfaces";
 import { addDoc, collection, doc, getDoc, getDocs, query, runTransaction, where } from "firebase/firestore";
 import { db } from "~/config/firebase";
 import { Calendar } from "~/components/Calendar";
 import { transactionContext } from "~/enums/enums";
-import { predefinedColors } from "~/constants/colors";
-import { predefinedIcons } from "~/constants/icons";
 import { useTransactions } from "~/context/TransactionContext";
 import useUser from "~/hooks/useUser";
 import { getBankLogo } from "~/utils/utils";
@@ -19,6 +17,7 @@ import { SelectionModal } from "~/components/SelectionModal";
 import { NewCategoryModal } from "~/components/NewCategoryModal";
 import { ColorPickerModal } from "~/components/ColorPickerModal";
 import { IconPickerModal } from "~/components/IconPickerModal";
+import { useCreditCards } from "~/context/CreditCardContext";
 
 const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { isModalVisible: boolean, context: transactionContext, onClose: () => void }) => {
     const user = useUser();
@@ -29,6 +28,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
     const [isIconPickerVisible, setIsIconPickerVisible] = useState(false);
     const [isCalendarVisible, setIsCalendarVisible] = useState(false);
     const [isAccountsVisible, setIsAccountsVisible] = useState(false);
+    const [isCreditCardVisible, setIsCreditCardVisible] = useState(false);
 
     const [transactionValue, setTransactionValue] = useState<number>(0);
     const [description, setDescription] = useState<string>('');
@@ -48,11 +48,15 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
     const [selectedAccount, setSelectedAccount] = useState<IAccount | null>(null);
     const [searchAccount, setSearchAccount] = useState<string>('');
 
+    const [selectedCreditCard, setSelectedCreditCard] = useState<ICreditCard | null>(null);
+    const [searchCreditCard, setSearchCreditCard] = useState<string>('');
+    
     const transactionCollectionRef = collection(db, "transaction");
     const categoryCollectionRef = collection(db, "category");
 
     const { fetchTransactions } = useTransactions();
     const { accounts, fetchAccounts } = useAccounts();
+    const { creditCards, fetchCreditCards } = useCreditCards();
 
     const formatCurrency = (num: number): string => 
         `R$ ${num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -92,6 +96,13 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
         }
     }
 
+    const openCreditCardModal = async (): Promise<void> => {
+        if (user) {
+            await fetchCreditCards(user);
+            setIsCreditCardVisible(true);
+        }
+    }
+
     const handleSelectCategory = (category: ICategory): void => {
         setSelectedCategory(category);
         setIsCategoriesVisible(false);
@@ -100,6 +111,11 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
     const handleSelectAccount = (account: IAccount): void => {
         setSelectedAccount(account);
         setIsAccountsVisible(false);
+    };
+
+    const handleSelectCreditCard = (card: ICreditCard): void => {
+        setSelectedCreditCard(card);
+        setIsCreditCardVisible(false);
     };
 
     const handleCloseAndReset = (): void => {
@@ -127,7 +143,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
     };
 
     const createTransaction = async (): Promise<void> => {
-        if (!transactionValue || !description || !selectedDate || !selectedCategory || !selectedAccount) {
+        if (!transactionValue || !description || !selectedDate || !selectedCategory || !(selectedAccount || selectedCreditCard)) {
             alert("Por favor, preencha todos os campos antes de continuar.");
             return;
         }
@@ -246,17 +262,25 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
     }, [user]);
 
     useEffect(() => {
-        if (accounts.length > 0 && isModalVisible) {
-            setSelectedAccount(accounts[0]);
+        if (isModalVisible) {
+            if (accounts.length > 0 && context !== transactionContext.cardExpense) {
+                setSelectedAccount(accounts[0]);
+            } else if (creditCards.length > 0 && context === transactionContext.cardExpense) {
+                setSelectedCreditCard(creditCards[0]);
+            }
         }
     }, [isModalVisible]);
 
-    const filteredCategories = categories.filter(ctg => 
-        ctg.name.toLowerCase().includes(searchCategory.toLowerCase())
+    const filteredCategories = categories.filter(category => 
+        category.name.toLowerCase().includes(searchCategory.toLowerCase())
     );
 
-    const filteredAccounts = accounts.filter(ctg => 
-        ctg.name.toLowerCase().includes(searchCategory.toLowerCase())
+    const filteredAccounts = accounts.filter(account => 
+        account.name.toLowerCase().includes(searchCategory.toLowerCase())
+    );
+
+    const filteredCreditCard = creditCards.filter(card =>
+        card.name.toLowerCase().includes(searchCategory.toLowerCase())
     );
     
     return (
@@ -307,15 +331,20 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                         <FontAwesome6 name="angle-right" color={colors.gray_100} size={15} />
                     </TouchableOpacity>
                     {/* Conta */}
-                    <TouchableOpacity style={[base.input, { backgroundColor: colors.gray_825 }]} onPress={openAccountModal}>
+                    <TouchableOpacity style={[base.input, { backgroundColor: colors.gray_825 }]} onPress={context === transactionContext.cardExpense ? openCreditCardModal : openAccountModal}>
                         <View style={styles.row}>
                             <View style={[base.alignItemsCenter, {width: 20}]}>
-                                {selectedAccount
-                                    ? <Image source={getBankLogo(selectedAccount.bankName)} style={[styles.accountIcon]}/>
-                                    : <FontAwesome6 name="ellipsis" color={colors.gray_100} size={20} style={styles.iconCtgEmpty}/>
+                                {selectedAccount && context !== transactionContext.cardExpense &&
+                                    <Image source={getBankLogo(selectedAccount.bankName)} style={[styles.accountIcon]}/>
+                                }
+                                {selectedCreditCard && context === transactionContext.cardExpense &&
+                                    <Image source={getBankLogo(selectedCreditCard.bankName)} style={[styles.accountIcon]} />
+                                }
+                                {!selectedAccount && !selectedCreditCard &&
+                                    <FontAwesome6 name="ellipsis" color={colors.gray_100} size={20} style={styles.iconCtgEmpty} />
                                 }
                             </View>
-                            <Text style={base.inputText}>{selectedAccount?.name || "Conta"}</Text>
+                            <Text style={base.inputText}>{context === transactionContext.cardExpense ? selectedCreditCard?.name || "Cartão" : selectedAccount?.name || "Conta"}</Text>
                         </View>
                         <FontAwesome6 name="angle-right" color={colors.gray_100} size={15} />
                     </TouchableOpacity>
@@ -361,6 +390,18 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                 contextLabel="conta"
                 getItemIcon={(account) => getBankLogo(account.bankName)}
                 getItemName={(account) => account.name}
+            />
+            <SelectionModal
+                isVisible={isCreditCardVisible}
+                filteredItems={filteredCreditCard}
+                searchItem={searchCreditCard}
+                setSearchItem={setSearchCreditCard}
+                handleSelectItem={handleSelectCreditCard}
+                setIsVisible={setIsCreditCardVisible}
+                selectedItem={selectedCreditCard}
+                contextLabel="cartão"
+                getItemIcon={(creditCard) => getBankLogo(creditCard.bankName)}
+                getItemName={(creditCard) => creditCard.name}
             />
             <NewCategoryModal
                 isVisible={isNewCategorieVisible}

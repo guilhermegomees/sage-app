@@ -1,9 +1,10 @@
-import { FontAwesome6, MaterialIcons } from '@expo/vector-icons';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dimensions, Modal, ScrollView, TouchableOpacity, View, Text, StyleSheet } from 'react-native';
+import { FontAwesome6, MaterialIcons } from '@expo/vector-icons';
 import { Bar } from 'react-native-progress';
 import base from '~/css/base';
 import colors from '~/css/colors';
+import { useGoals } from '~/context/goalContext'; // Certifique-se de ter este contexto para buscar metas do Firestore
 import { IGoal } from '~/interfaces/interfaces';
 
 export default function Goals() {
@@ -11,57 +12,22 @@ export default function Goals() {
     const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const [goalToDelete, setGoalToDelete] = useState<string | null>(null);
+
+    const { goals, fetchGoals } = useGoals(); // Obtém metas e função de busca do contexto
     
-    const goalsData : IGoal[] = [{
-        id: "1",
-        name: "Viagem",
-        currentValue: 6000,
-        goalValue: 6000,
-        icon: "airplanemode-active",
-        isCompleted: false
-    },{
-        id: "2",
-        name: "Comprar um carro",
-        currentValue: 25000,
-        goalValue: 30000,
-        icon: "directions-car",
-        isCompleted: false
-    },{
-        id: "3",
-        name: "Reformar a casa",
-        currentValue: 12200,
-        goalValue: 20000,
-        icon: "home",
-        isCompleted: false
-    },{
-        id: "4",
-        name: "Abrir um negócio",
-        currentValue: 50000,
-        goalValue: 100000,
-        icon: "store",
-        isCompleted: false
-    },{
-        id: "5",
-        name: "Abrir um negócio",
-        currentValue: 50000,
-        goalValue: 100000,
-        icon: "store",
-        isCompleted: false
-    }];
+    useEffect(() => {
+        fetchGoals(); // Chama a função para buscar metas ao carregar a tela
+    }, []);
 
     // Filtra as metas com base no filtro selecionado
-    const filteredGoals = goalsData.filter(goal => {
+    const filteredGoals = goals.filter(goal => {
         if (filter === 'completed') return goal.currentValue >= goal.goalValue;
         if (filter === 'incomplete') return goal.currentValue < goal.goalValue;
-        return true; // 'all' mostra todas as metas
+        return true;
     });
 
     const toggleTooltip = (id: string) => {
-        if (selectedGoal === id) {
-            setSelectedGoal(null); // Fecha a tooltip se já estiver aberta
-        } else {
-            setSelectedGoal(id); // Abre a tooltip para o item clicado
-        }
+        setSelectedGoal(selectedGoal === id ? null : id); // Alterna a tooltip
     };
 
     const handleEdit = (id: string) => {
@@ -90,10 +56,6 @@ export default function Goals() {
 
     return (
         <View style={[styles.container, base.flex_1]}>
-            {/* <View style={[styles.containerTitle]}>
-                <Text style={[styles.title]}>Metas</Text>
-            </View> */}
-            {/* Menu de Filtros */}
             <View style={styles.filterContainer}>
                 <TouchableOpacity onPress={() => setFilter('all')} style={[styles.filter, filter === 'all' && styles.activeFilter]}>
                     <Text style={[styles.filterText]}>Geral</Text>
@@ -105,11 +67,7 @@ export default function Goals() {
                     <Text style={[styles.filterText]}>Pendentes</Text>
                 </TouchableOpacity>
             </View>
-            <ScrollView
-                contentContainerStyle={styles.scrollContainer}
-                showsVerticalScrollIndicator={false}
-                showsHorizontalScrollIndicator={false}
-            >
+            <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
                 {filteredGoals.map((goal) => {
                     const progress = goal.currentValue / goal.goalValue;
                     const percentage = (progress * 100).toFixed(0);
@@ -119,20 +77,12 @@ export default function Goals() {
                             <View style={[styles.infoContainer]}>
                                 <View style={[base.flexRow, base.gap_13, base.alignItemsCenter]}>
                                     <View style={[styles.icon]}>
-                                        <MaterialIcons
-                                            name={goal.icon}
-                                            size={28}
-                                            color={colors.gray_900}
-                                        />
+                                        <FontAwesome6 name={goal.icon} size={28} color={colors.gray_900} />
                                     </View>
                                     <Text style={styles.text}>{goal.name}</Text>
                                 </View>
-                                <TouchableOpacity onPress={() => toggleTooltip(goal.id)} style={{marginBottom: 5}}>
-                                    <FontAwesome6
-                                        name="ellipsis-vertical"
-                                        size={20}
-                                        color={colors.gray_300}
-                                    />
+                                <TouchableOpacity onPress={() => toggleTooltip(goal.id)}>
+                                    <FontAwesome6 name="ellipsis-vertical" size={20} color={colors.gray_300} />
                                 </TouchableOpacity>
                                 {selectedGoal === goal.id && (
                                     <View style={styles.tooltip}>
@@ -147,20 +97,9 @@ export default function Goals() {
                             </View>
                             <View style={[base.gap_8]}>
                                 <View style={[styles.progressContainer]}>
-                                    <Bar
-                                        progress={progress}
-                                        width={Dimensions.get('window').width * 0.9 - 15}
-                                        height={18}
-                                        unfilledColor={colors.gray_750}
-                                        borderWidth={0}
-                                        borderRadius={20}
-                                        color={colors.blue_600}
-                                        animated={true}
-                                    />
+                                    <Bar progress={progress} width={Dimensions.get('window').width * 0.9 - 15} height={18} unfilledColor={colors.gray_750} borderWidth={0} borderRadius={20} color={colors.blue_600} animated={true} />
                                     <View style={styles.percentageContainer}>
-                                        <Text style={styles.textPercentage}>
-                                            {percentage}%
-                                        </Text>
+                                        <Text style={styles.textPercentage}>{percentage}%</Text>
                                     </View>
                                 </View>
                                 <Text style={styles.textValue}>
@@ -174,12 +113,7 @@ export default function Goals() {
             <TouchableOpacity style={styles.fabButton} onPress={() => console.log('Adicionar nova meta')}>
                 <FontAwesome6 name="plus" size={22} color={colors.gray_50} />
             </TouchableOpacity>
-            <Modal
-                transparent={true}
-                animationType="slide"
-                visible={isModalVisible}
-                onRequestClose={cancelDelete}
-            >
+            <Modal transparent={true} animationType="slide" visible={isModalVisible} onRequestClose={cancelDelete}>
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
                         <Text style={styles.modalText}>Deseja realmente apagar essa meta?</Text>

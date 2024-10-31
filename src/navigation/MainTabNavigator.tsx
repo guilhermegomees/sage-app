@@ -12,6 +12,7 @@ import { HeaderProvider } from '~/context/HeaderContext';
 import { TransactionProvider } from '~/context/TransactionContext';
 import { AccountProvider } from '~/context/AccountContext';
 import { CreditCardsProvider } from '~/context/CreditCardContext';
+import { GoalProvider } from '~/context/goalContext';
 
 const Tab = createBottomTabNavigator();
 
@@ -21,6 +22,7 @@ export default function MainTabNavigator(){
     return (
         <TransactionProvider>
             <CreditCardsProvider>
+                <GoalProvider>
                 <AccountProvider>
                     <HeaderProvider>
                         <Tab.Navigator
@@ -102,6 +104,7 @@ export default function MainTabNavigator(){
                         </Tab.Navigator>
                     </HeaderProvider>
                 </AccountProvider>
+                </GoalProvider>
             </CreditCardsProvider>
         </TransactionProvider>
     );

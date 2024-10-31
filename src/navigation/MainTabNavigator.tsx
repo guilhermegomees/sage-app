@@ -6,12 +6,12 @@ import Transactions from '~/screens/Transactions';
 import Goals from '~/screens/Goals';
 import ChartsTab from './ChartsTabNavigator';
 import colors from '~/css/colors';
-import Cards from '~/screens/Cards';
 import Home from '~/screens/Home';
 import { HeaderProvider } from '~/context/HeaderContext';
 import { TransactionProvider } from '~/context/TransactionContext';
 import { AccountProvider } from '~/context/AccountContext';
 import { CreditCardsProvider } from '~/context/CreditCardContext';
+import Profile from '~/screens/Profile';
 
 const Tab = createBottomTabNavigator();
 
@@ -64,7 +64,7 @@ export default function MainTabNavigator(){
                                 component={Home}
                                 options={{
                                     tabBarIcon: tabBarIcon('house'),
-                                    tabBarLabel: 'Home',
+                                    //tabBarLabel: 'Home',
                                 }}
                             />
                             <Tab.Screen
@@ -72,7 +72,7 @@ export default function MainTabNavigator(){
                                 component={Transactions}
                                 options={{
                                     tabBarIcon: tabBarIcon('arrow-right-arrow-left'),
-                                    tabBarLabel: 'Transações',
+                                    //tabBarLabel: 'Transações',
                                 }}
                             />
                             <Tab.Screen
@@ -80,15 +80,7 @@ export default function MainTabNavigator(){
                                 component={ChartsTab}
                                 options={{
                                     tabBarIcon: tabBarIcon('chart-line'),
-                                    tabBarLabel: 'Gráficos',
-                                }}
-                            />
-                            <Tab.Screen
-                                name="Cards"
-                                component={Cards}
-                                options={{
-                                    tabBarIcon: tabBarIcon('credit-card'),
-                                    tabBarLabel: 'Cartões',
+                                    //tabBarLabel: 'Gráficos',
                                 }}
                             />
                             <Tab.Screen
@@ -96,7 +88,15 @@ export default function MainTabNavigator(){
                                 component={Goals}
                                 options={{
                                     tabBarIcon: tabBarIcon('bullseye'),
-                                    tabBarLabel: 'Metas',
+                                    //tabBarLabel: 'Metas',
+                                }}
+                            />
+                            <Tab.Screen
+                                name="Profile"
+                                component={Profile}
+                                options={{
+                                    tabBarIcon: tabBarIcon('user-large'),
+                                    //tabBarLabel: 'Perfil',
                                 }}
                             />
                         </Tab.Navigator>

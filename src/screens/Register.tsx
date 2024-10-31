@@ -38,6 +38,15 @@ const RegisterScreen = () => {
                     name: name,
                     email: email,
                 });
+
+                // Criar conta default para usuário novo
+                await setDoc(doc(db, 'account', response.user.uid), {
+                    uid: response.user.uid,
+                    name: "Carteira",
+                    bankName: "Default",
+                    includeInSum: true,
+                    balance: 0,
+                });
             }
 
             navigation.dispatch(

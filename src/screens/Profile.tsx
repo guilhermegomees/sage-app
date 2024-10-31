@@ -4,7 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { getAuth, signOut, updateProfile } from 'firebase/auth';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
-import { CommonActions, useNavigation } from '@react-navigation/native';
+import { CommonActions, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import useUser from '~/hooks/useUser';
 import colors from '~/css/colors';
@@ -14,9 +14,17 @@ import base from '~/css/base';
 
 type ProfileScreenNavigationProp = StackNavigationProp<any, 'Profile'>;
 
+type ProfileScreenRouteProp = RouteProp<StackParamList, 'Profile'>;
+
+export type StackParamList = {
+    Profile: { fromScreen?: string };
+};
+
 const Profile: React.FC = () => {
     const navigation = useNavigation<ProfileScreenNavigationProp>();
     const user = useUser();
+    const route = useRoute<ProfileScreenRouteProp>();
+    const { fromScreen } = route.params || {};
     const [profileImage, setProfileImage] = useState<string | null>(null);
     
     const auth = getAuth(app);
@@ -110,12 +118,14 @@ const Profile: React.FC = () => {
     return (
         <View style={[base.flex_1, base.gap_50, { backgroundColor: colors.gray_900 }]}>
             <View style={styles.container}>
-                <View style={[styles.containerBack]}>
-                    <TouchableOpacity onPress={handleNavigateToBack}>
-                        <FontAwesome6 name="angle-left" size={20} color={colors.gray_50} />
-                    </TouchableOpacity>
-                </View>
-                <View style={[base.alignItemsCenter, base.gap_20]}>
+                {fromScreen === 'Home' &&
+                    <View style={[styles.containerBack]}>
+                        <TouchableOpacity onPress={handleNavigateToBack}>
+                            <FontAwesome6 name="angle-left" size={20} color={colors.gray_50} />
+                        </TouchableOpacity>
+                    </View>
+                }
+                <View style={[base.alignItemsCenter, base.gap_20, { marginTop: fromScreen === 'Home' ? 0 : 30}]}>
                     <TouchableOpacity onPress={handleImagePick}>
                         <Image 
                             source={profileImage 

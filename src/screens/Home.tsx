@@ -6,19 +6,13 @@ import { HeaderContext } from '~/context/HeaderContext';
 import base from '~/css/base';
 import { FontAwesome6, MaterialIcons } from '@expo/vector-icons';
 import colors from '~/css/colors';
-import { TypeScreem } from '~/enums/enums';
 import FloatingButton from '~/components/FloatingButton';
 import { useTransactions } from '~/context/TransactionContext';
 import useUser from '~/hooks/useUser';
 import { IAccount, ICreditCard } from '~/interfaces/interfaces';
-import { getBankLogo } from '~/utils/utils';
+import { formatValue, getBankLogo } from '~/utils/utils';
 import { useAccounts } from '~/context/AccountContext';
 import { useCreditCards } from '~/context/CreditCardContext';
-
-// Formatar valores com duas casas decimais
-function formatValue(value: number): string {
-    return value.toFixed(2).replace('.', ',');
-}
 
 export default function Home() {
     const { showValues } = useContext(HeaderContext);

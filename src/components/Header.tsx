@@ -20,7 +20,7 @@ export default function Header() {
     }
 
     const handleNavigateToProfile = () => {
-        navigation.navigate('Profile', { fromScreen: 'Home' });
+        navigation.navigate('Profile');
     }
 
     return (

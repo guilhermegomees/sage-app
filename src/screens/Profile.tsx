@@ -11,6 +11,7 @@ import colors from '~/css/colors';
 import { app, db } from '~/config/firebase';
 import { FontAwesome6 } from '@expo/vector-icons';
 import base from '~/css/base';
+import { AccountProvider } from '~/context/AccountContext';
 
 type ProfileScreenNavigationProp = StackNavigationProp<any, 'Profile'>;
 
@@ -96,10 +97,10 @@ const Profile: React.FC = () => {
             }
         }
     };
-    
-    const handleNavigateToBack = () => {
-        navigation.goBack();
-    };
+
+    const handleAccount = () => {
+        navigation.navigate('Account');
+    }
 
     const signOutUser = async () => {
         try {
@@ -118,13 +119,6 @@ const Profile: React.FC = () => {
     return (
         <View style={[base.flex_1, base.gap_50, { backgroundColor: colors.gray_900 }]}>
             <View style={styles.container}>
-                {fromScreen === 'Home' &&
-                    <View style={[styles.containerBack]}>
-                        <TouchableOpacity onPress={handleNavigateToBack}>
-                            <FontAwesome6 name="angle-left" size={20} color={colors.gray_50} />
-                        </TouchableOpacity>
-                    </View>
-                }
                 <View style={[base.alignItemsCenter, base.gap_20, { marginTop: fromScreen === 'Home' ? 0 : 30}]}>
                     <TouchableOpacity onPress={handleImagePick}>
                         <Image 
@@ -141,15 +135,17 @@ const Profile: React.FC = () => {
                 </View>
             </View>
             <View style={[styles.bottomMenu]}>
-                <View style={[styles.containerMenu]}>
-                    <View style={[base.flexRow, base.gap_18, base.alignItemsCenter]}>
-                        <View style={[styles.containerIcon]}>
-                            <FontAwesome6 name="building-columns" size={23} color={colors.gray_100}/>
+                <TouchableOpacity onPress={handleAccount}>
+                    <View style={[styles.containerMenu]}>
+                        <View style={[base.flexRow, base.gap_18, base.alignItemsCenter]}>
+                            <View style={[styles.containerIcon]}>
+                                <FontAwesome6 name="building-columns" size={23} color={colors.gray_100}/>
+                            </View>
+                            <Text style={[styles.menuText]}>Contas</Text>
                         </View>
-                        <Text style={[styles.menuText]}>Contas</Text>
+                        <FontAwesome6 name="angle-right" size={20} color={colors.gray_100}/>
                     </View>
-                    <FontAwesome6 name="angle-right" size={20} color={colors.gray_100}/>
-                </View>
+                </TouchableOpacity>
                 <View style={[styles.line]} />
                 <View style={[styles.containerMenu]}>
                     <View style={[base.flexRow, base.gap_18, base.alignItemsCenter]}>

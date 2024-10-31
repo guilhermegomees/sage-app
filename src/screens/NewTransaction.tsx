@@ -4,7 +4,7 @@ import Modal from "react-native-modal";
 import base from "~/css/base";
 import colors from "~/css/colors";
 import { FontAwesome6, Octicons } from "@expo/vector-icons";
-import { IAccount, ICategory, ICreditCard, IUser } from "~/interfaces/interfaces";
+import { IAccount, ICategory, ICreditCard, ITransaction, IUser } from "~/interfaces/interfaces";
 import { addDoc, collection, doc, getDoc, getDocs, query, runTransaction, where } from "firebase/firestore";
 import { db } from "~/config/firebase";
 import { Calendar } from "~/components/Calendar";
@@ -157,7 +157,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                 const updatedValue = isExpense ? -transactionValue : transactionValue;
 
                 // Cria os dados da nova transação
-                const newTransactionData = {
+                const newTransactionData: ITransaction = {
                     value: transactionValue,
                     description: description,
                     date: date,
@@ -168,28 +168,41 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                     },
                     isExpense: isExpense,
                     source: context === transactionContext.cardExpense ? 2 : 1,
-                    account: selectedAccount.id,
                     uid: user.uid,
                 };
+
+                // Adiciona `account` ou `creditCard` dependendo do contexto
+                if (selectedAccount) {
+                    newTransactionData.account = selectedAccount.id;
+                } else if (selectedCreditCard) {
+                    newTransactionData.creditCard = selectedCreditCard.id;
+                }
 
                 // Adiciona a nova transação
                 await addDoc(transactionCollectionRef, newTransactionData);
 
                 // Atualiza o valor da conta no Firestore
-                const accountRef = doc(db, 'account', selectedAccount.id);
-                await runTransaction(db, async (transaction) => {
-                    const accountDoc = await getDoc(accountRef);
-                    if (accountDoc.exists()) {
-                        const currentBalance = accountDoc.data().balance || 0;
-                        const newBalance = parseFloat(currentBalance) + updatedValue;
+                if(selectedAccount){
+                    const accountRef = doc(db, 'account', selectedAccount.id);
+                    await runTransaction(db, async (transaction) => {
+                        const accountDoc = await getDoc(accountRef);
+                        if (accountDoc.exists()) {
+                            const currentBalance = accountDoc.data().balance || 0;
+                            const newBalance = parseFloat(currentBalance) + updatedValue;
 
-                        transaction.update(accountRef, { balance: newBalance });
-                    }
-                });
+                            transaction.update(accountRef, { balance: newBalance });
+                        }
+                    });
+                }
 
-                // Busca as transações atualizadas e fecha o modal
                 await fetchTransactions(user);
-                await fetchAccounts(user);
+
+                if (selectedAccount) {
+                    await fetchAccounts(user);
+                } else if (selectedCreditCard) {
+                    await fetchCreditCards(user);
+                }
+
                 handleCloseAndReset();
             }
         } catch (error) {

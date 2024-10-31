@@ -1,12 +1,13 @@
 export interface ITransaction {
-    id: string;
+    id?: string;
     description: string;
     date: Date;
-    category: ICategory;
+    category: ICategory | any;
     isExpense: boolean;
     source: number,
     value: number;
-    account: number;
+    account?: string;
+    creditCard?: string;
     uid: string;
 }
 

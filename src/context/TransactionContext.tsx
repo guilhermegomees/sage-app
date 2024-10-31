@@ -38,6 +38,7 @@ export const TransactionProvider = ({ children } : { children: React.ReactNode }
                 source: doc.data().source,
                 value: doc.data().value,
                 account: doc.data().account,
+                creditCard: doc.data().creditCard,
                 uid: doc.data().uid
             }));
             

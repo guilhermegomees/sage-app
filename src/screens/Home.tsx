@@ -37,39 +37,21 @@ export default function Home() {
 
     // Calcular despesas e receitas
     const { totalExpenses, totalIncome } = transactions.reduce((totals, item) => {
-        if (item.isExpense) {
-            totals.totalExpenses += item.value;
-        } else {
-            totals.totalIncome += item.value;
+        if (!item.creditCard){
+            if (item.isExpense) {
+                totals.totalExpenses += item.value;
+            } else {
+                totals.totalIncome += item.value;
+            }
         }
         return totals;
     }, { totalExpenses: 0, totalIncome: 0 });
 
-    const getCurrentInvoice = (closingDay: number) => {
-        const today = new Date();
-        const currentYear = today.getFullYear();
-        const currentMonth = today.getMonth() + 1;
-    
-        // Crie uma data para o dia de fechamento do mês atual
-        const closingDateThisMonth = new Date(currentYear, currentMonth, closingDay);
-        
-        // Verifique se a data de fechamento já ocorreu
-        if (today > closingDateThisMonth) {
-            // Se já passou do fechamento, retorna o mês atual menos um
-            const previousMonth = currentMonth - 1 <= 0 ? 12 : currentMonth - 1;
-            const previousYear = previousMonth === 12 ? currentYear - 1 : currentYear;
-            return `${previousYear}-${previousMonth.toString().padStart(2, '0')}`;
-        } else {
-            // Caso contrário, retorna o mês atual
-            return `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
-        }
-    };
-
     return (
         <>
             <Header />
-            <ScrollView style={[base.flex_1]}>
-                <View style={[styles.container, base.flex_1, base.alignItemsCenter, base.pt_5, base.gap_25, base.pb_90]}>
+            <ScrollView style={[base.flex_1, { backgroundColor: colors.gray_900 }]}>
+                <View style={[styles.container]}>
                     <View style={[base.flexColumn, base.alignItemsCenter, base.justifyContentCenter, base.gap_8, base.mb_10]}>
                         <Text style={[styles.valueBalance, styles.remainder, !showValues && styles.hideValues]}>R$ {formatValue(totalValue)}</Text>
                         <View style={[base.alignItemsCenter, base.justifyContentCenter, base.flexRow, base.gap_15]}>
@@ -110,7 +92,8 @@ export default function Home() {
                             <Text style={[styles.title]}>Cartões</Text>
                         </View>
                         <View style={[base.gap_20]}>
-                            {creditCards.map((creditCard: ICreditCard)=>{
+                            {creditCards.length > 0 ?
+                                creditCards.map((creditCard: ICreditCard)=>{
                                 // Calcule o valor da fatura atual
                                 const currentInvoice = creditCard.invoices.find(invoice => !invoice.isPaid);
                                 const invoiceValue = formatValue(currentInvoice ? currentInvoice.totalAmount : 0);
@@ -140,11 +123,15 @@ export default function Home() {
                                         </View>
                                     </View>
                                 )
-                            })}
+                            }) : 
+                            <View style={[base.flexColumn, base.alignItemsCenter, base.gap_10, base.my_10]}>
+                                    <Image source={require('../assets/images/no-credit-card.png')} tintColor={colors.gray_100} style={[styles.noCreditCardIcon]} />
+                                <Text style={[styles.emptyCard]}>Você ainda não possui nenhum cartão cadastrado</Text>
+                            </View>}
                         </View>
                     </View>
                     {/* Painel de transações */}
-                    <BottomSheet data={transactions} type={TypeScreem.Account} />
+                    {/* <BottomSheet data={transactions} type={TypeScreem.Account} /> */}
                 </View>
             </ScrollView>
             <FloatingButton/>
@@ -163,8 +150,10 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     container: {
-        backgroundColor: colors.gray_900,
-        paddingHorizontal: 15
+        alignItems: 'center',
+        paddingHorizontal: 15,
+        paddingTop: 5,
+        gap: 25
     },
     entrance: {
         color: colors.green_500,
@@ -347,4 +336,13 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: colors.gray_50
     },
+    emptyCard: {
+        fontFamily: "Outfit_500Medium",
+        fontSize: 16,
+        color: colors.gray_100,
+    },
+    noCreditCardIcon: {
+        width: 60,
+        height: 60
+    }
 })

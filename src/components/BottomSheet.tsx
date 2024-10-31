@@ -15,7 +15,7 @@ interface BottomSheetProps {
 const monthNames = monthsList.map(month => month.substring(0, 3));
 
 function formatValue(value: number, isExpense: boolean): string {
-    const valueStr = value.toString().replace('.', ',');
+    const valueStr = value.toFixed(2).replace('.', ',');
     const minus = isExpense ? '- ' : '';
     return `${minus}R$ ${valueStr}`;
 }
@@ -83,7 +83,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
                     <Text style={[styles.cardValueDifference]}>R$ 1.770</Text>
                 </View>
             }
-            {type === TypeScreem.Account && <Text style={[styles.latestTransactions]}>Últimas transações</Text>}
+            {type === TypeScreem.Account && <Text style={[styles.latestTransactions, styles.lineBottom]}>Últimas transações</Text>}
             {Object.keys(orderedGroupedTransactions).length > 0 && (
                 <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[base.pb_60]}>
                     {Object.entries(orderedGroupedTransactions).map(([date, transactionsForDate]) => {
@@ -136,7 +136,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
             {Object.keys(orderedGroupedTransactions).length === 0 && (
                 <View style={[base.justifyContentCenter, base.alignItemsCenter, base.flex_1, { paddingBottom: type === TypeScreem.Graphics ? 70 : 0 }]}>
                     <View style={[base.justifyContentCenter, base.alignItemsCenter, base.gap_15]}>
-                        <Image source={require('./../assets/images/bankrupt.png')} tintColor={colors.gray_100} style={{ width: 65, height: 65 }} />
+                        <Image source={require('./../assets/images/bankrupt.png')} tintColor={colors.gray_100} style={{ width: 60, height: 60 }} />
                         <Text style={base.emptyMessage}>
                             {type === TypeScreem.Graphics
                                 ? 'Sem transações por aqui!'
@@ -199,18 +199,18 @@ const styles = StyleSheet.create({
     panelTransactions: {
         flex: 1,
         width: '100%',
-        height: 600,
         borderRadius: 15
     },
     latestTransactions: {
         fontFamily: 'Outfit_600SemiBold',
         fontSize: 18,
         marginBottom: 20,
-        color: colors.gray_50
+        color: colors.gray_50,
+        paddingBottom: 20
     },
     date: {
         fontFamily: 'Outfit_500Medium',
-        fontSize: 13,
+        fontSize: 14,
         color: colors.gray_50,
     },
     line: {
@@ -240,12 +240,12 @@ const styles = StyleSheet.create({
     },
     textTransaction: {
         fontFamily: 'Outfit_600SemiBold',
-        fontSize: 12,
+        fontSize: 14,
         color: colors.gray_50
     },
     valueTransaction: {
         fontFamily: 'Outfit_500Medium',
-        fontSize: 12,
+        fontSize: 14,
     },
     divisor: {
         width: 324,
@@ -265,6 +265,10 @@ const styles = StyleSheet.create({
         fontFamily: 'Outfit_600SemiBold',
         color: colors.blue_300,
         fontSize: 12
+    },
+    lineBottom: {
+        borderBottomWidth: 1,
+        borderBottomColor: colors.gray_700,
     },
 })
 

@@ -6,6 +6,7 @@ export const banks: { [key: string]: any } = {
     'Caixa': require('../assets/images/banks/caixa.png'),
     'Clear': require('../assets/images/banks/clear.png'),
     'Daycoval': require('../assets/images/banks/daycoval.png'),
+    'Default': require('../assets/images/banks/default.png'),
     'Inter': require('../assets/images/banks/inter.png'),
     'Itaú': require('../assets/images/banks/itau.png'),
     'Mercado Pago': require('../assets/images/banks/mercadopago.png'),

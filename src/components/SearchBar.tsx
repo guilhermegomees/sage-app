@@ -1,44 +1,49 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, TextInput, StyleSheet } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import colors from '~/css/colors';
 import { FontAwesome6 } from '@expo/vector-icons';
+import base from '~/css/base';
 
 interface SearchBarProps {
-    searchValue: string; 
-    setSearchValue: React.Dispatch<React.SetStateAction<string>>;
+    searchItem: string;
+    setSearchItem: (text: string) => void;
+    placeholder?: string;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ searchValue, setSearchValue }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ searchItem, setSearchItem, placeholder }) => {
     return (
-        <View style={[styles.searchSection, {backgroundColor: colors.gray_800}]}>
-            <FontAwesome6 name="magnifying-glass" size={18} color={colors.gray_300} />
+        <View style={[base.flexRow, base.alignItemsCenter, base.gap_15, base.py_18, styles.lineBottom]}>
+            <View style={[styles.containerIcon, { backgroundColor: colors.gray_600 }]}>
+                <FontAwesome6 name="magnifying-glass" color={colors.white} size={15} />
+            </View>
             <TextInput
-                style={[styles.input, { color: colors.gray_100 }]}
-                placeholder="Pesquisar"
+                placeholder={placeholder || 'Pesquisar'}
                 placeholderTextColor={colors.gray_300}
-                value={searchValue}
-                onChangeText={setSearchValue}
+                style={[styles.searchBar]}
+                value={searchItem}
+                onChangeText={setSearchItem}
             />
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    searchSection: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderRadius: 10,
-        paddingHorizontal: 10,
-        height: 50,
-        gap: 10
+    lineBottom: {
+        borderBottomWidth: 1,
+        borderBottomColor: colors.gray_700
     },
-    input: {
-        fontFamily: 'Outfit_400Regular',
-        flex: 1,
-        height: '100%',
+    containerIcon: {
+        borderRadius: 50,
+        padding: 10,
+        width: 38,
+        height: 38,
+        justifyContent: "center",
+        alignItems: "center"
+    },
+    searchBar: {
+        fontFamily: 'Outfit_500Medium',
         fontSize: 15,
-        paddingVertical: 0
+        color: colors.gray_200
     },
 });
 

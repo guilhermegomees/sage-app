@@ -388,6 +388,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                 getItemIcon={(category) => category.icon}
                 getItemColor={(category) => category.color}
                 getItemName={(category) => category.name}
+                placeholder="Pesquisar categoria"
             />
             <SelectionModal
                 isVisible={isAccountsVisible}
@@ -400,6 +401,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                 contextLabel="conta"
                 getItemIcon={(account) => getBankLogo(account.bankName)}
                 getItemName={(account) => account.name}
+                placeholder="Pesquisar conta"
             />
             <SelectionModal
                 isVisible={isCreditCardVisible}
@@ -412,6 +414,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                 contextLabel="cartão"
                 getItemIcon={(creditCard) => getBankLogo(creditCard.bankName)}
                 getItemName={(creditCard) => creditCard.name}
+                placeholder="Pesquisar cartão"
             />
             <NewCategoryModal
                 isVisible={isNewCategorieVisible}

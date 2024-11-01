@@ -17,7 +17,7 @@ import { useCreditCards } from '~/context/CreditCardContext';
 export default function Home() {
     const { showValues } = useContext(HeaderContext);
     const { transactions, fetchTransactions } = useTransactions();
-    const { accounts, totalValue, fetchAccounts } = useAccounts();
+    const { accounts, totalValue, totalValueWithoutFilter, fetchAccounts } = useAccounts();
     const { creditCards, fetchCreditCards } = useCreditCards();
     const user = useUser();
 
@@ -78,7 +78,7 @@ export default function Home() {
                         </View>
                         <View style={[styles.lineTop, base.mt_15, base.pt_15, base.flexRow, base.justifyContentSpaceBetween]}>
                             <Text style={[styles.title]}>Total</Text>
-                            <Text style={[styles.title]}>R$ {formatValue(totalValue)}</Text>
+                            <Text style={[styles.title]}>R$ {formatValue(totalValueWithoutFilter)}</Text>
                         </View>
                     </View>
                     <View style={[styles.cards]}>

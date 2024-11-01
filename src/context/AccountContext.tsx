@@ -6,6 +6,7 @@ import { IAccount, IUser } from '~/interfaces/interfaces';
 type AccountContextType = {
     accounts: IAccount[];
     totalValue: number,
+    totalValueWithoutFilter: number,
     fetchAccounts: (user: IUser) => Promise<void>;
     updateAccountBalance: (accountId: string, amount: number) => Promise<void>;
 };
@@ -15,6 +16,7 @@ const AccountContext = createContext<AccountContextType | null>(null);
 export const AccountProvider = ({ children }: { children: React.ReactNode }) => {
     const [accounts, setAccounts] = useState<IAccount[]>([]);
     const [totalValue, setTotalValue] = useState<number>(0);
+    const [totalValueWithoutFilter, setTotalValueWithoutFilter] = useState<number>(0);
     const accountCollectionRef = collection(db, "account");
 
     const fetchAccounts = async (user: IUser): Promise<void> => {
@@ -23,7 +25,12 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
             const querySnapshot = await getDocs(q);
             const data: IAccount[] = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as IAccount[];
 
-            // Filtra as contas que devem ser incluídas no total e soma seus valores
+            const totalValueWithoutFilter = data
+            .reduce((acc, account) => {
+                const numericValue = account.balance;
+                return acc + numericValue;
+            }, 0);
+
             const totalValue = data
             .filter(account => account.includeInSum)
             .reduce((acc, account) => {
@@ -32,6 +39,7 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
             }, 0);
 
             setTotalValue(totalValue);
+            setTotalValueWithoutFilter(totalValueWithoutFilter)
             setAccounts(data);
         } catch (error) {
             console.error("Erro ao buscar contas: ", error);
@@ -48,7 +56,7 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
     };
 
     return (
-        <AccountContext.Provider value={{ accounts, totalValue, fetchAccounts, updateAccountBalance }}>
+        <AccountContext.Provider value={{ accounts, totalValue, totalValueWithoutFilter, fetchAccounts, updateAccountBalance }}>
             {children}
         </AccountContext.Provider>
     );

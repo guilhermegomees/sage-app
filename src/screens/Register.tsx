@@ -8,7 +8,7 @@ import { auth, db } from '~/config/firebase';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import PasswordInput from '~/components/PasswordInput';
 import Input from '~/components/Input';
-import { doc, setDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
 
 type RegisterScreenNavigationProp = StackNavigationProp<any, 'Register'>;
 
@@ -19,6 +19,7 @@ const RegisterScreen = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState(''); // Mensagem de erro caso o cadastro falhe
+    const accountCollectionRef = collection(db, "account");
 
     const signIn = async () => {
         if (password !== confirmPassword) {
@@ -40,13 +41,15 @@ const RegisterScreen = () => {
                 });
 
                 // Criar conta default para usuário novo
-                await setDoc(doc(db, 'account', response.user.uid), {
+                const account = {
                     uid: response.user.uid,
                     name: "Carteira",
                     bankName: "Default",
                     includeInSum: true,
                     balance: 0,
-                });
+                };
+
+                await addDoc(accountCollectionRef, account);
             }
 
             navigation.dispatch(

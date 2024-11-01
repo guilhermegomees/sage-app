@@ -3,6 +3,7 @@ import { ScrollView, TextInput, TouchableOpacity, View, Text, Image, StyleSheet,
 import Modal from "react-native-modal";
 import base from "~/css/base";
 import colors from "~/css/colors";
+import SearchBar from "./SearchBar";
 
 interface SelectionModalProps<T> {
     isVisible: boolean;
@@ -17,7 +18,7 @@ interface SelectionModalProps<T> {
     getItemIcon: (item: T) => string | ImageSourcePropType; // Agora aceita tanto string quanto imagem
     getItemColor?: (item: T) => string; // O item de cor é opcional
     getItemName: (item: T) => string;
-    showCreation?: boolean 
+    placeholder?: string;
 }
 
 export const SelectionModal = <T extends { id: string }>({
@@ -33,6 +34,7 @@ export const SelectionModal = <T extends { id: string }>({
     getItemIcon,
     getItemColor,
     getItemName,
+    placeholder,
 }: SelectionModalProps<T>) => (
     <Modal
         isVisible={isVisible}
@@ -42,19 +44,7 @@ export const SelectionModal = <T extends { id: string }>({
     >
         <View style={[styles.container]}>
             <View style={[base.px_20]}>
-                {/* Barra de pesquisa */}
-                <View style={[base.flexRow, base.alignItemsCenter, base.gap_15, base.py_18, styles.lineBottom]}>
-                    <View style={[styles.containerIcon, { backgroundColor: colors.gray_600 }]}>
-                        <FontAwesome6 name="magnifying-glass" color={colors.white} size={15} />
-                    </View>
-                    <TextInput
-                        placeholder={`Pesquisar ${contextLabel}`}
-                        placeholderTextColor={colors.gray_300}
-                        style={[styles.searchBar]}
-                        value={searchItem}
-                        onChangeText={setSearchItem}
-                    />
-                </View>
+                <SearchBar searchItem={searchItem} setSearchItem={setSearchItem} placeholder={placeholder} />
             </View>
             <ScrollView showsVerticalScrollIndicator={false}>
                 {filteredItems.map((item) => {

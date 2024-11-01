@@ -17,6 +17,7 @@ interface SelectionModalProps<T> {
     getItemIcon: (item: T) => string | ImageSourcePropType; // Agora aceita tanto string quanto imagem
     getItemColor?: (item: T) => string; // O item de cor é opcional
     getItemName: (item: T) => string;
+    showCreation?: boolean 
 }
 
 export const SelectionModal = <T extends { id: string }>({
@@ -31,7 +32,7 @@ export const SelectionModal = <T extends { id: string }>({
     contextLabel,
     getItemIcon,
     getItemColor,
-    getItemName
+    getItemName,
 }: SelectionModalProps<T>) => (
     <Modal
         isVisible={isVisible}

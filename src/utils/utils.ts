@@ -8,3 +8,6 @@ export const getBankLogo = (bankName: string) => {
 export const formatValue = (value: number) => {
     return value.toFixed(2).replace('.', ',');
 }
+
+export const formatCurrency = (num: number): string =>
+    `R$ ${num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;

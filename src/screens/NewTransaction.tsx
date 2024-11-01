@@ -11,7 +11,7 @@ import { Calendar } from "~/components/Calendar";
 import { transactionContext } from "~/enums/enums";
 import { useTransactions } from "~/context/TransactionContext";
 import useUser from "~/hooks/useUser";
-import { getBankLogo } from "~/utils/utils";
+import { formatCurrency, getBankLogo } from "~/utils/utils";
 import { useAccounts } from "~/context/AccountContext";
 import { SelectionModal } from "~/components/SelectionModal";
 import { NewCategoryModal } from "~/components/NewCategoryModal";
@@ -57,9 +57,6 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
     const { fetchTransactions } = useTransactions();
     const { accounts, fetchAccounts } = useAccounts();
     const { creditCards, fetchCreditCards } = useCreditCards();
-
-    const formatCurrency = (num: number): string => 
-        `R$ ${num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
     const handleChange = (text: string): void => {
         const numericValue = parseFloat(text.replace(/[^\d]/g, '')) / 100;
@@ -289,11 +286,11 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
     );
 
     const filteredAccounts = accounts.filter(account => 
-        account.name.toLowerCase().includes(searchCategory.toLowerCase())
+        account.name.toLowerCase().includes(searchAccount.toLowerCase())
     );
 
     const filteredCreditCard = creditCards.filter(card =>
-        card.name.toLowerCase().includes(searchCategory.toLowerCase())
+        card.name.toLowerCase().includes(searchCreditCard.toLowerCase())
     );
     
     return (
@@ -304,7 +301,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
             style={[base.justifyContentEnd, base.m_0]}
         >
             <View style={styles.modal}>
-                <View style={styles.containertransactionValue}>
+                <View style={styles.containerTransactionValue}>
                     <Text style={styles.label}>Valor</Text>
                     <TextInput 
                         style={[styles.transactionValue, { color: context === transactionContext.revenue ? colors.green_500 : colors.red_500 }]}
@@ -336,7 +333,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                             <View style={[base.alignItemsCenter, {width: 20}]}>
                                 {selectedCategory
                                     ? <FontAwesome6 name={selectedCategory.icon} color={selectedCategory.color} size={20}/>
-                                    : <FontAwesome6 name="ellipsis" color={colors.gray_100} size={20} style={styles.iconCtgEmpty}/>
+                                    : <FontAwesome6 name="ellipsis" color={colors.gray_100} size={20} style={styles.ellipsisIcon}/>
                                 }
                             </View>
                             <Text style={base.inputText}>{selectedCategory?.name || "Categoria"}</Text>
@@ -354,7 +351,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                                     <Image source={getBankLogo(selectedCreditCard.bankName)} style={[styles.accountIcon]} />
                                 }
                                 {!selectedAccount && !selectedCreditCard &&
-                                    <FontAwesome6 name="ellipsis" color={colors.gray_100} size={20} style={styles.iconCtgEmpty} />
+                                    <FontAwesome6 name="ellipsis" color={colors.gray_100} size={20} style={styles.ellipsisIcon} />
                                 }
                             </View>
                             <Text style={base.inputText}>{context === transactionContext.cardExpense ? selectedCreditCard?.name || "Cartão" : selectedAccount?.name || "Conta"}</Text>
@@ -449,7 +446,7 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 20,
         padding: 20,
     },
-    containertransactionValue: {
+    containerTransactionValue: {
         paddingBottom: 5,
         borderBottomWidth: 1,
         borderBottomColor: colors.gray_600
@@ -464,7 +461,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         gap: 15,
     },
-    iconCtgEmpty: {
+    ellipsisIcon: {
         width: 18,
     },
     label: {

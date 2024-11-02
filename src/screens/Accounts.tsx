@@ -151,7 +151,7 @@ export default function Accounts(){
                 console.error("Erro ao deletar conta e transações: ", error);
             }
         }
-    };    
+    };
 
     const handleChange = (text: string): void => {
         const numericValue = parseFloat(text.replace(/[^\d]/g, '')) / 100;
@@ -165,7 +165,7 @@ export default function Accounts(){
 
     return (
         <View style={[styles.container]}>
-            <View style={[styles.containerBack]}>
+            <View style={[styles.backContainer]}>
                 <TouchableOpacity onPress={handleNavigateToBack} style={[styles.iconBack]}>
                     <FontAwesome6 name="angle-left" size={20} color={colors.gray_50} />
                 </TouchableOpacity>
@@ -177,7 +177,7 @@ export default function Accounts(){
                         return (
                             <TouchableOpacity key={account.id} onPress={() => { 
                                 setSelectedAccount(account); 
-                                setIsOptionsModalVisible(true); 
+                                setIsOptionsModalVisible(true);
                             }}>
                                 <View style={[styles.account]}>
                                     <View style={[base.flexRow, base.alignItemsCenter, base.gap_15]}>
@@ -300,7 +300,7 @@ export default function Accounts(){
             >
                 <View style={[styles.containerOptionsModal]}>
                     <Text style={[styles.labelOptions]}>Opções</Text>
-                    <View style={[base.gap_30]}>
+                    <View style={[base.gap_20]}>
                         <TouchableOpacity onPress={() => {
                             handleEditAccount();
                             setIsOptionsModalVisible(false);
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
         backgroundColor: colors.gray_900,
         padding: 30
     },
-    containerBack: {
+    backContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-start',

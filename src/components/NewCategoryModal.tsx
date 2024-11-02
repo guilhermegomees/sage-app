@@ -9,6 +9,7 @@ interface NewCategoryModalProps {
     nameNewCategory: string | any;
     selectedColor: string;
     selectedIcon: string;
+    title?: string;
     setIsNewCategorieVisible: (visible: boolean) => void;
     setNameNewCtg: (desc: string) => void;
     setIsColorPickerVisible: (visible: boolean) => void;
@@ -16,15 +17,15 @@ interface NewCategoryModalProps {
     createCategory: () => void;
 }
 
-export const NewCategoryModal: React.FC<NewCategoryModalProps> = ({ isVisible, nameNewCategory, selectedColor, selectedIcon, setIsNewCategorieVisible, setNameNewCtg, setIsColorPickerVisible, setIsIconPickerVisible, createCategory }) => (
+export const NewCategoryModal: React.FC<NewCategoryModalProps> = ({ isVisible, nameNewCategory, selectedColor, selectedIcon, title, setIsNewCategorieVisible, setNameNewCtg, setIsColorPickerVisible, setIsIconPickerVisible, createCategory }) => (
     <Modal
         isVisible={isVisible}
         onBackdropPress={() => setIsNewCategorieVisible(false)}
-        backdropOpacity={0.4}
+        backdropOpacity={0.6}
         style={[base.justifyContentEnd, base.m_0]}
     >
         <View style={[styles.contaner]}>
-            <Text style={styles.textNewCtg}>Criar nova categoria</Text>
+            <Text style={styles.textNewCtg}>{title || 'Criar nova categoria'}</Text>
             <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={[base.gap_15]}>
                     <TextInput

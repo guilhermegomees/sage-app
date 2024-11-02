@@ -11,6 +11,7 @@ import { AccountProvider } from '~/context/AccountContext';
 import { GoalProvider } from '~/context/goalContext';
 import { CreditCardsProvider } from '~/context/CreditCardContext';
 import { TransactionProvider } from '~/context/TransactionContext';
+import Categories from '~/screens/Categories';
 
 const Stack = createStackNavigator();
 
@@ -48,8 +49,13 @@ export default function RootStack() {
                                     options={{ headerShown: false }}
                                 />
                                 <Stack.Screen
-                                    name="Account"
+                                    name="Accounts"
                                     component={Accounts}
+                                    options={{ headerShown: false }}
+                                />
+                                <Stack.Screen
+                                    name="Categories"
+                                    component={Categories}
                                     options={{ headerShown: false }}
                                 />
                             </Stack.Navigator>

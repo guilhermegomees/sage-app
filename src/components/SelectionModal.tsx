@@ -57,7 +57,7 @@ export const SelectionModal = <T extends { id: string }>({
                             <View style={[base.flexRow, base.justifyContentSpaceBetween, base.alignItemsCenter, base.w_100, base.py_18]}>
                                 <View style={[base.flexRow, base.alignItemsCenter, base.gap_15]}>
                                     {typeof itemIcon === 'string' ? (
-                                        <View style={[styles.containerIcon, { backgroundColor: itemColor }]}>
+                                        <View style={[styles.iconContainer, { backgroundColor: itemColor }]}>
                                             <FontAwesome6 name={itemIcon} color={colors.white} size={15} />
                                         </View>
                                     ) : (
@@ -87,7 +87,7 @@ export const SelectionModal = <T extends { id: string }>({
                 )}
                 <TouchableOpacity style={[base.px_20, base.pb_10]} onPress={handleNewItem}>
                     <View style={[base.flexRow, base.alignItemsCenter, base.gap_15, base.py_18]}>
-                        <View style={[styles.containerIcon, { backgroundColor: colors.gray_600 }]}>
+                        <View style={[styles.iconContainer, { backgroundColor: colors.gray_600 }]}>
                             <FontAwesome6 name="plus" color={colors.white} size={15} />
                         </View>
                         <Text style={[styles.textCreate]}>Criar nova {contextLabel}</Text>
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
     },
-    containerIcon: {
+    iconContainer: {
         borderRadius: 50,
         padding: 10,
         width: 38,

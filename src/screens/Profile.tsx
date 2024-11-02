@@ -98,8 +98,12 @@ const Profile: React.FC = () => {
         }
     };
 
-    const handleAccount = () => {
-        navigation.navigate('Account');
+    const handleAccounts = () => {
+        navigation.navigate('Accounts');
+    }
+
+    const handleCategories = () => {
+        navigation.navigate('Categories');
     }
 
     const signOutUser = async () => {
@@ -135,7 +139,7 @@ const Profile: React.FC = () => {
                 </View>
             </View>
             <View style={[styles.bottomMenu]}>
-                <TouchableOpacity onPress={handleAccount}>
+                <TouchableOpacity onPress={handleAccounts}>
                     <View style={[styles.containerMenu]}>
                         <View style={[base.flexRow, base.gap_18, base.alignItemsCenter]}>
                             <View style={[styles.containerIcon]}>
@@ -157,15 +161,17 @@ const Profile: React.FC = () => {
                     <FontAwesome6 name="angle-right" size={20} color={colors.gray_100}/>
                 </View>
                 <View style={[styles.line]} />
-                <View style={[styles.containerMenu]}>
-                    <View style={[base.flexRow, base.gap_18, base.alignItemsCenter]}>
-                        <View style={[styles.containerIcon]}>
-                            <FontAwesome6 name="shapes" size={23} color={colors.gray_100}/>
+                <TouchableOpacity onPress={handleCategories}>
+                    <View style={[styles.containerMenu]}>
+                        <View style={[base.flexRow, base.gap_18, base.alignItemsCenter]}>
+                            <View style={[styles.containerIcon]}>
+                                <FontAwesome6 name="shapes" size={23} color={colors.gray_100}/>
+                            </View>
+                            <Text style={[styles.menuText]}>Categorias</Text>
                         </View>
-                        <Text style={[styles.menuText]}>Categorias</Text>
+                        <FontAwesome6 name="angle-right" size={20} color={colors.gray_100}/>
                     </View>
-                    <FontAwesome6 name="angle-right" size={20} color={colors.gray_100}/>
-                </View>
+                </TouchableOpacity>
                 <View style={[styles.line]} />
                 <View style={[styles.containerMenu]}>
                     <View style={[base.flexRow, base.gap_18, base.alignItemsCenter]}>
@@ -265,7 +271,7 @@ const styles = StyleSheet.create({
     menuText: {
         fontFamily: 'Outfit_500Medium',
         fontSize: 16,
-        color: colors.gray_100
+        color: colors.gray_100,
     },
     line: {
         borderBottomWidth: 1,

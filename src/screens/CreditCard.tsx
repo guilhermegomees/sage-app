@@ -2,18 +2,26 @@ import React from 'react';
 import { View, Image, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import BottomSheet from '~/components/BottomSheet';
-import { useNavigation } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { TypeScreem } from '~/enums/enums';
 import colors from '~/css/colors';
 import base from '~/css/base';
 import { useTransactions } from '~/context/TransactionContext';
 import { FontAwesome6 } from '@expo/vector-icons';
+import { ICreditCard } from '~/interfaces/interfaces';
 
-type CardsScreenNavigationProp = StackNavigationProp<any, 'Cards'>;
+type CreditCardScreenNavigationProp = StackNavigationProp<any, 'CreditCard'>;
+type CreditCardScreenRouteProp = RouteProp<StackParamList, 'CreditCard'>;
 
-export default function Cards() {
-    const navigation = useNavigation<CardsScreenNavigationProp>();
+type StackParamList = {
+    CreditCard: { creditCard: ICreditCard };
+};
+
+export default function CreditCard() {
+    const navigation = useNavigation<CreditCardScreenNavigationProp>();
     const { transactions } = useTransactions();
+    const route = useRoute<CreditCardScreenRouteProp>();
+    const { creditCard } = route.params || {};
 
     // Filtra as transações onde source == 2
     const filteredTransactions = transactions.filter(transaction => transaction.source === 2);
@@ -22,13 +30,22 @@ export default function Cards() {
         navigation.navigate('CardDetails');
     };
 
+    const handleNavigateToBack = () => {
+        navigation.goBack();
+    }
+
     return (
         <View style={[styles.container, base.alignItemsCenter, base.flex_1]}>
+            <View style={styles.backContainer}>
+                <TouchableOpacity onPress={handleNavigateToBack} style={styles.iconBack}>
+                    <FontAwesome6 name="angle-left" size={20} color={colors.gray_50} />
+                </TouchableOpacity>
+            </View>
             {/* Card */}
             <View style={[styles.card]}>
                 <View style={[base.p_13, base.flexColumn, base.flexSpaceBetween, base.flex_1]}>
                     <View style={[styles.containerTop]}>
-                        <Text style={[styles.cardName]}>Cartão 1</Text>
+                        <Text style={[styles.cardName]}>{creditCard.name}</Text>
                         <Image source={require('./../assets/images/contactless.png')} style={styles.contactless} />
                     </View>
                     <View style={[styles.containerChip]}>
@@ -57,17 +74,6 @@ export default function Cards() {
                     </TouchableOpacity>
                     <Text style={[styles.textBtnsActions]}>Editar</Text>
                 </View>
-                {/* <View style={[base.alignItemsCenter, base.justifyContentCenter, base.gap_8]}>
-                    <TouchableOpacity>
-                        <View style={[styles.buttonsActions]}>
-                            <View style={[base.flexColumn, base.alignItemsCenter]}>
-                                <Text style={[styles.dueDate]}>10</Text>
-                                <Text style={[styles.dueMonth]}>Abr</Text>
-                            </View>
-                        </View>
-                    </TouchableOpacity>
-                    <Text style={[styles.textBtnsActions]}>Vencimento</Text>
-                </View> */}
             </View>
             {/* Painel de transações */}
             <BottomSheet data={filteredTransactions} type={TypeScreem.Card} />
@@ -78,7 +84,25 @@ export default function Cards() {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: colors.gray_900,
-        paddingTop: 25
+    },
+    backContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        width: '100%',
+        gap: 10,
+        padding: 30,
+    },
+    iconBack: {
+        justifyContent: "center",
+        width: 30,
+        height: 30,
+    },
+    screenTitle: {
+        fontFamily: 'Outfit_600SemiBold',
+        color: colors.gray_50,
+        fontSize: 22,
+        height: 22
     },
     card: {
         width: 288,

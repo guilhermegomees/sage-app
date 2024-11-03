@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { View, StyleSheet, Text, Image, ScrollView, TouchableOpacity } from 'react-native';
-import BottomSheet from '~/components/BottomSheet';
 import Header from '~/components/Header';
 import { HeaderContext } from '~/context/HeaderContext';
 import base from '~/css/base';
@@ -20,8 +19,14 @@ import { db } from '~/config/firebase';
 import AccountModal from '~/components/AccountModal';
 import BankIconModal from '~/components/BankIconModal';
 import { banks } from '~/constants/banks';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+
+type HomeScreenNavigationProp = StackNavigationProp<any, 'Home'>;
 
 export default function Home() {
+    const navigation = useNavigation<HomeScreenNavigationProp>();
+    
     const { showValues } = useContext(HeaderContext);
     const { transactions, fetchTransactions } = useTransactions();
     const { accounts, totalValue, totalValueWithoutFilter, fetchAccounts } = useAccounts();
@@ -249,31 +254,35 @@ export default function Home() {
 
                                 // Verifique a data atual em relação à data de fechamento
                                 const today = new Date();
-                                const closingDate = new Date(today.getFullYear(), today.getMonth() + 1, creditCard.closingDay);
+                                const closingDate = new Date(today.getFullYear(), today.getMonth(), creditCard.closingDay);
                                 const isClosed = today > closingDate;
-                                
+
                                 return (
-                                    <View key={creditCard.id} style={[styles.card]}>
-                                        <View style={[base.flexRow, base.justifyContentSpaceBetween, base.alignItemsCenter]}>
-                                            <Image source={getBankLogo(creditCard.bankName)} style={[styles.cardIcon]} />
-                                            <FontAwesome6 name="angle-right" size={15} color={colors.gray_200} />
-                                        </View>
-                                        <View style={[base.gap_5]}>
-                                            <View style={[base.flexRow, base.justifyContentSpaceBetween]}>
-                                                <Text style={[styles.cardText]}>{creditCard.name}</Text>
-                                                <View style={[base.flexRow]}>
-                                                    <Text style={[styles.cardValue]}>R$ </Text>
-                                                    <Text style={[styles.cardValue, !showValues && styles.hideValues]}>{invoiceValue}</Text>
+                                    <TouchableOpacity key={creditCard.id} onPress={() => {
+                                        navigation.navigate("CreditCard", { creditCard: creditCard });
+                                    }}>
+                                        <View style={[styles.card]}>
+                                            <View style={[base.flexRow, base.justifyContentSpaceBetween, base.alignItemsCenter]}>
+                                                <Image source={getBankLogo(creditCard.bankName)} style={[styles.cardIcon]} />
+                                                <FontAwesome6 name="angle-right" size={15} color={colors.gray_200} />
+                                            </View>
+                                            <View style={[base.gap_5]}>
+                                                <View style={[base.flexRow, base.justifyContentSpaceBetween]}>
+                                                    <Text style={[styles.cardText]}>{creditCard.name}</Text>
+                                                    <View style={[base.flexRow]}>
+                                                        <Text style={[styles.cardValue]}>R$ </Text>
+                                                        <Text style={[styles.cardValue, !showValues && styles.hideValues]}>{invoiceValue}</Text>
+                                                    </View>
+                                                </View>
+                                                <View style={[base.w_100, base.justifyContentEnd, base.alignItemsCenter, base.gap_4, base.flexRow]}>
+                                                    <MaterialIcons name={'circle'} color={isClosed ? colors.red_500 : colors.blue_300} size={7} />
+                                                    <Text style={[styles.invoiceStatus, { color: isClosed ? colors.red_500 : colors.blue_300 }]}>
+                                                        {isClosed ? "Fechada" : "Aberta"}
+                                                    </Text>
                                                 </View>
                                             </View>
-                                            <View style={[base.w_100, base.justifyContentEnd, base.alignItemsCenter, base.gap_4, base.flexRow]}>
-                                                <MaterialIcons name={'circle'} color={isClosed ? colors.red_500 : colors.blue_300} size={7} />
-                                                <Text style={[styles.invoiceStatus, { color: isClosed ? colors.red_500 : colors.blue_300 }]}>
-                                                    {isClosed ? "Fechada" : "Aberta"}
-                                                </Text>
-                                            </View>
                                         </View>
-                                    </View>
+                                    </TouchableOpacity>
                                 )
                             }) : 
                             <View style={[base.flexColumn, base.alignItemsCenter, base.gap_10, base.my_10]}>

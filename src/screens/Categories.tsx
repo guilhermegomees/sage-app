@@ -13,7 +13,7 @@ import Modal from "react-native-modal";
 import { NewCategoryModal } from "~/components/NewCategoryModal";
 import { ColorPickerModal } from "~/components/ColorPickerModal";
 import { IconPickerModal } from "~/components/IconPickerModal";
-import { transactionContext } from "~/enums/enums";
+import OptionsModal from "~/components/OptionsModal";
 
 type CategoriesScreenNavigationProp = StackNavigationProp<any, 'Categories'>;
 
@@ -212,37 +212,13 @@ export default function Categories() {
                     </View>
                 )}
             </View>
-            <Modal
+            <OptionsModal
                 isVisible={isOptionsModalVisible}
-                onBackdropPress={() => { setIsOptionsModalVisible(false) }}
-                backdropOpacity={0.6}
-                style={[base.justifyContentEnd, base.m_0]}
-            >
-                <View style={[styles.containerOptionsModal]}>
-                    <Text style={[styles.labelOptions]}>Opções</Text>
-                    <View style={[base.gap_20]}>
-                        <TouchableOpacity onPress={() => {
-                            handleEditCategory();
-                            setIsOptionsModalVisible(false);
-                        }}>
-                            <View style={[base.flexRow, base.alignItemsCenter, base.gap_20]}>
-                                <View style={[styles.iconContainer]}>
-                                    <FontAwesome6 name='pencil' size={18} color={colors.gray_100} />
-                                </View>
-                                <Text style={[styles.options, { color: colors.gray_100 }]}>Editar categoria</Text>
-                            </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={deleteCategory}>
-                            <View style={[base.flexRow, base.alignItemsCenter, base.gap_20]}>
-                                <View style={[styles.iconContainer]}>
-                                    <FontAwesome6 name='trash' size={18} color={colors.red_500} />
-                                </View>
-                                <Text style={[styles.options, { color: colors.red_500 }]}>Excluir categoria</Text>
-                            </View>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </Modal>
+                contextLabel="categoria"
+                onClose={() => setIsOptionsModalVisible(false)}
+                onEdit={handleEditCategory}
+                onDelete={deleteCategory}
+            />
             <TouchableOpacity style={styles.fabButton} onPress={() => setIsNewCategoryVisible(true)}>
                 <FontAwesome6 name="plus" size={22} color={colors.gray_50} />
             </TouchableOpacity>
@@ -294,6 +270,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Outfit_600SemiBold',
         color: colors.gray_50,
         fontSize: 22,
+        height: 22
     },
     contextFilterContainer: {
         flexDirection: 'row',

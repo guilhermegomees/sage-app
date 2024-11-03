@@ -272,6 +272,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Outfit_500Medium',
         fontSize: 16,
         color: colors.gray_100,
+        height: 16
     },
     line: {
         borderBottomWidth: 1,

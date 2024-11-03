@@ -4,21 +4,19 @@ import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, TextInput, FlatList, Switch } from "react-native";
 import { useAccounts } from "~/context/AccountContext";
 import { IAccount } from "~/interfaces/interfaces";
-import { formatCurrency, formatValue, getBankLogo } from "~/utils/utils";
+import { formatValue, getBankLogo } from "~/utils/utils";
 import base from "~/css/base";
 import colors from "~/css/colors";
 import useUser from "~/hooks/useUser";
 import { FontAwesome6 } from "@expo/vector-icons";
-import Modal from "react-native-modal";
 import { banks } from "~/constants/banks";
-import SearchBar from "~/components/SearchBar";
 import { addDoc, collection, deleteDoc, doc, getDocs, query, setDoc, where } from "firebase/firestore";
 import { db } from "~/config/firebase";
 import { useTransactions } from "~/context/TransactionContext";
 import OptionsModal from "~/components/OptionsModal";
 import ConfirmationModal from "~/components/ConfirmationModal";
 import AccountModal from "~/components/AccountModal";
-import BankIconModal from "~/components/bankIconModal";
+import BankIconModal from "~/components/BankIconModal";
 
 type AccountsScreenNavigationProp = StackNavigationProp<any, 'Accounts'>;
 

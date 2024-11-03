@@ -18,7 +18,7 @@ import ConfirmationModal from '~/components/ConfirmationModal';
 import { addDoc, collection, deleteDoc, doc, getDocs, query, setDoc, where } from 'firebase/firestore';
 import { db } from '~/config/firebase';
 import AccountModal from '~/components/AccountModal';
-import BankIconModal from '~/components/bankIconModal';
+import BankIconModal from '~/components/BankIconModal';
 import { banks } from '~/constants/banks';
 
 export default function Home() {

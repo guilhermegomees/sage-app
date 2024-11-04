@@ -4,22 +4,25 @@ import { FontAwesome6, MaterialIcons } from '@expo/vector-icons';
 import { Bar } from 'react-native-progress';
 import base from '~/css/base';
 import colors from '~/css/colors';
-import { useGoals } from '~/context/goalContext'; // Certifique-se de ter este contexto para buscar metas do Firestore
-import { IGoal } from '~/interfaces/interfaces';
+import { useGoals } from '~/context/goalContext';
+import { GoalModal } from "~/components/GoalModal";
+import { db } from "~/config/firebase";
+import { collection, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 
 export default function Goals() {
     const [filter, setFilter] = useState<'all' | 'completed' | 'incomplete'>('all');
     const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const [goalToDelete, setGoalToDelete] = useState<string | null>(null);
+    const [isNewGoalVisible, setIsNewGoalVisible] = useState(false);
+    const [goalToEdit, setGoalToEdit] = useState(null);
 
-    const { goals, fetchGoals } = useGoals(); // Obtém metas e função de busca do contexto
-    
+    const { goals, fetchGoals } = useGoals();
+
     useEffect(() => {
-        fetchGoals(); // Chama a função para buscar metas ao carregar a tela
+        fetchGoals();
     }, []);
 
-    // Filtra as metas com base no filtro selecionado
     const filteredGoals = goals.filter(goal => {
         if (filter === 'completed') return goal.currentValue >= goal.goalValue;
         if (filter === 'incomplete') return goal.currentValue < goal.goalValue;
@@ -27,11 +30,12 @@ export default function Goals() {
     });
 
     const toggleTooltip = (id: string) => {
-        setSelectedGoal(selectedGoal === id ? null : id); // Alterna a tooltip
+        setSelectedGoal(selectedGoal === id ? null : id);
     };
 
-    const handleEdit = (id: string) => {
-        console.log(`Editar meta com id: ${id}`);
+    const handleEdit = (goal) => {
+        setGoalToEdit(goal); // Define a meta a ser editada
+        setIsNewGoalVisible(true); // Abre o modal de edição
         setSelectedGoal(null);
     };
 
@@ -41,11 +45,16 @@ export default function Goals() {
         setSelectedGoal(null);
     };
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         if (goalToDelete !== null) {
-            console.log(`Excluir meta com id: ${goalToDelete}`);
-            setGoalToDelete(null);
-            setIsModalVisible(false);
+            try {
+                await deleteDoc(doc(db, 'goal', goalToDelete));
+                fetchGoals(); // Atualiza a lista de metas após deletar
+                setGoalToDelete(null);
+                setIsModalVisible(false);
+            } catch (error) {
+                console.error("Erro ao excluir meta: ", error);
+            }
         }
     };
 
@@ -53,6 +62,34 @@ export default function Goals() {
         setGoalToDelete(null);
         setIsModalVisible(false);
     };
+
+    const handleSaveGoal = async (goal) => {
+        console.log("Goal sendo salvo:", goal);
+        if (!goal || !goal.name) {
+            console.error("Goal inválido:", goal);
+            return;
+        }
+        try {
+            if (goalToEdit) {
+                // Editar meta existente
+                await updateDoc(doc(db, 'goal', goalToEdit.id), {
+                    ...goal,
+                    updatedAt: new Date(),
+                });
+                setGoalToEdit(null); // Reseta a meta em edição
+            } else {
+                // Adicionar nova meta
+                await addDoc(collection(db, 'goal'), {
+                    ...goal,
+                    createdAt: new Date(),
+                });
+            }
+            fetchGoals(); // Atualiza a lista de metas após salvar
+        } catch (error) {
+            console.error("Erro ao salvar meta: ", error);
+        }
+    };
+    
 
     return (
         <View style={[styles.container, base.flex_1]}>
@@ -86,7 +123,7 @@ export default function Goals() {
                                 </TouchableOpacity>
                                 {selectedGoal === goal.id && (
                                     <View style={styles.tooltip}>
-                                        <TouchableOpacity onPress={() => handleEdit(goal.id)} style={styles.tooltipOption}>
+                                        <TouchableOpacity onPress={() => handleEdit(goal)} style={styles.tooltipOption}>
                                             <Text style={styles.tooltipText}>Editar</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity onPress={() => handleDelete(goal.id)} style={styles.tooltipOption}>
@@ -110,9 +147,16 @@ export default function Goals() {
                     );
                 })}
             </ScrollView>
-            <TouchableOpacity style={styles.fabButton} onPress={() => console.log('Adicionar nova meta')}>
+            <TouchableOpacity style={styles.fabButton} onPress={() => setIsNewGoalVisible(true)}>
                 <FontAwesome6 name="plus" size={22} color={colors.gray_50} />
             </TouchableOpacity>
+
+            <GoalModal
+                isVisible={isNewGoalVisible}
+                goal={selectedGoal} // Assegure-se de que selectedGoal tem o formato correto
+                setIsNewGoalVisible={setIsNewGoalVisible}
+                onSave={fetchGoals} // ou a função que atualiza a lista de metas
+            />
             <Modal transparent={true} animationType="slide" visible={isModalVisible} onRequestClose={cancelDelete}>
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
@@ -210,7 +254,7 @@ const styles = StyleSheet.create({
     },
     icon: {
         borderRadius: 40,
-        padding: 4,
+        padding: 8,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: colors.blue_600

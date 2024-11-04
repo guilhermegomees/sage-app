@@ -11,7 +11,7 @@ import {
 } from '@env';
 
 const firebaseConfig = {
-	apiKey: REACT_APP_FIREBASE_API_KEY,
+	apiKey: 'AIzaSyBjHpQrtGMeWsmg3BX-jUW8wom7-dQshHg',
 	authDomain: REACT_APP_FIREBASE_AUTH_DOMAIN,
 	projectId: REACT_APP_FIREBASE_PROJECT_ID,
 	storageBucket: REACT_APP_FIREBASE_STORAGE_BUCKET,

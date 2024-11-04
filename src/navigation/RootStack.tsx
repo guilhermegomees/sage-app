@@ -7,6 +7,7 @@ import RegisterScreen from '~/screens/Register';
 import CardDetails from '~/screens/CardDetails';
 import Profile from '~/screens/Profile';
 import Accounts from '~/screens/Accounts';
+import Goals from '~/screens/Goals'
 import { AccountProvider } from '~/context/AccountContext';
 import { GoalProvider } from '~/context/goalContext';
 import { CreditCardsProvider } from '~/context/CreditCardContext';
@@ -56,6 +57,11 @@ export default function RootStack() {
                                 <Stack.Screen
                                     name="Categories"
                                     component={Categories}
+                                    options={{ headerShown: false }}
+                                />
+                                <Stack.Screen
+                                    name="Goals"
+                                    component={Goals}
                                     options={{ headerShown: false }}
                                 />
                             </Stack.Navigator>

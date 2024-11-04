@@ -102,6 +102,10 @@ const Profile: React.FC = () => {
         navigation.navigate('Accounts');
     }
 
+    const handleGoal = () => {
+        navigation.navigate('Goals');
+    }
+
     const handleCategories = () => {
         navigation.navigate('Categories');
     }
@@ -173,6 +177,7 @@ const Profile: React.FC = () => {
                     </View>
                 </TouchableOpacity>
                 <View style={[styles.line]} />
+                <TouchableOpacity onPress={handleGoal}>
                 <View style={[styles.containerMenu]}>
                     <View style={[base.flexRow, base.gap_18, base.alignItemsCenter]}>
                         <View style={[styles.containerIcon]}>
@@ -182,6 +187,7 @@ const Profile: React.FC = () => {
                     </View>
                     <FontAwesome6 name="angle-right" size={20} color={colors.gray_100}/>
                 </View>
+                </TouchableOpacity>
                 <View style={[styles.line]} />
                 <View style={[styles.containerMenu]}>
                     <TouchableOpacity onPress={signOutUser}>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import Modal from 'react-native-modal';
 import Input from './Input';
 import DayPicker from './DayPicker';
@@ -7,25 +7,35 @@ import base from '~/css/base';
 import colors from '~/css/colors';
 import { ICreditCard } from '~/interfaces/interfaces';
 import useUser from '~/hooks/useUser';
-import { doc, setDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
 import { db } from '~/config/firebase';
 import { useCreditCards } from '~/context/CreditCardContext';
+import { FontAwesome6 } from '@expo/vector-icons';
+import { getBankLogo } from '~/utils/utils';
+import BankIconModal from './BankIconModal';
+import { banks } from '~/constants/banks';
 
 interface CreditCardModalProps {
-    creditCard: ICreditCard | null;
+    creditCard?: ICreditCard | null;
     isVisible: boolean;
+    isEditing?: boolean;
     onClose: () => void;
 }
 
-const CreditCardModal: React.FC<CreditCardModalProps> = ({ creditCard, isVisible, onClose }) => {
+const CreditCardModal: React.FC<CreditCardModalProps> = ({ creditCard, isVisible, isEditing, onClose }) => {
     const user = useUser();
     const [name, setName] = useState<string | null>(creditCard?.name || "");
+    const [creditCardIcon, setCreditCardIcon] = useState<string | null>();
     const [limit, setLimit] = useState<number | null>(creditCard?.limit || 0);
     const [selectedClosingDay, setSelectedClosingDay] = useState<number>(creditCard?.closingDay || 1);
     const [selectedDueDay, setSelectedDueDay] = useState<number>(creditCard?.dueDay || 5);
     const [isClosingDayModalVisible, setIsClosingDayModalVisible] = useState<boolean>(false);
     const [isDueDayModalVisible, setIsDueDayModalVisible] = useState<boolean>(false);
     const { fetchCreditCards } = useCreditCards();
+    const creditCardsCollectionRef = collection(db, "creditCard");
+
+    const [isIconModalVisible, setIsIconModalVisible] = useState(false);
+    const [searchCreditCardIcon, setSearchCreditCardIcon] = useState<string>('');
     
     const formatValueInput = (value: any) => {
         if (!value) return '';
@@ -41,27 +51,33 @@ const CreditCardModal: React.FC<CreditCardModalProps> = ({ creditCard, isVisible
     const closeDueDayPicker = () => setIsDueDayModalVisible(false);
 
     const saveCreditCard = async (): Promise<void> => {
-        if (!name || !limit || !selectedClosingDay || !selectedDueDay) {
+        if (!name || !creditCardIcon || !limit || !selectedClosingDay || !selectedDueDay) {
             alert("Por favor, preencha todos os campos antes de continuar.");
             return;
         }
 
         try {
-            if (user && creditCard) {
+            if (user) {
                 const data = {
                     uid: user.uid,
                     name: name,
-                    bankName: creditCard.bankName,
+                    bankName: creditCardIcon || creditCard?.bankName,
                     limit: limit,
                     closingDay: selectedClosingDay,
                     dueDay: selectedDueDay
                 };
 
-                const creditCardDocRef = doc(db, "creditCard", creditCard.id);
-                await setDoc(creditCardDocRef, data);
+                if (isEditing && creditCard) {
+                    // Atualizar cartão existente
+                    const creditCardDocRef = doc(db, "creditCard", creditCard.id);
+                    await setDoc(creditCardDocRef, data);
+                } else {
+                    // Criar novo cartão
+                    await addDoc(creditCardsCollectionRef, data);
+                }
 
+                await fetchCreditCards(user);
                 handleCloseAndReset();
-                fetchCreditCards(user);
             }
         } catch (error) {
             console.error("Erro ao salvar conta: ", error);
@@ -70,13 +86,26 @@ const CreditCardModal: React.FC<CreditCardModalProps> = ({ creditCard, isVisible
 
     const handleCloseAndReset = (): void => {
         onClose();
-        //setIsEditing(false);
+        setName(null);
+        setCreditCardIcon(null);
+        setLimit(null);
+        setSelectedClosingDay(1);
+        setSelectedDueDay(5);
     };
+
+    const handleChangeLimit = (text: string): void => {
+        setLimit(parseInt(text.replace(/[^\d]/g, '')));
+    };
+
+    // Filtra os bancos conforme a busca
+    const filteredBanks = Object.keys(banks)
+        .sort()
+        .filter((key) => key.toLowerCase().includes(searchCreditCardIcon.toLowerCase()));
 
     return (
         <Modal
             isVisible={isVisible}
-            onBackdropPress={onClose}
+            onBackdropPress={handleCloseAndReset}
             backdropOpacity={0.5}
             style={[base.justifyContentEnd, base.m_0]}
         >
@@ -93,6 +122,24 @@ const CreditCardModal: React.FC<CreditCardModalProps> = ({ creditCard, isVisible
                             maxLength={25}
                         />
                     </View>
+                    {!isEditing && (
+                        <View style={[base.gap_10]}>
+                            <Text style={[styles.inputText]}>Ícone do cartão</Text>
+                            <TouchableOpacity style={[base.input, { backgroundColor: colors.gray_825 }]} onPress={() => setIsIconModalVisible(true)}>
+                                <View style={[base.flexRow, base.alignItemsCenter, base.gap_15]}>
+                                    <View style={[base.alignItemsCenter, { width: 20 }]}>
+                                        {creditCardIcon ? (
+                                            <Image source={getBankLogo(creditCardIcon)} style={[styles.creditCardIconModal]} />
+                                        ) : (
+                                            <FontAwesome6 name="ellipsis" color={colors.gray_100} size={20} style={styles.ellipsisIcon} />
+                                        )}
+                                    </View>
+                                    <Text style={base.inputText}>{creditCardIcon || 'Ícone do cartão'}</Text>
+                                </View>
+                                <FontAwesome6 name="angle-right" color={colors.gray_100} size={15} />
+                            </TouchableOpacity>
+                        </View>
+                    )}
                     <View style={[base.gap_10]}>
                         <Text style={[styles.inputText]}>Limite</Text>
                         <Input
@@ -100,7 +147,7 @@ const CreditCardModal: React.FC<CreditCardModalProps> = ({ creditCard, isVisible
                             keyboardType="numeric"
                             placeholder="Limite do cartão"
                             placeholderTextColor={colors.gray_50}
-                            onChangeText={setLimit}
+                            onChangeText={handleChangeLimit}
                             value={formatValueInput(limit)}
                             maxLength={14}
                         />
@@ -130,6 +177,17 @@ const CreditCardModal: React.FC<CreditCardModalProps> = ({ creditCard, isVisible
                     </TouchableOpacity>
                 </View>
             </View>
+            <BankIconModal
+                isVisible={isIconModalVisible}
+                searchItem={searchCreditCardIcon}
+                filteredBanks={filteredBanks}
+                onSearch={setSearchCreditCardIcon}
+                onSelectIcon={(icon: string) => {
+                    setCreditCardIcon(icon);
+                    setIsIconModalVisible(false);
+                }}
+                onClose={() => setIsIconModalVisible(false)}
+            />
         </Modal>
     );
 };
@@ -137,7 +195,6 @@ const CreditCardModal: React.FC<CreditCardModalProps> = ({ creditCard, isVisible
 const styles = StyleSheet.create({
     containerCreditCard: {
         backgroundColor: colors.gray_875,
-        flex: 0.53,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         paddingHorizontal: 20,
@@ -148,6 +205,14 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: colors.white,
         lineHeight: 18,
+    },
+    creditCardIconModal: {
+        borderRadius: 50,
+        width: 25,
+        height: 25
+    },
+    ellipsisIcon: {
+        width: 18
     },
 });
 

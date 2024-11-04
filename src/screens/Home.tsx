@@ -259,7 +259,7 @@ export default function Home() {
 
                                 return (
                                     <TouchableOpacity key={creditCard.id} onPress={() => {
-                                        navigation.navigate("CreditCard", { creditCardId: creditCard.id });
+                                        navigation.navigate("CreditCardDetails", { creditCardId: creditCard.id });
                                     }}>
                                         <View style={[styles.card]}>
                                             <View style={[base.flexRow, base.justifyContentSpaceBetween, base.alignItemsCenter]}>

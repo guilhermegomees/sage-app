@@ -11,7 +11,8 @@ import { GoalProvider } from '~/context/goalContext';
 import { CreditCardsProvider } from '~/context/CreditCardContext';
 import { TransactionProvider } from '~/context/TransactionContext';
 import Categories from '~/screens/Categories';
-import CreditCard from '~/screens/CreditCard';
+import CreditCardDetails from '~/screens/CreditCardDetails';
+import CreditCards from '~/screens/CreditCards';
 
 const Stack = createStackNavigator();
 
@@ -39,8 +40,13 @@ export default function RootStack() {
                                     options={{ headerShown: false }}
                                 />
                                 <Stack.Screen
-                                    name="CreditCard"
-                                    component={CreditCard}
+                                    name="CreditCardDetails"
+                                    component={CreditCardDetails}
+                                    options={{ headerShown: false }}
+                                />
+                                <Stack.Screen
+                                    name="CreditCards"
+                                    component={CreditCards}
                                     options={{ headerShown: false }}
                                 />
                                 <Stack.Screen

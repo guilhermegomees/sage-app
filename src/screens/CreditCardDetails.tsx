@@ -16,6 +16,7 @@ import { collection, deleteDoc, doc, getDocs, query, where, onSnapshot } from 'f
 import { db } from '~/config/firebase';
 import { useCreditCards } from '~/context/CreditCardContext';
 import CreditCardModal from '~/components/CreditCardModal';
+import { formatValue } from '~/utils/utils';
 
 type CreditCardScreenNavigationProp = StackNavigationProp<any, 'CreditCard'>;
 type CreditCardScreenRouteProp = RouteProp<StackParamList, 'CreditCard'>;
@@ -24,7 +25,7 @@ type StackParamList = {
     CreditCard: { creditCardId: string }; // Alterado para receber apenas o ID do cartão
 };
 
-export default function CreditCard() {
+export default function CreditCardDetails() {
     const navigation = useNavigation<CreditCardScreenNavigationProp>();
     const { transactions, fetchTransactions } = useTransactions();
     const { creditCards, fetchCreditCards } = useCreditCards();
@@ -39,7 +40,9 @@ export default function CreditCard() {
     const transactionCollectionRef = collection(db, "transaction");
 
     const filteredTransactions = transactions.filter(transaction => transaction.source === 2);
-    const totalInvoice = filteredTransactions.reduce((acc, transaction) => acc + transaction.value, 0);
+    // Calcule o valor da fatura atual
+    const currentInvoice = creditCards[0].invoices.find(invoice => !invoice.isPaid);
+    const invoiceValue = formatValue(currentInvoice ? currentInvoice.totalAmount : 0);
 
     useEffect(() => {
         if(user && creditCardId){
@@ -169,7 +172,7 @@ export default function CreditCard() {
                         </View>
                         <View style={[base.gap_5]}>
                             <Text style={[styles.title]}>Total da fatura</Text>
-                            <Text style={[styles.label, {color: colors.red_500}]}>R$ {totalInvoice.toFixed(2).replace('.', ',')}</Text>
+                            <Text style={[styles.label, { color: colors.red_500 }]}>R$ {invoiceValue}</Text>
                         </View>
                     </View>
                 </View>
@@ -185,6 +188,7 @@ export default function CreditCard() {
             />
             <CreditCardModal
                 isVisible={isCreditCardModalVisible}
+                isEditing={true}
                 onClose={() => { setIsCreditCardModalVisible(false) }}
                 creditCard={creditCards[0]}
             />

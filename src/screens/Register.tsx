@@ -59,6 +59,7 @@ const RegisterScreen = () => {
             setErrorMessage('Sign in failed: ' + error.message);
         }
     }
+    
     const handleLogin = () => {
         navigation.navigate('Login');
     };

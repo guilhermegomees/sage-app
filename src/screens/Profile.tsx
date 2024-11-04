@@ -3,7 +3,7 @@ import { View, Image, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { getAuth, signOut, updateProfile } from 'firebase/auth';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { CommonActions, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import useUser from '~/hooks/useUser';
@@ -11,13 +11,12 @@ import colors from '~/css/colors';
 import { app, db } from '~/config/firebase';
 import { FontAwesome6 } from '@expo/vector-icons';
 import base from '~/css/base';
-import { AccountProvider } from '~/context/AccountContext';
 
 type ProfileScreenNavigationProp = StackNavigationProp<any, 'Profile'>;
 
 type ProfileScreenRouteProp = RouteProp<StackParamList, 'Profile'>;
 
-export type StackParamList = {
+type StackParamList = {
     Profile: { fromScreen?: string };
 };
 
@@ -278,6 +277,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Outfit_500Medium',
         fontSize: 16,
         color: colors.gray_100,
+        height: 16
     },
     line: {
         borderBottomWidth: 1,

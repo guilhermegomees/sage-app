@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, StyleSheet, Text, Image, ScrollView } from 'react-native';
-import BottomSheet from '~/components/BottomSheet';
+import { View, StyleSheet, Text, Image, ScrollView, TouchableOpacity } from 'react-native';
 import Header from '~/components/Header';
 import { HeaderContext } from '~/context/HeaderContext';
 import base from '~/css/base';
@@ -13,13 +12,45 @@ import { IAccount, ICreditCard } from '~/interfaces/interfaces';
 import { formatValue, getBankLogo } from '~/utils/utils';
 import { useAccounts } from '~/context/AccountContext';
 import { useCreditCards } from '~/context/CreditCardContext';
+import OptionsModal from '~/components/OptionsModal';
+import ConfirmationModal from '~/components/ConfirmationModal';
+import { addDoc, collection, deleteDoc, doc, getDocs, query, setDoc, where } from 'firebase/firestore';
+import { db } from '~/config/firebase';
+import AccountModal from '~/components/AccountModal';
+import BankIconModal from '~/components/BankIconModal';
+import { banks } from '~/constants/banks';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+
+type HomeScreenNavigationProp = StackNavigationProp<any, 'Home'>;
 
 export default function Home() {
+    const navigation = useNavigation<HomeScreenNavigationProp>();
+    
     const { showValues } = useContext(HeaderContext);
     const { transactions, fetchTransactions } = useTransactions();
     const { accounts, totalValue, totalValueWithoutFilter, fetchAccounts } = useAccounts();
     const { creditCards, fetchCreditCards } = useCreditCards();
     const user = useUser();
+
+    const [isAccountModalVisible, setIsAccountModalVisible] = useState<boolean>(false);
+    const [currentBalance, setCurrentBalance] = useState<number>(0);
+    const [accountName, setAccountName] = useState<string>();
+    const [accountIcon, setAccountIcon] = useState<string>();
+    const [includeInSum, setIncludeInSum] = useState<boolean>(true);
+
+    const [isIconModalVisible, setIsIconModalVisible] = useState(false);
+    const [searchAccountIcon, setSearchAccountIcon] = useState<string>('');
+
+    const [isOptionsModalVisible, setIsOptionsModalVisible] = useState<boolean>(false);
+
+    const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [selectedAccount, setSelectedAccount] = useState<IAccount | null>(null);
+
+    const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false);
+
+    const accountCollectionRef = collection(db, "account");
+    const transactionCollectionRef = collection(db, "transaction");
 
     useEffect(() => {
         if (user) {
@@ -41,21 +72,139 @@ export default function Home() {
         return totals;
     }, { totalExpenses: 0, totalIncome: 0 });
 
+    const handleEditAccount = () => {
+        if (selectedAccount) {
+            setAccountName(selectedAccount.name);
+            setAccountIcon(selectedAccount.bankName);
+            setCurrentBalance(selectedAccount.balance);
+            setIncludeInSum(selectedAccount.includeInSum);
+            setIsAccountModalVisible(true);
+            setIsEditing(true);
+            setIsOptionsModalVisible(false);
+        }
+    };
+
+    const saveAccount = async (): Promise<void> => {
+        if (!accountName || !accountIcon || currentBalance === undefined) {
+            alert("Por favor, preencha todos os campos antes de continuar.");
+            return;
+        }
+
+        try {
+            if (user) {
+                const account = {
+                    uid: user.uid,
+                    name: accountName,
+                    bankName: accountIcon,
+                    includeInSum: includeInSum,
+                    balance: currentBalance,
+                };
+
+                if (isEditing && selectedAccount) {
+                    // Atualizar conta existente
+                    const accountDocRef = doc(db, "account", selectedAccount.id);
+                    await setDoc(accountDocRef, account);
+                } else {
+                    // Criar nova conta
+                    await addDoc(accountCollectionRef, account);
+                }
+
+                await fetchAccounts(user);
+                handleCloseAndReset();
+            }
+        } catch (error) {
+            console.error("Erro ao salvar conta: ", error);
+        }
+    };
+
+    const deleteAccount = async () => {
+        if (user && selectedAccount) {
+            try {
+                // Verifica a quantidade de contas antes de deletar
+                const accountsSnapshot = await getDocs(accountCollectionRef);
+                const accountsCount = accountsSnapshot.docs.filter(doc => doc.data().uid === user.uid).length;
+
+                if (accountsCount > 1) {
+                    const transactionsQuery = query(
+                        transactionCollectionRef,
+                        where("account", "==", selectedAccount.id)
+                    );
+
+                    const transactionsSnapshot = await getDocs(transactionsQuery);
+                    const deleteTransactionPromises = transactionsSnapshot.docs.map(transactionDoc =>
+                        deleteDoc(transactionDoc.ref)
+                    );
+
+                    // Aguardar a exclusão de todas as transações
+                    await Promise.all(deleteTransactionPromises);
+
+                    await fetchTransactions(user);
+
+                    const accountDocRef = doc(db, "account", selectedAccount.id);
+                    await deleteDoc(accountDocRef);
+
+                    await fetchAccounts(user);
+                    setIsDeleteConfirmModalVisible(false);
+                    setSelectedAccount(null);
+                } else {
+                    alert("Você deve ter pelo menos uma conta.");
+                    setIsDeleteConfirmModalVisible(false);
+                }
+            } catch (error) {
+                console.error("Erro ao deletar conta e transações: ", error);
+            }
+        }
+    };
+
+    const handleChange = (text: string): void => {
+        const numericValue = parseFloat(text.replace(/[^\d]/g, '')) / 100;
+        setCurrentBalance(numericValue);
+    };
+
+    const handleCloseAndReset = (): void => {
+        setIsAccountModalVisible(false);
+        setCurrentBalance(0);
+        setAccountName('');
+        setAccountIcon('');
+        setIncludeInSum(true);
+        setIsEditing(false);
+        setSelectedAccount(null);
+    };
+
+    // Filtra os bancos conforme a busca
+    const filteredBanks = Object.keys(banks)
+        .sort()
+        .filter((key) => key.toLowerCase().includes(searchAccountIcon.toLowerCase()));
+
+    const confirmDeleteAccount = () => {
+        setIsDeleteConfirmModalVisible(true);
+        setIsOptionsModalVisible(false);
+    };
+
     return (
         <>
             <Header />
             <ScrollView style={[base.flex_1, { backgroundColor: colors.gray_900 }]}>
                 <View style={[styles.container]}>
                     <View style={[base.flexColumn, base.alignItemsCenter, base.justifyContentCenter, base.gap_8, base.mb_10]}>
-                        <Text style={[styles.valueBalance, styles.remainder, !showValues && styles.hideValues]}>R$ {formatValue(totalValue)}</Text>
+                        <View style={[base.flexRow]}>
+                            <Text style={[styles.valueBalance, styles.remainder]}>R$ </Text>
+                            <Text style={[styles.valueBalance, styles.remainder, !showValues && styles.hideValues]}>{formatValue(totalValue)}</Text>
+                        </View>
                         <View style={[base.alignItemsCenter, base.justifyContentCenter, base.flexRow, base.gap_15]}>
                             <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_5]}>
                                 <FontAwesome6 name='caret-up' color={colors.green_500} size={20} />
-                                <Text style={[styles.valueBalance, styles.entrance, !showValues && styles.hideValues, styles.shortText]}>R$ {formatValue(totalIncome)}</Text>
+                                <View style={[base.flexRow]}>
+                                    <Text style={[styles.valueBalance, styles.entrance, styles.shortText]}>R$ </Text>
+                                    <Text style={[styles.valueBalance, styles.entrance, !showValues && styles.hideValues, styles.shortText]}>{formatValue(totalIncome)}</Text>
+                                </View>
                             </View>
                             <View style={[base.flexRow, base.alignItemsCenter, base.justifyContentCenter, base.gap_5]}>
                                 <FontAwesome6 name='caret-down' color={colors.red_500} size={20} />
-                                <Text style={[styles.valueBalance, styles.exits, !showValues && styles.hideValues, styles.shortText]}>R$ {formatValue(totalExpenses)}</Text>
+                                <View style={[base.flexRow]}>
+                                    <Text style={[styles.valueBalance, styles.exits, styles.shortText]}>R$ </Text>
+                                    <Text style={[styles.valueBalance, styles.exits, !showValues && styles.hideValues, styles.shortText]}>{formatValue(totalExpenses)}</Text>
+                                </View>
                             </View>
                         </View>
                     </View>
@@ -66,19 +215,30 @@ export default function Home() {
                         <View style={[base.gap_20]}>
                             {accounts.map((account: IAccount)=>{
                                 return (
-                                    <View key={account.id} style={[styles.account]}>
-                                        <Image source={getBankLogo(account.bankName)} style={[styles.accountIcon]}/>
-                                        <View style={[base.gap_5]}>
-                                            <Text style={[styles.accountText]}>{account.name}</Text>
-                                            <Text style={[styles.accountValue, { color: account.balance < 0 ? colors.red_500 : colors.green_500 }]}>R$ {formatValue(account.balance)}</Text>
+                                    <TouchableOpacity key={account.id} onPress={() => { 
+                                        setSelectedAccount(account); 
+                                        setIsOptionsModalVisible(true);
+                                    }}>
+                                        <View style={[styles.account]}>
+                                            <Image source={getBankLogo(account.bankName)} style={[styles.accountIcon]}/>
+                                            <View style={[base.gap_5]}>
+                                                <Text style={[styles.accountText]}>{account.name}</Text>
+                                                <View style={[base.flexRow]}>
+                                                    <Text style={[styles.accountValue, { color: account.balance < 0 ? colors.red_500 : colors.green_500 }]}>R$ </Text>
+                                                    <Text style={[styles.accountValue, { color: account.balance < 0 ? colors.red_500 : colors.green_500 }, !showValues && styles.hideValues]}>{formatValue(account.balance)}</Text>
+                                                </View>
+                                            </View>
                                         </View>
-                                    </View>
+                                    </TouchableOpacity>
                                 )
                             })}
                         </View>
                         <View style={[styles.lineTop, base.mt_15, base.pt_15, base.flexRow, base.justifyContentSpaceBetween]}>
                             <Text style={[styles.title]}>Total</Text>
-                            <Text style={[styles.title]}>R$ {formatValue(totalValueWithoutFilter)}</Text>
+                            <View style={[base.flexRow]}>
+                                <Text style={[styles.title]}>R$ </Text>
+                                <Text style={[styles.title, !showValues && styles.hideValues]}>{formatValue(totalValueWithoutFilter)}</Text>
+                            </View>
                         </View>
                     </View>
                     <View style={[styles.cards]}>
@@ -94,28 +254,35 @@ export default function Home() {
 
                                 // Verifique a data atual em relação à data de fechamento
                                 const today = new Date();
-                                const closingDate = new Date(today.getFullYear(), today.getMonth() + 1, creditCard.closingDay);
+                                const closingDate = new Date(today.getFullYear(), today.getMonth(), creditCard.closingDay);
                                 const isClosed = today > closingDate;
-                                
+
                                 return (
-                                    <View key={creditCard.id} style={[styles.card]}>
-                                        <View style={[base.flexRow, base.justifyContentSpaceBetween, base.alignItemsCenter]}>
-                                            <Image source={getBankLogo(creditCard.bankName)} style={[styles.cardIcon]} />
-                                            <FontAwesome6 name="angle-right" size={15} color={colors.gray_200} />
-                                        </View>
-                                        <View style={[base.gap_5]}>
-                                            <View style={[base.flexRow, base.justifyContentSpaceBetween]}>
-                                                <Text style={[styles.cardText]}>{creditCard.name}</Text>
-                                                <Text style={[styles.cardValue]}>R$ {invoiceValue}</Text>
+                                    <TouchableOpacity key={creditCard.id} onPress={() => {
+                                        navigation.navigate("CreditCard", { creditCardId: creditCard.id });
+                                    }}>
+                                        <View style={[styles.card]}>
+                                            <View style={[base.flexRow, base.justifyContentSpaceBetween, base.alignItemsCenter]}>
+                                                <Image source={getBankLogo(creditCard.bankName)} style={[styles.cardIcon]} />
+                                                <FontAwesome6 name="angle-right" size={15} color={colors.gray_200} />
                                             </View>
-                                            <View style={[base.w_100, base.justifyContentEnd, base.alignItemsCenter, base.gap_4, base.flexRow]}>
-                                                <MaterialIcons name={'circle'} color={isClosed ? colors.red_500 : colors.blue_300} size={7} />
-                                                <Text style={[styles.invoiceStatus, { color: isClosed ? colors.red_500 : colors.blue_300 }]}>
-                                                    {isClosed ? "Fechada" : "Aberta"}
-                                                </Text>
+                                            <View style={[base.gap_5]}>
+                                                <View style={[base.flexRow, base.justifyContentSpaceBetween]}>
+                                                    <Text style={[styles.cardText]}>{creditCard.name}</Text>
+                                                    <View style={[base.flexRow]}>
+                                                        <Text style={[styles.cardValue]}>R$ </Text>
+                                                        <Text style={[styles.cardValue, !showValues && styles.hideValues]}>{invoiceValue}</Text>
+                                                    </View>
+                                                </View>
+                                                <View style={[base.w_100, base.justifyContentEnd, base.alignItemsCenter, base.gap_4, base.flexRow]}>
+                                                    <MaterialIcons name={'circle'} color={isClosed ? colors.red_500 : colors.blue_300} size={7} />
+                                                    <Text style={[styles.invoiceStatus, { color: isClosed ? colors.red_500 : colors.blue_300 }]}>
+                                                        {isClosed ? "Fechada" : "Aberta"}
+                                                    </Text>
+                                                </View>
                                             </View>
                                         </View>
-                                    </View>
+                                    </TouchableOpacity>
                                 )
                             }) : 
                             <View style={[base.flexColumn, base.alignItemsCenter, base.gap_10, base.my_10]}>
@@ -124,10 +291,48 @@ export default function Home() {
                             </View>}
                         </View>
                     </View>
-                    {/* Painel de transações */}
-                    {/* <BottomSheet data={transactions} type={TypeScreem.Account} /> */}
                 </View>
             </ScrollView>
+            <AccountModal
+                isVisible={isAccountModalVisible}
+                isEditing={isEditing}
+                currentBalance={currentBalance}
+                accountName={accountName}
+                accountIcon={accountIcon}
+                includeInSum={includeInSum}
+                onChangeBalance={handleChange}
+                onChangeAccountName={setAccountName}
+                onToggleIncludeInSum={setIncludeInSum}
+                onSelectIcon={() => setIsIconModalVisible(true)}
+                onClose={handleCloseAndReset}
+                onSave={saveAccount}
+            />
+            <BankIconModal
+                isVisible={isIconModalVisible}
+                searchItem={searchAccountIcon}
+                filteredBanks={filteredBanks}
+                onSearch={setSearchAccountIcon}
+                onSelectIcon={(icon: string) => {
+                    setAccountIcon(icon);
+                    setIsIconModalVisible(false);
+                }}
+                onClose={() => setIsIconModalVisible(false)}
+            />
+            <OptionsModal
+                isVisible={isOptionsModalVisible}
+                contextLabel="conta"
+                onClose={() => setIsOptionsModalVisible(false)}
+                onEdit={handleEditAccount}
+                onDelete={confirmDeleteAccount}
+            />
+            <ConfirmationModal
+                isVisible={isDeleteConfirmModalVisible}
+                onClose={() => setIsDeleteConfirmModalVisible(false)}
+                onConfirm={deleteAccount}
+                confirmationText="Tem certeza que deseja excluir esta conta?"
+                cancelText="Cancelar"
+                confirmText="Confirmar"
+            />
             <FloatingButton/>
         </>
     );

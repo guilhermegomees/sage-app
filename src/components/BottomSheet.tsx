@@ -77,12 +77,12 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ data, type }) => {
             { paddingHorizontal: type === TypeScreem.Transaction || type === TypeScreem.Graphics ? 0 : 25 },
             { backgroundColor: type === TypeScreem.Transaction || type === TypeScreem.Graphics ? 'transparent' : colors.gray_800 }
         ]}>
-            {type === TypeScreem.Card &&
+            {/* {type === TypeScreem.Card &&
                 <View style={[base.alignItemsCenter, base.mb_15, base.gap_10]}>
                     <Text style={[styles.cardValuesLimit]}>R$ 1.430 / R$ 3.200</Text>
                     <Text style={[styles.cardValueDifference]}>R$ 1.770</Text>
                 </View>
-            }
+            } */}
             {type === TypeScreem.Account && <Text style={[styles.latestTransactions, styles.lineBottom]}>Últimas transações</Text>}
             {Object.keys(orderedGroupedTransactions).length > 0 && (
                 <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[base.pb_60]}>

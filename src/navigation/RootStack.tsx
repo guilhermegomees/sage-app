@@ -4,7 +4,6 @@ import React from 'react';
 import MainTabNavigator from '~/navigation/MainTabNavigator';
 import LoginScreen from '~/screens/Login';
 import RegisterScreen from '~/screens/Register';
-import CardDetails from '~/screens/CardDetails';
 import Profile from '~/screens/Profile';
 import Accounts from '~/screens/Accounts';
 import Goals from '~/screens/Goals'
@@ -13,6 +12,7 @@ import { GoalProvider } from '~/context/goalContext';
 import { CreditCardsProvider } from '~/context/CreditCardContext';
 import { TransactionProvider } from '~/context/TransactionContext';
 import Categories from '~/screens/Categories';
+import CreditCard from '~/screens/CreditCard';
 
 const Stack = createStackNavigator();
 
@@ -40,8 +40,8 @@ export default function RootStack() {
                                     options={{ headerShown: false }}
                                 />
                                 <Stack.Screen
-                                    name="CardDetails"
-                                    component={CardDetails}
+                                    name="CreditCard"
+                                    component={CreditCard}
                                     options={{ headerShown: false }}
                                 />
                                 <Stack.Screen

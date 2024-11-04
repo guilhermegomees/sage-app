@@ -1,6 +1,5 @@
 import { StyleSheet } from 'react-native';
 import colors from './colors';
-import { ClipPath } from 'react-native-svg';
 
 export const base = StyleSheet.create({
 	input: {

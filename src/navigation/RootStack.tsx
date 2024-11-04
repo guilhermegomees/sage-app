@@ -4,7 +4,6 @@ import React from 'react';
 import MainTabNavigator from '~/navigation/MainTabNavigator';
 import LoginScreen from '~/screens/Login';
 import RegisterScreen from '~/screens/Register';
-import CardDetails from '~/screens/CardDetails';
 import Profile from '~/screens/Profile';
 import Accounts from '~/screens/Accounts';
 import { AccountProvider } from '~/context/AccountContext';
@@ -42,11 +41,6 @@ export default function RootStack() {
                                 <Stack.Screen
                                     name="CreditCard"
                                     component={CreditCard}
-                                    options={{ headerShown: false }}
-                                />
-                                <Stack.Screen
-                                    name="CardDetails"
-                                    component={CardDetails}
                                     options={{ headerShown: false }}
                                 />
                                 <Stack.Screen

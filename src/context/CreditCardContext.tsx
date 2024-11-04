@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useState } from 'react';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, documentId, getDocs, query, where } from 'firebase/firestore';
 import { ICreditCard, IInvoice, IUser } from '~/interfaces/interfaces';
 import { db } from '~/config/firebase';
 
 type CreditCardContextType = {
     creditCards: ICreditCard[];
-    fetchCreditCards: (user: IUser) => Promise<void>;
+    fetchCreditCards: (user: IUser, id?: string) => Promise<void>;
 };
 
 const CreditCardContext = createContext<CreditCardContextType | null>(null);
@@ -15,9 +15,12 @@ export const CreditCardsProvider = ({ children } : { children: React.ReactNode }
 
 const creditCardCollectionRef = collection(db, "creditCard");
 
-const fetchCreditCards = async (user: IUser): Promise<void> => {
+const fetchCreditCards = async (user: IUser, id?: string): Promise<void> => {
     try {
-        const q = query(creditCardCollectionRef, where("uid", "==", user.uid));
+        const q = id
+            ? query(creditCardCollectionRef, where("uid", "==", user.uid), where(documentId(), "==", id))
+            : query(creditCardCollectionRef, where("uid", "==", user.uid));
+            
         const querySnapshot = await getDocs(q);
         
         // Para cada cartão, busque a subcoleção `invoices`

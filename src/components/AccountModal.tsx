@@ -8,7 +8,7 @@ import { formatCurrency, getBankLogo } from '~/utils/utils';
 
 interface AccountModalProps {
     isVisible: boolean;
-    isEditing: boolean;
+    isEditing?: boolean;
     currentBalance: number;
     accountName: string | undefined;
     accountIcon?: string;
@@ -102,7 +102,7 @@ const AccountModal: React.FC<AccountModalProps> = ({
 const styles = StyleSheet.create({
     createAccountModal: {
         backgroundColor: colors.gray_875,
-        flex: 0.45,
+        flex: 0.37,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         padding: 20,

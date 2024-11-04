@@ -18,6 +18,9 @@ import { NewCategoryModal } from "~/components/NewCategoryModal";
 import { ColorPickerModal } from "~/components/ColorPickerModal";
 import { IconPickerModal } from "~/components/IconPickerModal";
 import { useCreditCards } from "~/context/CreditCardContext";
+import AccountModal from "~/components/AccountModal";
+import BankIconModal from "~/components/BankIconModal";
+import { banks } from "~/constants/banks";
 
 const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { isModalVisible: boolean, context: transactionContext, onClose: () => void }) => {
     const user = useUser();
@@ -50,7 +53,17 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
 
     const [selectedCreditCard, setSelectedCreditCard] = useState<ICreditCard | null>(null);
     const [searchCreditCard, setSearchCreditCard] = useState<string>('');
+
+    const [isNewAccountVisible, setIsNewAccountVisible] = useState<boolean>(false);
+    const [currentBalance, setCurrentBalance] = useState<number>(0);
+    const [accountName, setAccountName] = useState<string>();
+    const [accountIcon, setAccountIcon] = useState<string>();
+    const [includeInSum, setIncludeInSum] = useState<boolean>(true);
+
+    const [isIconModalVisible, setIsIconModalVisible] = useState(false);
+    const [searchAccountIcon, setSearchAccountIcon] = useState<string>('');
     
+    const accountCollectionRef = collection(db, "account");
     const transactionCollectionRef = collection(db, "transaction");
     const categoryCollectionRef = collection(db, "category");
 
@@ -127,6 +140,11 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
     const handleNewCategory = (): void => {
         setIsCategoriesVisible(false);
         setIsNewCategorieVisible(true);
+    };
+
+    const handleNewAccount = (): void => {
+        setIsAccountsVisible(false);
+        setIsNewAccountVisible(true);
     };
 
     const handleSelectColor = (color: string): void => {
@@ -240,6 +258,32 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
         setSelectedColor('#FF6347');
         setSelectedIcon('apple-whole');
     };
+    
+    const createAccount = async (): Promise<void> => {
+        if (!accountName || !accountIcon || currentBalance === undefined) {
+            alert("Por favor, preencha todos os campos antes de continuar.");
+            return;
+        }
+
+        try {
+            if (user) {
+                const account = {
+                    uid: user.uid,
+                    name: accountName,
+                    bankName: accountIcon,
+                    includeInSum: includeInSum,
+                    balance: currentBalance,
+                };
+
+                await addDoc(accountCollectionRef, account);
+                
+                await fetchAccounts(user);
+                handleCloseAndReset();
+            }
+        } catch (error) {
+            console.error("Erro ao salvar conta: ", error);
+        }
+    };
 
     const fetchCategories = async (user: IUser): Promise<void> => {
         try {
@@ -292,6 +336,11 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
     const filteredCreditCard = creditCards.filter(card =>
         card.name.toLowerCase().includes(searchCreditCard.toLowerCase())
     );
+
+    // Filtra os bancos conforme a busca
+    const filteredBanks = Object.keys(banks)
+        .sort()
+        .filter((key) => key.toLowerCase().includes(searchAccountIcon.toLowerCase()));
     
     return (
         <Modal
@@ -396,6 +445,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                 searchItem={searchAccount}
                 setSearchItem={setSearchAccount}
                 handleSelectItem={handleSelectAccount}
+                handleNewItem={handleNewAccount}
                 setIsVisible={setIsAccountsVisible}
                 selectedItem={selectedAccount}
                 contextLabel="conta"
@@ -436,6 +486,30 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                 isVisible={isIconPickerVisible}
                 handleSelectIcon={handleSelectIcon}
                 setIsIconPickerVisible={setIsIconPickerVisible}
+            />
+            <AccountModal
+                isVisible={isNewAccountVisible}
+                currentBalance={currentBalance}
+                accountName={accountName}
+                accountIcon={accountIcon}
+                includeInSum={includeInSum}
+                onChangeBalance={handleChange}
+                onChangeAccountName={setAccountName}
+                onToggleIncludeInSum={setIncludeInSum}
+                onSelectIcon={() => setIsIconModalVisible(true)}
+                onClose={() => {setIsNewAccountVisible(false)}}
+                onSave={createAccount}
+            />
+            <BankIconModal
+                isVisible={isIconModalVisible}
+                searchItem={searchAccountIcon}
+                filteredBanks={filteredBanks}
+                onSearch={setSearchAccountIcon}
+                onSelectIcon={(icon: string) => {
+                    setAccountIcon(icon);
+                    setIsIconModalVisible(false);
+                }}
+                onClose={() => setIsIconModalVisible(false)}
             />
         </Modal>
     );

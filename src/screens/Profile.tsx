@@ -243,7 +243,6 @@ const styles = StyleSheet.create({
     },
     bottomMenu: {
         backgroundColor: colors.gray_800,
-        //height: '63%',
         flex: 1,
         width: '100%',
         borderTopRightRadius: 30,

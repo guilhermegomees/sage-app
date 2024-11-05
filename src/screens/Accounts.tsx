@@ -193,7 +193,7 @@ export default function Accounts(){
                     })}
                 </View>
             </ScrollView>
-            <TouchableOpacity style={styles.fabButton} onPress={() => setIsAccountModalVisible(true)}>
+            <TouchableOpacity style={styles.floatingButton} onPress={() => setIsAccountModalVisible(true)}>
                 <FontAwesome6 name="plus" size={22} color={colors.gray_50} />
             </TouchableOpacity>
             <AccountModal
@@ -223,10 +223,11 @@ export default function Accounts(){
             />
             <OptionsModal
                 isVisible={isOptionsModalVisible}
-                contextLabel="conta"
                 onClose={() => setIsOptionsModalVisible(false)}
-                onEdit={handleEditAccount}
-                onDelete={confirmDeleteAccount}
+                options={[
+                    { label: 'Editar conta', icon: 'pencil', color: colors.gray_100, onPress: handleEditAccount },
+                    { label: 'Excluir conta', icon: 'trash', color: colors.red_500, onPress: confirmDeleteAccount },
+                ]}
             />
             <ConfirmationModal
                 isVisible={isDeleteConfirmModalVisible}
@@ -304,7 +305,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: colors.gray_50,
     },
-    fabButton: {
+    floatingButton: {
         position: 'absolute',
         bottom: 20,
         right: 20,

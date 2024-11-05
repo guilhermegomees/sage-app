@@ -181,10 +181,11 @@ export default function CreditCardDetails() {
             <BottomSheet data={filteredTransactions} type={TypeScreem.Card} />
             <OptionsModal
                 isVisible={isOptionsModalVisible}
-                contextLabel="cartão"
                 onClose={() => setIsOptionsModalVisible(false)}
-                onEdit={handleEditCreditCard}
-                onDelete={confirmDeleteCreditCard}
+                options={[
+                    { label: 'Editar cartão', icon: 'pencil', color: colors.gray_100, onPress: handleEditCreditCard },
+                    { label: 'Excluir cartão', icon: 'trash', color: colors.red_500, onPress: confirmDeleteCreditCard }
+                ]}
             />
             <CreditCardModal
                 isVisible={isCreditCardModalVisible}

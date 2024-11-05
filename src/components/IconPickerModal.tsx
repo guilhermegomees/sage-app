@@ -16,7 +16,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({ isVisible, han
         <Modal
             isVisible={isVisible}
             onBackdropPress={() => setIsIconPickerVisible(false)}
-            backdropOpacity={0}
+            backdropOpacity={0.5}
             style={[base.justifyContentEnd, base.m_0]}
         >
             <View style={styles.modalIconPicker}>

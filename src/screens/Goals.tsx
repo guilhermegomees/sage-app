@@ -1,174 +1,388 @@
 import React, { useState, useEffect } from 'react';
-import { Dimensions, Modal, ScrollView, TouchableOpacity, View, Text, StyleSheet } from 'react-native';
+import { Dimensions, ScrollView, TouchableOpacity, View, Text, StyleSheet } from 'react-native';
 import { FontAwesome6, MaterialIcons } from '@expo/vector-icons';
 import { Bar } from 'react-native-progress';
 import base from '~/css/base';
 import colors from '~/css/colors';
-import { useGoals } from '~/context/goalContext';
-import { GoalModal } from "~/components/GoalModal";
 import { db } from "~/config/firebase";
-import { collection, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, deleteDoc, getDocs, setDoc, getDoc } from 'firebase/firestore';
+import OptionsModal from '~/components/OptionsModal';
+import { useGoals } from '~/context/GoalContext';
+import { IGoal } from '~/interfaces/interfaces';
+import ConfirmationModal from '~/components/ConfirmationModal';
+import useUser from '~/hooks/useUser';
+import GoalModal from '~/components/GoalModal';
+import NoData from '~/components/NoData';
+import Modal from "react-native-modal";
+import Input from '~/components/Input';
 
 export default function Goals() {
+    const user = useUser();
     const [filter, setFilter] = useState<'all' | 'completed' | 'incomplete'>('all');
-    const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
-    const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-    const [goalToDelete, setGoalToDelete] = useState<string | null>(null);
+    const [selectedGoal, setSelectedGoal] = useState<IGoal | null>(null);
     const [isNewGoalVisible, setIsNewGoalVisible] = useState(false);
-    const [goalToEdit, setGoalToEdit] = useState(null);
+    const [isOptionsModalVisible, setIsOptionsModalVisible] = useState<boolean>(false);
+
+    const [name, setName] = useState<string | null>(null);
+    const [goalValue, setGoalValue] = useState<number | null>(null);
+    const [initialValue, setInitialValue] = useState<number | null>(null);
+    const [icon, setIcon] = useState<string>('guitar');
+    const [color, setColor] = useState<string>('#FF6347');
+    const [isEditing, setIsEditing] = useState<boolean>(false);
+
+    const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false);
+
+    const [isIconModalVisible, setIsIconModalVisible] = useState(false);
+    const [isColorModalVisible, setIsColorModalVisible] = useState(false);
+
+    const [endDate, setEndDate] = useState<string>('');
+    const [tempEndDate, setTempEndDate] = useState<string>('');
+    const [formattedDate, setFormattedDate] = useState<string>('');
+    const [isCalendarVisible, setIsCalendarVisible] = useState(false);
+
+    const [isDepositModalVisible, setIsDepositModalVisible] = useState<boolean>(false);
+    const [currentDepositValue, setCurrentDepositValue] = useState<number | null>(null);
+
+    const goalCollectionRef = collection(db, "goal");
 
     const { goals, fetchGoals } = useGoals();
 
     useEffect(() => {
-        fetchGoals();
-    }, []);
+        if(user){
+            fetchGoals(user);
+        }
+    }, [user]);
 
     const filteredGoals = goals.filter(goal => {
-        if (filter === 'completed') return goal.currentValue >= goal.goalValue;
-        if (filter === 'incomplete') return goal.currentValue < goal.goalValue;
+        if (filter === 'completed') return goal.isCompleted;
+        if (filter === 'incomplete') return !goal.isCompleted;
         return true;
     });
 
-    const toggleTooltip = (id: string) => {
-        setSelectedGoal(selectedGoal === id ? null : id);
+    const handleEditGoal = () => {
+        if (selectedGoal) {
+            setName(selectedGoal.name);
+            setIcon(selectedGoal.icon);
+            setColor(selectedGoal.color);
+            setGoalValue(selectedGoal.goalValue);
+            setInitialValue(selectedGoal.initialValue);
+            setEndDate(selectedGoal.endDate);
+            setFormattedDate(formatDate(selectedGoal.endDate));
+            setIsNewGoalVisible(true);
+            setIsEditing(true);
+            setIsOptionsModalVisible(false);
+        }
     };
 
-    const handleEdit = (goal) => {
-        setGoalToEdit(goal); // Define a meta a ser editada
-        setIsNewGoalVisible(true); // Abre o modal de edição
-        setSelectedGoal(null);
-    };
+    const formatDate = (date: string) => {
+        const [year, month, day] = date.split("-");
+        return new Date(Number(year), Number(month) - 1, Number(day)).toLocaleDateString('pt-BR');
+    }
 
-    const handleDelete = (id: string) => {
-        setGoalToDelete(id);
-        setIsModalVisible(true);
-        setSelectedGoal(null);
-    };
-
-    const confirmDelete = async () => {
-        if (goalToDelete !== null) {
+    const deleteGoal = async () => {
+        if (user && selectedGoal) {
             try {
-                await deleteDoc(doc(db, 'goal', goalToDelete));
-                fetchGoals(); // Atualiza a lista de metas após deletar
-                setGoalToDelete(null);
-                setIsModalVisible(false);
+                const goalDocRef = doc(db, "goal", selectedGoal.id);
+                await deleteDoc(goalDocRef);
+
+                await fetchGoals(user);
+                handleCloseAndReset();
+                setIsDeleteConfirmModalVisible(false);
             } catch (error) {
-                console.error("Erro ao excluir meta: ", error);
+                console.error("Erro ao deletar meta: ", error);
             }
         }
     };
 
-    const cancelDelete = () => {
-        setGoalToDelete(null);
-        setIsModalVisible(false);
+    const confirmDeleteGoal = () => {
+        setIsDeleteConfirmModalVisible(true);
+        setIsOptionsModalVisible(false);
     };
 
-    const handleSaveGoal = async (goal) => {
-        console.log("Goal sendo salvo:", goal);
-        if (!goal || !goal.name) {
-            console.error("Goal inválido:", goal);
+    const saveGoal = async (): Promise<void> => {
+        if (!name || !icon || !goalValue || !endDate) {
+            alert("Por favor, preencha todos os campos antes de continuar.");
             return;
         }
-        try {
-            if (goalToEdit) {
-                // Editar meta existente
-                await updateDoc(doc(db, 'goal', goalToEdit.id), {
-                    ...goal,
-                    updatedAt: new Date(),
-                });
-                setGoalToEdit(null); // Reseta a meta em edição
-            } else {
-                // Adicionar nova meta
-                await addDoc(collection(db, 'goal'), {
-                    ...goal,
-                    createdAt: new Date(),
-                });
+
+        if(initialValue && goalValue){
+            if(initialValue > goalValue){
+                alert("O valor inicial não pode ser maior que o valor da meta!");
+                return;
             }
-            fetchGoals(); // Atualiza a lista de metas após salvar
+        }
+    
+        try {
+            if (user) {
+                const goal = {
+                    uid: user.uid,
+                    name: name,
+                    icon: icon,
+                    color: color,
+                    goalValue: goalValue,
+                    initialValue: initialValue,
+                    endDate: endDate,
+                    isCompleted: initialValue == goalValue,
+                    currentValue: 0
+                };
+    
+                if (isEditing && selectedGoal) {
+                    // Atualizar meta existente
+                    const goalDocRef = doc(db, "goal", selectedGoal.id);
+                    await setDoc(goalDocRef, goal);
+                } else {
+                    // Criar nova meta
+                    await addDoc(goalCollectionRef, goal);
+                }
+    
+                await fetchGoals(user);
+                handleCloseAndReset();
+            }
         } catch (error) {
-            console.error("Erro ao salvar meta: ", error);
+            console.error("Erro ao salvar conta: ", error);
         }
     };
+
+    const handleCloseAndReset = (): void => {
+        setIsNewGoalVisible(false);
+        setIsEditing(false);
+        setSelectedGoal(null);
+        resetStates();
+    };
+
+    const resetStates = () => {
+        setName(null);
+        setIcon('guitar');
+        setColor('#FF6347');
+        setGoalValue(null);
+        setInitialValue(null);
+        setEndDate('');
+        setTempEndDate('');
+        setFormattedDate('');
+    }
+
+    const handleSelectTempDate = (date: string): void => setTempEndDate(date);
+
+    const handleSelectDate = (): void => {
+        setEndDate(tempEndDate);
+        setFormattedDate(formatDate(tempEndDate));
+        setIsCalendarVisible(false);
+    };
+
+    const handleCancelCalendar = (): void => {
+        setTempEndDate(endDate);
+        setIsCalendarVisible(false);
+    };
+
+    const daysUntilTargetDate = (targetDate: string): string => {
+        const currentDate = new Date();
+        const target = new Date(targetDate);
+        target.setHours(target.getHours() + 3);
     
+        // Ajusta a data target para o horário local, eliminando o deslocamento UTC
+        const targetLocal = new Date(target.getFullYear(), target.getMonth(), target.getDate());
+    
+        // Calcula a diferença em milissegundos e converte para dias
+        const differenceInTime = targetLocal.getTime() - currentDate.setHours(0, 0, 0, 0);
+        const differenceInDays = Math.floor(differenceInTime / (1000 * 60 * 60 * 24));
+    
+        // Formata a data de vencimento no estilo desejado (e.g., "05 de nov de 2024")
+        const formattedDate = targetLocal.toLocaleDateString('pt-BR', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        }).replace('.', ''); // Remove ponto final do mês
+        
+        // Retorna o texto apropriado com base na diferença de dias
+        if (differenceInDays > 0) {
+            return `Restam: ${differenceInDays} ${differenceInDays === 1 ? 'dia' : 'dias'}`;
+        } else {
+            return `Venceu em: ${formattedDate}`;
+        }
+    };
+
+    const formatValueInput = (value: any) => {
+        if (!value) return '';
+
+        const parsedValue = parseFloat(value.toString().replace(/[^0-9]/g, ''));
+        return `R$ ${!isNaN(parsedValue) ? parsedValue.toLocaleString('pt-BR') : ''}`;
+    };
+
+    const addDeposit = async () => {
+        try {
+            if (selectedGoal && currentDepositValue && user) {
+                const documentRef = doc(db, "goal", selectedGoal.id);
+                const docSnapshot = await getDoc(documentRef);
+        
+                if (docSnapshot.exists()) {
+                    const documentData = docSnapshot.data();
+                    const { initialValue, goalValue, currentValue = 0 } = documentData;
+
+                    // Soma o depósito ao valor atual
+                    let newCurrentValue = currentValue + currentDepositValue;
+
+                    if((newCurrentValue + initialValue) > goalValue){
+                        newCurrentValue = goalValue - initialValue;
+                    }
+
+                    // Calcula se a meta foi atingida ou ultrapassada
+                    const isCompleted = newCurrentValue >= goalValue || (newCurrentValue + initialValue) >= goalValue;
+
+                    // Atualiza o documento com newCurrentValue e, se aplicável, isCompleted
+                    await updateDoc(documentRef, {
+                        currentValue: newCurrentValue,
+                        ...(isCompleted && { isCompleted: true })
+                    });
+                    await fetchGoals(user);
+                    setIsDepositModalVisible(false);
+                    setCurrentDepositValue(null);
+                }
+            }
+        } catch (error) {
+            console.error("Erro ao fazer depósito:", error);
+        }
+    }
 
     return (
         <View style={[styles.container, base.flex_1]}>
             <View style={styles.filterContainer}>
                 <TouchableOpacity onPress={() => setFilter('all')} style={[styles.filter, filter === 'all' && styles.activeFilter]}>
-                    <Text style={[styles.filterText]}>Geral</Text>
+                    <Text style={[styles.filterText, filter === 'all' && styles.activeFilterText]}>Geral</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => setFilter('completed')} style={[styles.filter, filter === 'completed' && styles.activeFilter]}>
-                    <Text style={[styles.filterText]}>Alcançadas</Text>
+                    <Text style={[styles.filterText, filter === 'completed' && styles.activeFilterText]}>Alcançadas</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => setFilter('incomplete')} style={[styles.filter, filter === 'incomplete' && styles.activeFilter]}>
-                    <Text style={[styles.filterText]}>Pendentes</Text>
+                    <Text style={[styles.filterText, filter === 'incomplete' && styles.activeFilterText]}>Pendentes</Text>
                 </TouchableOpacity>
             </View>
-            <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-                {filteredGoals.map((goal) => {
-                    const progress = goal.currentValue / goal.goalValue;
-                    const percentage = (progress * 100).toFixed(0);
+            {filteredGoals.length >= 1 ?
+                <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+                    {filteredGoals.map((goal) => {
+                        if(!goal.initialValue) goal.initialValue = 0;
+                        if(!goal?.currentValue) goal.currentValue = 0;
+                        
+                        const currentValue = goal.initialValue + goal.currentValue;
+                        const progress = currentValue / goal.goalValue;
+                        const percentage = (progress * 100).toFixed(0);
+                        const daysRemaining = daysUntilTargetDate(goal.endDate);
 
-                    return (
-                        <View key={goal.id} style={styles.goalContainer}>
-                            <View style={[styles.infoContainer]}>
-                                <View style={[base.flexRow, base.gap_13, base.alignItemsCenter]}>
-                                    <View style={[styles.icon]}>
-                                        <FontAwesome6 name={goal.icon} size={28} color={colors.gray_900} />
+                        return (
+                            <TouchableOpacity key={goal.id} onPress={() => {
+                                setIsOptionsModalVisible(true);
+                                setSelectedGoal(goal);
+                            }}>
+                                <View style={styles.goalContainer}>
+                                    <View style={[base.flexRow, base.gap_13, base.alignItemsCenter]}>
+                                        <View style={[styles.icon, {backgroundColor: goal.color}]}>
+                                            <FontAwesome6 name={goal.icon} size={20} color={colors.gray_100} />
+                                        </View>
+                                        <Text style={styles.text}>{goal.name}</Text>
                                     </View>
-                                    <Text style={styles.text}>{goal.name}</Text>
+                                    <View style={[base.gap_8]}>
+                                        <View style={[styles.progressContainer]}>
+                                            <Bar
+                                                progress={progress}
+                                                width={Dimensions.get('window').width * 0.9 - 15}
+                                                height={18}
+                                                unfilledColor={colors.gray_750}
+                                                borderWidth={0}
+                                                borderRadius={20}
+                                                color={goal.color}
+                                                animated={true}
+                                            />
+                                            <View style={styles.percentageContainer}>
+                                                <Text style={styles.textPercentage}>{percentage}%</Text>
+                                            </View>
+                                        </View>
+                                        <Text style={styles.textValue}>R$ {currentValue.toLocaleString('pt-br')} de R$ {goal.goalValue.toLocaleString('pt-br')}</Text>
+                                        <Text style={styles.textValue}>{daysRemaining}</Text>
+                                    </View>
                                 </View>
-                                <TouchableOpacity onPress={() => toggleTooltip(goal.id)}>
-                                    <FontAwesome6 name="ellipsis-vertical" size={20} color={colors.gray_300} />
-                                </TouchableOpacity>
-                                {selectedGoal === goal.id && (
-                                    <View style={styles.tooltip}>
-                                        <TouchableOpacity onPress={() => handleEdit(goal)} style={styles.tooltipOption}>
-                                            <Text style={styles.tooltipText}>Editar</Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity onPress={() => handleDelete(goal.id)} style={styles.tooltipOption}>
-                                            <Text style={styles.tooltipText}>Excluir</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                )}
-                            </View>
-                            <View style={[base.gap_8]}>
-                                <View style={[styles.progressContainer]}>
-                                    <Bar progress={progress} width={Dimensions.get('window').width * 0.9 - 15} height={18} unfilledColor={colors.gray_750} borderWidth={0} borderRadius={20} color={colors.blue_600} animated={true} />
-                                    <View style={styles.percentageContainer}>
-                                        <Text style={styles.textPercentage}>{percentage}%</Text>
-                                    </View>
-                                </View>
-                                <Text style={styles.textValue}>
-                                    R$ {goal.currentValue.toLocaleString('pt-BR')} de R$ {goal.goalValue.toLocaleString('pt-BR')}
-                                </Text>
-                            </View>
-                        </View>
-                    );
-                })}
-            </ScrollView>
-            <TouchableOpacity style={styles.fabButton} onPress={() => setIsNewGoalVisible(true)}>
-                <FontAwesome6 name="plus" size={22} color={colors.gray_50} />
-            </TouchableOpacity>
-
+                            </TouchableOpacity>
+                        );
+                    })}
+                </ScrollView> : 
+                <NoData
+                    title="Nenhuma meta encontrada"
+                    subTitle="Clique no botão abaixo para adicionar sua primeira meta e começar a alcançar seus objetivos!"
+                    buttonText="Adicionar meta"
+                    buttonAction={() => {setIsNewGoalVisible(true); setIsEditing(false)}}
+                />
+            }
+            {filteredGoals.length >= 1 && (
+                <TouchableOpacity style={styles.floatingButton} onPress={() => {setIsNewGoalVisible(true); setIsEditing(false)}}>
+                    <FontAwesome6 name="plus" size={22} color={colors.gray_50} />
+                </TouchableOpacity>
+            )}
             <GoalModal
                 isVisible={isNewGoalVisible}
-                goal={selectedGoal} // Assegure-se de que selectedGoal tem o formato correto
-                setIsNewGoalVisible={setIsNewGoalVisible}
-                onSave={fetchGoals} // ou a função que atualiza a lista de metas
+                name={name}
+                icon={icon}
+                color={color}
+                goalValue={goalValue}
+                initialValue={initialValue}
+                endDate={endDate}
+                tempEndDate={tempEndDate}
+                formattedDate={formattedDate}
+                setName={setName}
+                setIcon={setIcon}
+                setColor={setColor}
+                setGoalValue={setGoalValue}
+                setInitialValue={setInitialValue}
+                onClose={() => {
+                    setIsNewGoalVisible(false);
+                    resetStates();
+                }}
+                onSave={saveGoal}
+                isIconPickerVisible={isIconModalVisible}
+                isColorPickerVisible={isColorModalVisible}
+                setIsIconPickerVisible={setIsIconModalVisible}
+                setIsColorPickerVisible={setIsColorModalVisible}
+                isCalendarVisible={isCalendarVisible}
+                setIsCalendarVisible={() => setIsCalendarVisible(true)}
+                handleSelectDate={handleSelectDate}
+                handleSelectTempDate={handleSelectTempDate}
+                handleCancelCalendar={handleCancelCalendar}
             />
-            <Modal transparent={true} animationType="slide" visible={isModalVisible} onRequestClose={cancelDelete}>
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                        <Text style={styles.modalText}>Deseja realmente apagar essa meta?</Text>
-                        <View style={styles.modalButtons}>
-                            <TouchableOpacity style={styles.modalButton} onPress={confirmDelete}>
-                                <Text style={styles.modalButtonText}>Sim</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.modalButton} onPress={cancelDelete}>
-                                <Text style={styles.modalButtonText}>Não</Text>
-                            </TouchableOpacity>
-                        </View>
+            <OptionsModal
+                isVisible={isOptionsModalVisible}
+                onClose={() => setIsOptionsModalVisible(false)}
+                options={[
+                    { label: 'Adicionar depósito', icon: 'money-bill', color: colors.gray_100, disabled: selectedGoal?.isCompleted, onPress: () => { setIsDepositModalVisible(true) } },
+                    { label: 'Editar meta', icon: 'pencil', color: colors.gray_100, onPress: handleEditGoal },
+                    { label: 'Excluir meta', icon: 'trash', color: colors.red_500, onPress: confirmDeleteGoal }
+                ]}
+            />
+            <ConfirmationModal
+                isVisible={isDeleteConfirmModalVisible}
+                onClose={() => setIsDeleteConfirmModalVisible(false)}
+                onConfirm={deleteGoal}
+                confirmationText="Tem certeza que deseja excluir esta meta?"
+                cancelText="Cancelar"
+                confirmText="Confirmar"
+            />
+            <Modal
+                isVisible={isDepositModalVisible}
+                onBackdropPress={() => { setIsDepositModalVisible(false); setCurrentDepositValue(null); }}
+                backdropOpacity={0.5}
+                style={[base.justifyContentEnd, base.m_0]}
+            >
+                <View style={styles.containerModalAddDeposit}>
+                    <Text style={styles.modalTitle}>Adicionar depósito</Text>
+                    <View style={[base.gap_30]}>
+                        <Input
+                            styleInput={[base.input, { backgroundColor: colors.gray_800 }]}
+                            keyboardType="numeric"
+                            placeholder="R$ 0,00"
+                            placeholderTextColor={colors.gray_400}
+                            onChangeText={(value: string) => { setCurrentDepositValue(parseInt(value.replace(/[^\d]/g, ''))); }}
+                            value={formatValueInput(currentDepositValue)}
+                            maxLength={14}
+                        />
+                        <TouchableOpacity style={[base.button, base.btnSave, base.w_100, base.mt_5]} onPress={addDeposit}>
+                            <Text style={[base.btnText]}>Salvar</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </Modal>
@@ -208,10 +422,13 @@ const styles = StyleSheet.create({
     filterText: {
         fontFamily: 'Outfit_600SemiBold',
         color: colors.gray_200,
-        fontSize: 14,
+        fontSize: 16,
     },
     activeFilter: {
         backgroundColor: colors.blue_600
+    },
+    activeFilterText: {
+        color: colors.gray_100
     },
     scrollContainer: {
         flexGrow: 1,
@@ -221,7 +438,6 @@ const styles = StyleSheet.create({
     },
     goalContainer: {
         flexDirection: 'column',
-        alignItems: 'center',
         justifyContent: 'center',
         gap: 20,
         paddingHorizontal: 15,
@@ -337,10 +553,10 @@ const styles = StyleSheet.create({
         fontFamily: 'Outfit_600SemiBold',
         fontSize: 12,
     },
-    fabButton: {
+    floatingButton: {
         position: 'absolute',
-        bottom: 90,
-        right: 10,
+        bottom: 80,
+        right: 20,
         width: 60,
         height: 60,
         borderRadius: 30,
@@ -352,5 +568,21 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.8,
         shadowRadius: 2,
         elevation: 5,
+    },
+    containerModalAddDeposit: {
+        backgroundColor: colors.gray_900,
+        padding: 30,
+        gap: 25,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20
+    },
+    modalTitle: {
+        fontFamily: 'Outfit_600SemiBold',
+        fontSize: 22,
+        color: colors.gray_100,
+        width: '100%',
+        borderBottomColor: colors.gray_700,
+        borderBottomWidth: 1,
+        paddingBottom: 20
     },
 });

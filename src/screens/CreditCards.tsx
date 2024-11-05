@@ -10,6 +10,7 @@ import useUser from "~/hooks/useUser";
 import { FontAwesome6, MaterialIcons } from "@expo/vector-icons";
 import { useCreditCards } from "~/context/CreditCardContext";
 import CreditCardModal from "~/components/CreditCardModal";
+import NoData from "~/components/NoData";
 
 type CreditCardsScreenNavigationProp = StackNavigationProp<any, 'CreditCards'>;
 
@@ -39,10 +40,10 @@ export default function CreditCards() {
                 </TouchableOpacity>
                 <Text style={[styles.screenTitle]}>Cartões</Text>
             </View>
-            <ScrollView showsVerticalScrollIndicator={false}>
-                <View style={[base.gap_10]}>
-                    {creditCards.length > 0 ?
-                        creditCards.map((creditCard: ICreditCard) => {
+            {creditCards.length >= 1 ?
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    <View style={[base.gap_10]}>
+                        {creditCards.map((creditCard: ICreditCard) => {
                             // Calcule o valor da fatura atual
                             const currentInvoice = creditCard.invoices.find(invoice => !invoice.isPaid);
                             const invoiceValue = formatValue(currentInvoice ? currentInvoice.totalAmount : 0);
@@ -79,16 +80,20 @@ export default function CreditCards() {
                                     </View>
                                 </TouchableOpacity>
                             )
-                        }) :
-                        <View style={[base.flexColumn, base.alignItemsCenter, base.gap_10, base.my_10]}>
-                            <Image source={require('../assets/images/no-credit-card.png')} tintColor={colors.gray_100} style={[styles.noCreditCardIcon]} />
-                            <Text style={[styles.emptyCard]}>Você ainda não possui nenhum cartão cadastrado</Text>
-                        </View>}
-                </View>
-            </ScrollView>
-            <TouchableOpacity style={styles.fabButton} onPress={() => setIsCreditCardModalVisible(true)}>
-                <FontAwesome6 name="plus" size={22} color={colors.gray_50} />
-            </TouchableOpacity>
+                        })}
+                    </View>
+                </ScrollView> : 
+                <NoData
+                    title="Nenhum cartão cadastrado"
+                    subTitle="Clique no botão abaixo para adicionar seu cartão para que possamos te ajudar a controlar suas finanças!"
+                    buttonText="Adicionar cartão"
+                    buttonAction={() => setIsCreditCardModalVisible(true)}
+                />}
+            {creditCards.length >= 1 && (
+                <TouchableOpacity style={styles.floatingButton} onPress={() => setIsCreditCardModalVisible(true)}>
+                    <FontAwesome6 name="plus" size={22} color={colors.gray_50} />
+                </TouchableOpacity>
+            )}
             <CreditCardModal
                 isVisible={isCreditCardModalVisible}
                 onClose={() => { setIsCreditCardModalVisible(false) }}
@@ -121,7 +126,7 @@ const styles = StyleSheet.create({
         color: colors.gray_50,
         fontSize: 22,
     },
-    fabButton: {
+    floatingButton: {
         position: 'absolute',
         bottom: 20,
         right: 20,

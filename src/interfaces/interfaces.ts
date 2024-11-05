@@ -23,10 +23,13 @@ export interface ICategory {
 export interface IGoal {
     id: string;
     name: string;
-    currentValue: number;
+    initialValue: number;
     goalValue: number;
-    icon: any;
+    currentValue: number;
+    icon: string;
+    color: string;
     isCompleted: boolean;
+    endDate: string;
 }
 
 export interface IUser {

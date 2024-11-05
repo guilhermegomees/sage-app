@@ -60,7 +60,7 @@ const FloatingButton: React.FC = () => {
 
     return (
         <>
-            <View style={[styles.fabButton]}>
+            <View style={[styles.floatingButton]}>
                 <Animated.View style={[styles.circle, styles.insideCircles, { bottom: icon_1 }]}>
                     <TouchableOpacity onPress={() => { toggleModal(context.revenue) }}>
                         <FontAwesome6 name={"arrow-trend-up"} size={22} color={colors.green_500} />
@@ -111,9 +111,9 @@ const styles = StyleSheet.create({
     insideCircles: {
         backgroundColor: colors.gray_700
     },
-    fabButton: {
+    floatingButton: {
         position: 'absolute',
         bottom: 40,
-        right: -30
+        right: -20
     },
 });

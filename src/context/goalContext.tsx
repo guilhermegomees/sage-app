@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
-import { IGoal } from '~/interfaces/interfaces';
+import { IGoal, IUser } from '~/interfaces/interfaces';
 import { db } from '~/config/firebase';
 
 type GoalContextType = {
     goals: IGoal[];
-    fetchGoals: () => Promise<void>;
+    fetchGoals: (user: IUser) => Promise<void>;
 };
 
 const GoalContext = createContext<GoalContextType | null>(null);
@@ -21,10 +21,13 @@ export const GoalProvider = ({ children } : { children: React.ReactNode }) => {
             const data: IGoal[] = querySnapshot.docs.map(doc => ({
                 id: doc.id,
                 name: doc.data().name,
-                currentValue: doc.data().currentValue,
+                initialValue: doc.data().initialValue,
                 goalValue: doc.data().goalValue,
+                currentValue: doc.data().currentValue,
                 icon: doc.data().icon,
+                color: doc.data().color,
                 isCompleted: doc.data().isCompleted,
+                endDate: doc.data().endDate
             }));
             
             setGoals(data);

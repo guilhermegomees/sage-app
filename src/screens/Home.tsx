@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { View, StyleSheet, Text, Image, ScrollView, TouchableOpacity } from 'react-native';
 import Header from '~/components/Header';
 import { HeaderContext } from '~/context/HeaderContext';
@@ -19,7 +19,7 @@ import { db } from '~/config/firebase';
 import AccountModal from '~/components/AccountModal';
 import BankIconModal from '~/components/BankIconModal';
 import { banks } from '~/constants/banks';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 type HomeScreenNavigationProp = StackNavigationProp<any, 'Home'>;
@@ -251,7 +251,7 @@ export default function Home() {
                                 <FontAwesome6 name="angle-right" size={15} color={colors.gray_100} />
                             </TouchableOpacity>
                         </View>
-                        <View style={[base.gap_20]}>
+                        <View style={[base.gap_10]}>
                             {creditCards.length > 0 ?
                                 creditCards.map((creditCard: ICreditCard)=>{
                                 // Calcule o valor da fatura atual

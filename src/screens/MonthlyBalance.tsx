@@ -170,12 +170,14 @@ export default function MonthlyBalance() {
     
     return (
         <View style={[styles.container, base.flex_1]}>
-            <PeriodSelector
-                currentPeriod={`${monthNames[startMonth - 1]}. ${year} - ${monthNames[endMonth - 1]}. ${year}`}
-                onPrevPeriod={() => handlePeriodChange('prev')}
-                onNextPeriod={() => handlePeriodChange('next')}
-                chart={charts.bar}
-            />
+            <View style={[base.mt_15]}>
+                <PeriodSelector
+                    currentPeriod={`${monthNames[startMonth - 1]}. ${year} - ${monthNames[endMonth - 1]}. ${year}`}
+                    onPrevPeriod={() => handlePeriodChange('prev')}
+                    onNextPeriod={() => handlePeriodChange('next')}
+                    chart={charts.bar}
+                />
+            </View>
             <View style={[styles.chartContainer]}>
                 <VictoryChart theme={VictoryTheme.material} domainPadding={50} height={270} padding={{ top: 10, bottom: 40, left: 80, right: 20 }}>
                     <VictoryAxis

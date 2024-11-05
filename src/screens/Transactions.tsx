@@ -23,8 +23,8 @@ export default function Transactions() {
 
     return (
         <View style={[styles.container]}>
-            <View style={[base.mb_20, base.mt_25, base.mx_2]}>
-                <SearchBar searchValue={searchTransaction} setSearchValue={setSearchTransaction} />
+            <View style={[base.mb_20, base.mx_2]}>
+                <SearchBar searchItem={searchTransaction} setSearchItem={setSearchTransaction} />
             </View>
             <BottomSheet data={filteredTransactions} type={TypeScreem.Transaction} />
         </View>

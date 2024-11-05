@@ -5,7 +5,7 @@ import base from "~/css/base";
 import colors from "~/css/colors";
 import { FontAwesome6, Octicons } from "@expo/vector-icons";
 import { IAccount, ICategory, ICreditCard, ITransaction, IUser } from "~/interfaces/interfaces";
-import { addDoc, collection, doc, getDoc, getDocs, query, runTransaction, where } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, getDocs, increment, query, runTransaction, where } from "firebase/firestore";
 import { db } from "~/config/firebase";
 import { Calendar } from "~/components/Calendar";
 import { transactionContext } from "~/enums/enums";
@@ -21,6 +21,7 @@ import { useCreditCards } from "~/context/CreditCardContext";
 import AccountModal from "~/components/AccountModal";
 import BankIconModal from "~/components/BankIconModal";
 import { banks } from "~/constants/banks";
+import InstallmentPicker from "~/components/InstallmentPicker";
 
 const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { isModalVisible: boolean, context: transactionContext, onClose: () => void }) => {
     const user = useUser();
@@ -32,6 +33,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
     const [isCalendarVisible, setIsCalendarVisible] = useState(false);
     const [isAccountsVisible, setIsAccountsVisible] = useState(false);
     const [isCreditCardVisible, setIsCreditCardVisible] = useState(false);
+    const [isInstallmentModalVisible, setIsInstallmentModalVisible] = useState<boolean>(false);
 
     const [transactionValue, setTransactionValue] = useState<number>(0);
     const [description, setDescription] = useState<string>('');
@@ -41,7 +43,8 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
     const [nameNewCategory, setNameNewCategory] = useState<string>('');
     const [selectedColor, setSelectedColor] = useState<string>('#FF6347');
     const [selectedIcon, setSelectedIcon] = useState<string>('apple-whole');
-
+    const [selectedInstallment, setSelectedInstallment] = useState<number>(1);
+    
     const today = new Date();
     today.setHours(today.getHours() - 3);
     const [selectedDate, setSelectedDate] = useState<string>(today.toISOString().split('T')[0]);
@@ -135,6 +138,8 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
         setSelectedDate(today.toISOString().split('T')[0]);
         setSelectedCategory(null);
         setSelectedAccount(null);
+        setSelectedCreditCard(null);
+        setSelectedInstallment(1);
     };
 
     const handleNewCategory = (): void => {
@@ -162,62 +167,90 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
             alert("Por favor, preencha todos os campos antes de continuar.");
             return;
         }
-
+    
         try {
             if (user) {
                 const date = new Date(selectedDate);
                 date.setHours(date.getHours() + 3);
-
-                const isExpense = context != transactionContext.revenue;
+    
+                const isExpense = context !== transactionContext.revenue;
                 const updatedValue = isExpense ? -transactionValue : transactionValue;
-
-                // Cria os dados da nova transação
-                const newTransactionData: ITransaction = {
-                    value: transactionValue,
-                    description: description,
-                    date: date,
-                    category: {
-                        id: selectedCategory.id,
-                        color: selectedCategory.color,
-                        icon: selectedCategory.icon,
-                    },
-                    isExpense: isExpense,
-                    source: context === transactionContext.cardExpense ? 2 : 1,
-                    uid: user.uid,
-                };
-
-                // Adiciona `account` ou `creditCard` dependendo do contexto
-                if (selectedAccount) {
-                    newTransactionData.account = selectedAccount.id;
-                } else if (selectedCreditCard) {
-                    newTransactionData.creditCard = selectedCreditCard.id;
+    
+                const isInstallment = selectedCreditCard && selectedInstallment && selectedInstallment > 1;
+                const installmentValue = transactionValue / (selectedInstallment || 1);
+    
+                for (let i = 0; i < (isInstallment ? selectedInstallment : 1); i++) {
+                    const installmentDate = new Date(date);
+                    installmentDate.setMonth(installmentDate.getMonth() + i);
+    
+                    const installmentTransactionData: ITransaction = {
+                        value: installmentValue,
+                        description: `${description}${isInstallment ? ` - ${i + 1}/${selectedInstallment}` : ''}`,
+                        date: installmentDate,
+                        category: {
+                            id: selectedCategory.id,
+                            color: selectedCategory.color,
+                            icon: selectedCategory.icon,
+                        },
+                        isExpense: isExpense,
+                        source: context === transactionContext.cardExpense ? 2 : 1,
+                        uid: user.uid,
+                    };
+    
+                    if (selectedAccount) {
+                        installmentTransactionData.account = selectedAccount.id;
+                    } else if (selectedCreditCard) {
+                        installmentTransactionData.creditCard = selectedCreditCard.id;
+                    }
+    
+                    // Adiciona a nova transação (ou parcela) ao Firestore
+                    await addDoc(transactionCollectionRef, installmentTransactionData);
+    
+                    if (selectedCreditCard) {
+                        const cardRef = doc(db, 'creditCard', selectedCreditCard.id);
+                        const monthKey = `${installmentDate.getFullYear()}-${String(installmentDate.getMonth() + 1).padStart(2, '0')}`;
+                        const invoiceRef = doc(cardRef, 'invoices', monthKey);
+    
+                        // Adiciona ou atualiza a fatura do mês correspondente
+                        await runTransaction(db, async (transaction) => {
+                            const invoiceDoc = await transaction.get(invoiceRef);
+    
+                            if (invoiceDoc.exists()) {
+                                // Incrementa o total da fatura existente
+                                transaction.update(invoiceRef, {
+                                    totalAmount: increment(installmentValue)
+                                });
+                            } else {
+                                // Cria uma nova fatura se não existir
+                                transaction.set(invoiceRef, {
+                                    isPaid: false,
+                                    month: monthKey,
+                                    totalAmount: installmentValue
+                                });
+                            }
+                        });
+                    }
                 }
-
-                // Adiciona a nova transação
-                await addDoc(transactionCollectionRef, newTransactionData);
-
-                // Atualiza o valor da conta no Firestore
-                if(selectedAccount){
+    
+                if (selectedAccount) {
                     const accountRef = doc(db, 'account', selectedAccount.id);
                     await runTransaction(db, async (transaction) => {
-                        const accountDoc = await getDoc(accountRef);
+                        const accountDoc = await transaction.get(accountRef);
                         if (accountDoc.exists()) {
                             const currentBalance = accountDoc.data().balance || 0;
                             const newBalance = parseFloat(currentBalance) + updatedValue;
-
                             transaction.update(accountRef, { balance: newBalance });
                         }
                     });
                 }
-
+    
                 await fetchTransactions(user);
-
                 if (selectedAccount) {
                     await fetchAccounts(user);
                 } else if (selectedCreditCard) {
                     await fetchCreditCards(user);
                 }
-
+    
                 handleCloseAndReset();
             }
         } catch (error) {
@@ -389,7 +422,7 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                         </View>
                         <FontAwesome6 name="angle-right" color={colors.gray_100} size={15} />
                     </TouchableOpacity>
-                    {/* Conta */}
+                    {/* Conta ou Cartão */}
                     <TouchableOpacity style={[base.input, { backgroundColor: colors.gray_825 }]} onPress={context === transactionContext.cardExpense ? openCreditCardModal : openAccountModal}>
                         <View style={styles.row}>
                             <View style={[base.alignItemsCenter, {width: 20}]}>
@@ -407,6 +440,15 @@ const NewTransaction: React.FC<any> = ({ isModalVisible, context, onClose } : { 
                         </View>
                         <FontAwesome6 name="angle-right" color={colors.gray_100} size={15} />
                     </TouchableOpacity>
+                    {context === transactionContext.cardExpense && (
+                        <InstallmentPicker
+                            isVisible={isInstallmentModalVisible}
+                            selectedInstallment={selectedInstallment}
+                            setSelectedInstallment={setSelectedInstallment}
+                            setIsVisible={() => setIsInstallmentModalVisible(true)}
+                            onClose={() => setIsInstallmentModalVisible(false)}
+                        />
+                    )}
                 </View>
                 <View style={[base.flexRow, base.justifyContentSpaceBetween, base.mt_30]}>
                     <TouchableOpacity style={[base.button, base.btnCancel]} onPress={handleCloseAndReset}>

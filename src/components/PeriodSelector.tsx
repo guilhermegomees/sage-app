@@ -2,6 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { monthsList } from '~/constants/monthsList';
+import base from '~/css/base';
 import colors from '~/css/colors';
 import { charts } from '~/enums/enums';
 
@@ -31,6 +32,8 @@ const PeriodSelector: React.FC<PeriodSelectorProps> = ({ currentPeriod, currentY
             return <MaterialIcons name="chevron-left" size={28} color={colors.gray_50} />;
         } else if (chart === charts.pie) {
             return <Text style={styles.month}>{prevMonth}</Text>;
+        } else {
+            return <MaterialIcons name="chevron-left" size={28} color={colors.gray_50} />
         }
     };
 
@@ -39,13 +42,15 @@ const PeriodSelector: React.FC<PeriodSelectorProps> = ({ currentPeriod, currentY
             return <MaterialIcons name="chevron-right" size={28} color={colors.gray_50} />;
         } else if (chart === charts.pie) {
             return <Text style={styles.month}>{nextMonth}</Text>;
+        } else {
+            return <MaterialIcons name="chevron-right" size={28} color={colors.gray_50} />
         }
     };
 
     return (
         <View style={styles.container}>
-            <View style={styles.periodSelector}>
-                <TouchableOpacity onPress={onPrevPeriod}>
+            <View style={[styles.periodSelector]}>
+                <TouchableOpacity onPress={onPrevPeriod} style={[base.me_35]}>
                     {renderLeftContent()}
                 </TouchableOpacity>
                 <Text
@@ -56,11 +61,11 @@ const PeriodSelector: React.FC<PeriodSelectorProps> = ({ currentPeriod, currentY
                     ]}>
                     {currentPeriod}
                 </Text>
-                <TouchableOpacity onPress={onNextPeriod}>
+                <TouchableOpacity onPress={onNextPeriod} style={[base.ms_35]}>
                     {renderRightContent()}
                 </TouchableOpacity>
             </View>
-            {chart === charts.pie && (
+            {(chart === charts.pie || !chart) && (
                 <Text style={styles.currentYear}>{currentYear}</Text>
             )}
         </View>
@@ -81,15 +86,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         alignItems: 'center',
-        marginTop: 15,
-        marginBottom: 5,
-        width: '90%',
     },
     currentPeriod: {
         fontFamily: 'Outfit_600SemiBold',
-        color: colors.white,        
+        color: colors.white,
         textAlign: 'center',
-        height: 25
+        height: 20
     },
     month: {
         color: colors.gray_100,

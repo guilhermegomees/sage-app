@@ -39,7 +39,7 @@ export const SelectionModal = <T extends { id: string }>({
     <Modal
         isVisible={isVisible}
         onBackdropPress={() => setIsVisible(false)}
-        backdropOpacity={0.4}
+        backdropOpacity={0.5}
         style={[base.justifyContentEnd, base.m_0]}
     >
         <View style={[styles.container]}>

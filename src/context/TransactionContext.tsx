@@ -1,17 +1,20 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, documentId, getDocs, query, where } from 'firebase/firestore';
 import { ITransaction, IUser } from '~/interfaces/interfaces';
 import { db } from '~/config/firebase';
 
 type TransactionContextType = {
     transactions: ITransaction[];
+    cardTransactions: ITransaction[];
     fetchTransactions: (user: IUser) => Promise<void>;
+    fetchCardTransactions: (user: IUser, cardId: string) => Promise<void>;
 };
 
 const TransactionContext = createContext<TransactionContextType | null>(null);
 
 export const TransactionProvider = ({ children } : { children: React.ReactNode }) => {
     const [transactions, setTransactions] = useState<ITransaction[]>([]);
+    const [cardTransactions, setCardTransactions] = useState<ITransaction[]>([]);
 
     const transactionCollectionRef = collection(db, "transaction");
 
@@ -48,8 +51,31 @@ export const TransactionProvider = ({ children } : { children: React.ReactNode }
         }
     };
 
+    const fetchCardTransactions = async (user: IUser, cardId: string): Promise<void> => {
+        try {
+            const q = query(transactionCollectionRef, where("uid", "==", user.uid), where("creditCard", "==", cardId));
+            const querySnapshot = await getDocs(q);
+            const data: ITransaction[] = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                description: doc.data().description,
+                date: convertToDate(doc.data().date),
+                category: doc.data().category,
+                isExpense: doc.data().isExpense,
+                source: doc.data().source,
+                value: doc.data().value,
+                account: doc.data().account,
+                creditCard: doc.data().creditCard,
+                uid: doc.data().uid
+            }));
+            
+            setCardTransactions(data);
+        } catch (error) {
+            console.error("Erro ao buscar transações: ", error);
+        }
+    };
+
     return (
-        <TransactionContext.Provider value={{ transactions, fetchTransactions }}>
+        <TransactionContext.Provider value={{ transactions, cardTransactions, fetchTransactions, fetchCardTransactions }}>
             {children}
         </TransactionContext.Provider>
     );

@@ -15,7 +15,7 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({ isVisible, h
         <Modal
             isVisible={isVisible}
             onBackdropPress={() => setIsColorPickerVisible(false)}
-            backdropOpacity={0}
+            backdropOpacity={0.5}
             style={[base.justifyContentEnd, base.m_0]}
         >
             <View style={styles.modalColorPicker}>

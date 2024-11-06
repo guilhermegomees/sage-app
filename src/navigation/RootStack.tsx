@@ -8,13 +8,13 @@ import Profile from '~/screens/Profile';
 import Accounts from '~/screens/Accounts';
 import Goals from '~/screens/Goals'
 import { AccountProvider } from '~/context/AccountContext';
-import { GoalProvider } from '~/context/goalContext';
 import { CreditCardsProvider } from '~/context/CreditCardContext';
 import { TransactionProvider } from '~/context/TransactionContext';
 import Categories from '~/screens/Categories';
 import CreditCardDetails from '~/screens/CreditCardDetails';
 import CreditCards from '~/screens/CreditCards';
 import EditProfile from '~/screens/EditProfile';
+import { GoalProvider } from '~/context/goalContext';
 
 const Stack = createStackNavigator();
 

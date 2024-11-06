@@ -14,6 +14,7 @@ import { NewCategoryModal } from "~/components/NewCategoryModal";
 import { ColorPickerModal } from "~/components/ColorPickerModal";
 import { IconPickerModal } from "~/components/IconPickerModal";
 import OptionsModal from "~/components/OptionsModal";
+import NoData from "~/components/NoData";
 
 type CategoriesScreenNavigationProp = StackNavigationProp<any, 'Categories'>;
 
@@ -206,20 +207,23 @@ export default function Categories() {
                         </View>
                     </ScrollView>
                 ) : (
-                    <View style={[base.flex_1, base.justifyContentCenter, base.alignItemsCenter, base.gap_10, base.px_10]}>
-                        <Image source={require('./../assets/images/no-category.png')} tintColor={colors.gray_100} style={{ width: 115, height: 115 }} />
-                        <Text style={[styles.noCategory]}>Ops! Você ainda não possui nenhuma categoria de {selectedContext === 2 ? 'despesa' : 'receita'}. Use o botão de adicionar para começar!</Text>
-                    </View>
+                    <NoData
+                        title="Nenhuma categoria encontrada"
+                        subTitle="Quer uma visão mais organizada dos seus gastos? Adicione uma nova categoria clicando no botão abaixo!"
+                        buttonText="Adicionar categoria"
+                        buttonAction={() => setIsNewCategoryVisible(true)}
+                    />
                 )}
             </View>
             <OptionsModal
                 isVisible={isOptionsModalVisible}
-                contextLabel="categoria"
                 onClose={() => setIsOptionsModalVisible(false)}
-                onEdit={handleEditCategory}
-                onDelete={deleteCategory}
+                options={[
+                    { label: 'Editar categoria', icon: 'pencil', color: colors.gray_100, onPress: handleEditCategory },
+                    { label: 'Excluir categoria', icon: 'trash', color: colors.red_500, onPress: deleteCategory },
+                ]}
             />
-            <TouchableOpacity style={styles.fabButton} onPress={() => setIsNewCategoryVisible(true)}>
+            <TouchableOpacity style={styles.floatingButton} onPress={() => setIsNewCategoryVisible(true)}>
                 <FontAwesome6 name="plus" size={22} color={colors.gray_50} />
             </TouchableOpacity>
             <NewCategoryModal
@@ -338,7 +342,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Outfit_500Medium',
         fontSize: 20,
     },
-    fabButton: {
+    floatingButton: {
         position: 'absolute',
         bottom: 20,
         right: 20,

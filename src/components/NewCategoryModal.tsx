@@ -21,7 +21,7 @@ export const NewCategoryModal: React.FC<NewCategoryModalProps> = ({ isVisible, n
     <Modal
         isVisible={isVisible}
         onBackdropPress={() => setIsNewCategorieVisible(false)}
-        backdropOpacity={0.6}
+        backdropOpacity={0.5}
         style={[base.justifyContentEnd, base.m_0]}
     >
         <View style={[styles.contaner]}>

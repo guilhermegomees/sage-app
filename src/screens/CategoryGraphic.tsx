@@ -24,12 +24,17 @@ export default function CategoryGraphic() {
 
 	useEffect(() => {
 		const filteredTransactions = transactions.filter(transaction => {
-			const transactionMonth = new Date(transaction.date).getMonth();
+			const transactionDate = new Date(transaction.date);
+			const transactionMonth = transactionDate.getMonth();
+			const transactionYear = transactionDate.getFullYear();
+		
 			const isCorrectMonth = transactionMonth === monthsList.indexOf(month);
-			const isCorrectType = filter === 'expense' ? transaction.isExpense : transaction.isExpense === false;
-			return isCorrectMonth && isCorrectType;
+			const isCorrectYear = transactionYear === year; // Adiciona a verificação do ano
+			const isCorrectType = filter === 'expense' ? transaction.isExpense : !transaction.isExpense;
+		
+			return isCorrectMonth && isCorrectYear && isCorrectType;
 		});
-
+		
 		const total = filteredTransactions.reduce((acc, transaction) => acc + transaction.value, 0);
 		setTotalExpenses(total);
 
@@ -56,15 +61,30 @@ export default function CategoryGraphic() {
 		setMonth(prevMonth => {
 			const currentIndex = monthsList.indexOf(prevMonth);
 			const newIndex = (currentIndex - 1 + monthsList.length) % monthsList.length;
-			return monthsList[newIndex];
+			const newMonth = monthsList[newIndex];
+	
+			// Decrementa o ano se o novo mês for dezembro (indicando uma volta de ano)
+			if (newIndex === monthsList.length - 1) {
+				setYear(prevYear => prevYear - 1);
+			}
+	
+			return newMonth;
 		});
 	}
+	
 
 	function handleNextPeriod() {
 		setMonth(prevMonth => {
 			const currentIndex = monthsList.indexOf(prevMonth);
 			const newIndex = (currentIndex + 1) % monthsList.length;
-			return monthsList[newIndex];
+			const newMonth = monthsList[newIndex];
+	
+			// Incrementa o ano se o novo mês for janeiro (indicando a mudança de ano)
+			if (newIndex === 0) {
+				setYear(prevYear => prevYear + 1);
+			}
+	
+			return newMonth;
 		});
 	}
 
@@ -121,9 +141,9 @@ export default function CategoryGraphic() {
 					</>
 				)}
 				{data.length == 0 && (
-					<View style={[styles.emptyContainer]}>
-						<Image source={require('./../assets/images/empty.png')} style={styles.emptyImg} />
-						<Text style={[styles.emptyMsg]}>Ops, você não possui {filter === 'expense' ? 'despesas' : 'receitas'} registradas.</Text>
+					<View style={[styles.containerNoData]}>
+						<Text style={[styles.noDataTitle]}>Nenhuma transação encontrada</Text>
+						<Text style={[styles.noDataSubtitle]}>Quer uma visão mais organizada dos seus gastos? Adicione suas transações.</Text>
 					</View>
 				)}
 			</View>
@@ -169,7 +189,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'center',
 		gap: 10,
-		marginTop: 15
+		marginVertical: 15
 	},
 	filterButton: {
 		padding: 10,
@@ -201,21 +221,24 @@ const styles = StyleSheet.create({
 		backgroundColor: colors.gray_800,
 		borderRadius: 20
 	},
-	emptyContainer: {
+	containerNoData: {
 		justifyContent: 'center',
 		alignItems: 'center',
 		width: '70%',
-		gap: 15,
-		marginTop: 50
+		gap: 10,
+		marginTop: 100
 	},
-	emptyMsg: {
-		color: colors.gray_100,
-		fontFamily: 'Outfit_500Medium',
-		fontSize: 18,
-		textAlign: 'center'
-	},
-	emptyImg: {
-		height: 110,
-		width: 110
-	}
+	noDataTitle: {
+        fontFamily: 'Outfit_600SemiBold',
+        fontSize: 18,
+        height: 18,
+        color: colors.gray_150,
+        textAlign: 'center',
+    },
+    noDataSubtitle: {
+        fontFamily: 'Outfit_500Medium',
+        fontSize: 16,
+        color: colors.gray_200,
+        textAlign: 'center',
+    }
 });

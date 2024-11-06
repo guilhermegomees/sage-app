@@ -35,7 +35,7 @@ export const Calendar: React.FC<CalendarModalProps> = ({
     <Modal
         isVisible={isVisible}
         onBackdropPress={handleCancelCalendar}
-        backdropOpacity={0.4}
+        backdropOpacity={0.5}
         style={[base.alignItemsCenter, base.px_10]}
     >
         <View style={styles.calendarContainer}>

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { View, StyleSheet, Text, Image, ScrollView, TouchableOpacity } from 'react-native';
 import Header from '~/components/Header';
 import { HeaderContext } from '~/context/HeaderContext';
@@ -19,7 +19,7 @@ import { db } from '~/config/firebase';
 import AccountModal from '~/components/AccountModal';
 import BankIconModal from '~/components/BankIconModal';
 import { banks } from '~/constants/banks';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 type HomeScreenNavigationProp = StackNavigationProp<any, 'Home'>;
@@ -210,7 +210,10 @@ export default function Home() {
                     </View>
                     <View style={[styles.accounts]}>
                         <View style={[styles.lineBottom, base.mb_15, base.pb_15]}>
-                            <Text style={[styles.title]}>Contas</Text>
+                            <TouchableOpacity onPress={() => { navigation.navigate('Accounts'); }} style={[{width: 20, height: 20}, base.alignItemsCenter, base.justifyContentSpaceBetween, base.flexRow, base.w_100]}>
+                                <Text style={[styles.title]}>Contas</Text>
+                                <FontAwesome6 name="angle-right" size={15} color={colors.gray_100} />
+                            </TouchableOpacity>
                         </View>
                         <View style={[base.gap_20]}>
                             {accounts.map((account: IAccount)=>{
@@ -243,9 +246,12 @@ export default function Home() {
                     </View>
                     <View style={[styles.cards]}>
                         <View style={[styles.lineBottom, base.mb_15, base.pb_15]}>
-                            <Text style={[styles.title]}>Cartões</Text>
+                            <TouchableOpacity onPress={() => { navigation.navigate('CreditCards'); }} style={[{width: 20, height: 20}, base.alignItemsCenter, base.justifyContentSpaceBetween, base.flexRow, base.w_100]}>
+                                <Text style={[styles.title]}>Cartões</Text>
+                                <FontAwesome6 name="angle-right" size={15} color={colors.gray_100} />
+                            </TouchableOpacity>
                         </View>
-                        <View style={[base.gap_20]}>
+                        <View style={[base.gap_10]}>
                             {creditCards.length > 0 ?
                                 creditCards.map((creditCard: ICreditCard)=>{
                                 // Calcule o valor da fatura atual
@@ -286,8 +292,7 @@ export default function Home() {
                                 )
                             }) : 
                             <View style={[base.flexColumn, base.alignItemsCenter, base.gap_10, base.my_10]}>
-                                    <Image source={require('../assets/images/no-credit-card.png')} tintColor={colors.gray_100} style={[styles.noCreditCardIcon]} />
-                                <Text style={[styles.emptyCard]}>Você ainda não possui nenhum cartão cadastrado</Text>
+                                <Text style={[styles.noCard]}>Você não tem nenhum cartão cadastrado</Text>
                             </View>}
                         </View>
                     </View>
@@ -320,10 +325,11 @@ export default function Home() {
             />
             <OptionsModal
                 isVisible={isOptionsModalVisible}
-                contextLabel="conta"
                 onClose={() => setIsOptionsModalVisible(false)}
-                onEdit={handleEditAccount}
-                onDelete={confirmDeleteAccount}
+                options={[
+                    { label: 'Editar conta', icon: 'pencil', color: colors.gray_100, onPress: handleEditAccount },
+                    { label: 'Excluir conta', icon: 'trash', color: colors.red_500, onPress: confirmDeleteAccount },
+                ]}
             />
             <ConfirmationModal
                 isVisible={isDeleteConfirmModalVisible}
@@ -535,7 +541,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: colors.gray_50
     },
-    emptyCard: {
+    noCard: {
         fontFamily: "Outfit_500Medium",
         fontSize: 16,
         color: colors.gray_100,

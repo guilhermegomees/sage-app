@@ -115,8 +115,8 @@ const CreditCardModal: React.FC<CreditCardModalProps> = ({ creditCard, isVisible
                         <Text style={[styles.inputText]}>Nome do cartão</Text>
                         <Input
                             styleInput={[base.input, { backgroundColor: colors.gray_800 }]}
-                            placeholder="Nome do cartão"
-                            placeholderTextColor={colors.gray_50}
+                            placeholder="Ex: Nubank"
+                            placeholderTextColor={colors.gray_400}
                             onChangeText={setName}
                             value={name}
                             maxLength={25}
@@ -134,7 +134,7 @@ const CreditCardModal: React.FC<CreditCardModalProps> = ({ creditCard, isVisible
                                             <FontAwesome6 name="ellipsis" color={colors.gray_100} size={20} style={styles.ellipsisIcon} />
                                         )}
                                     </View>
-                                    <Text style={base.inputText}>{creditCardIcon || 'Ícone do cartão'}</Text>
+                                    <Text style={base.inputText}>{creditCardIcon}</Text>
                                 </View>
                                 <FontAwesome6 name="angle-right" color={colors.gray_100} size={15} />
                             </TouchableOpacity>
@@ -145,8 +145,8 @@ const CreditCardModal: React.FC<CreditCardModalProps> = ({ creditCard, isVisible
                         <Input
                             styleInput={[base.input, { backgroundColor: colors.gray_800 }]}
                             keyboardType="numeric"
-                            placeholder="Limite do cartão"
-                            placeholderTextColor={colors.gray_50}
+                            placeholder="R$ 10.000"
+                            placeholderTextColor={colors.gray_400}
                             onChangeText={handleChangeLimit}
                             value={formatValueInput(limit)}
                             maxLength={14}

@@ -36,7 +36,7 @@ export const GoalModal: React.FC<GoalModalProps> = ({
     <Modal
         isVisible={isVisible}
         onBackdropPress={() => setIsGoalModalVisible(false)}
-        backdropOpacity={0.6}
+        backdropOpacity={0.5}
         style={[base.justifyContentEnd, base.m_0]}
     >
         <View style={styles.container}>

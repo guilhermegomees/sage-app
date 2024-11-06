@@ -1,161 +1,218 @@
-import React, { useState, useEffect } from 'react';
-import { FontAwesome6 } from "@expo/vector-icons";
-import { ScrollView, TextInput, TouchableOpacity, View, Text, StyleSheet } from "react-native";
-import Modal from "react-native-modal";
-import { db } from '~/config/firebase';
-import { addDoc, updateDoc, doc, deleteDoc, collection } from 'firebase/firestore';
-import base from "~/css/base";
-import colors from "~/css/colors";
+import React from 'react';
+import Modal from 'react-native-modal';
+import { View, Text, TextInput, TouchableOpacity, Image, Switch, StyleSheet } from 'react-native';
+import base from '~/css/base';
+import colors from '~/css/colors';
+import { FontAwesome6 } from '@expo/vector-icons';
+import Input from './Input';
+import { IconPickerModal } from './IconPickerModal';
+import { ColorPickerModal } from './ColorPickerModal';
+import { Calendar } from './Calendar';
 
-interface GoalModalProps {
-  isVisible: boolean;
-  goal?: any; // pode ser `undefined` para nova meta
-  setIsNewGoalVisible: (visible: boolean) => void;
-  onSave: () => void;
+interface AccountModalProps {
+    isVisible: boolean;
+    isEditing?: boolean;
+    name: string | null;
+    icon: string;
+	color: string;
+    goalValue: number | null;
+    initialValue: number | null;
+    tempEndDate: string;
+	endDate: string;
+    formattedDate: string;
+    setName: (text: string) => void;
+	setIcon: (icon: string) => void;
+	setColor: (color: string) => void;
+    setGoalValue: (value: number) => void;
+    setInitialValue: (value: number) => void;
+    onClose: () => void;
+    onSave: () => void;
+	isIconPickerVisible: boolean;
+	isColorPickerVisible: boolean;
+	setIsIconPickerVisible: (visible: boolean) => void;
+	setIsColorPickerVisible: (visible: boolean) => void;
+    isCalendarVisible: boolean;
+    setIsCalendarVisible: (visible: boolean) => void;
+    handleSelectTempDate: (date: string) => void;
+    handleSelectDate: () => void;
+    handleCancelCalendar: () => void;
 }
 
-export const GoalModal: React.FC<GoalModalProps> = ({
-  isVisible,
-  goal,
-  setIsNewGoalVisible,
-  onSave,
+const AccountModal: React.FC<AccountModalProps> = ({
+    isVisible,
+    name,
+    icon,
+	color,
+    goalValue,
+    initialValue,
+    tempEndDate,
+    endDate,
+    formattedDate,
+    setName,
+	setIcon,
+    setGoalValue,
+    setInitialValue,
+	setColor,
+    onClose,
+    onSave,
+	isColorPickerVisible,
+	isIconPickerVisible,
+	setIsIconPickerVisible,
+	setIsColorPickerVisible,
+    isCalendarVisible,
+    setIsCalendarVisible,
+    handleSelectTempDate,
+    handleSelectDate,
+    handleCancelCalendar
 }) => {
-  const [name, setName] = useState(goal?.name || '');
-  const [currentValue, setCurrentValue] = useState(goal?.currentValue?.toString() || '0');
-  const [goalValue, setGoalValue] = useState(goal?.goalValue?.toString() || '0');
-  const [icon, setIcon] = useState(goal?.icon || 'star');
+	const formatValueInput = (value: any) => {
+        if (!value) return '';
 
-  useEffect(() => {
-    if (goal) {
-      setName(goal.name);
-      setCurrentValue(goal.currentValue?.toString() || '0');
-      setGoalValue(goal.goalValue?.toString() || '0');
-      setIcon(goal.icon || 'star'); // Garantir que o ícone seja inicializado corretamente
-    }
-  }, [goal]);
-
-  const handleSave = async () => {
-    if (!name) {
-      console.error('Nome da meta não pode ser vazio.');
-      return;
-    }
-  
-    const newGoal = {
-      name: name || 'Meta sem nome',
-      currentValue: parseFloat(currentValue) || 0,
-      goalValue: parseFloat(goalValue) || 0,
-      icon: icon || 'default-icon',
-      isCompleted: false // ou conforme sua lógica
+        const parsedValue = parseFloat(value.toString().replace(/[^0-9]/g, ''));
+        return `R$ ${!isNaN(parsedValue) ? parsedValue.toLocaleString('pt-BR') : ''}`;
     };
-  
-    try {
-      if (goal) {
-        const goalDocRef = doc(db, 'goal', goal.id);
-        await updateDoc(goalDocRef, newGoal);
-      } else {
-        await addDoc(collection(db, 'goal'), { ...newGoal, createdAt: new Date() });
-      }
-      onSave();
-      setIsNewGoalVisible(false);
-    } catch (error) {
-      console.error('Erro ao salvar meta:', error);
-    }
-  };
 
-  const handleDelete = async () => {
-    if (goal) {
-      try {
-        const goalDocRef = doc(db, 'goal', goal.id);
-        await deleteDoc(goalDocRef);
-        onSave(); // Atualiza a lista após a exclusão
-        setIsNewGoalVisible(false); // Fecha o modal
-      } catch (error) {
-        console.error('Erro ao excluir meta:', error);
-      }
-    }
-  };
+	const handleSelectColor = (color: string): void => {
+        setColor(color);
+        setIsColorPickerVisible(false);
+    };
 
-  return (
-    <Modal
-      isVisible={isVisible}
-      onBackdropPress={() => setIsNewGoalVisible(false)}
-      backdropOpacity={0.6}
-      style={[base.justifyContentEnd, base.m_0]}
-    >
-      <View style={styles.container}>
-        <Text style={styles.textNewGoal}>{goal ? 'Editar Meta' : 'Nova Meta'}</Text>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={[base.gap_15]}>
-            <TextInput
-              style={[base.input, { backgroundColor: colors.gray_825 }]}
-              placeholder="Nome"
-              placeholderTextColor={colors.gray_200}
-              value={name}
-              onChangeText={setName}
-              maxLength={25}
-            />
-            <TextInput
-              style={[base.input, { backgroundColor: colors.gray_825 }]}
-              placeholder="Valor Atual"
-              placeholderTextColor={colors.gray_200}
-              keyboardType="numeric"
-              value={currentValue}
-              onChangeText={setCurrentValue}
-            />
-            <TextInput
-              style={[base.input, { backgroundColor: colors.gray_825 }]}
-              placeholder="Valor da Meta"
-              placeholderTextColor={colors.gray_200}
-              keyboardType="numeric"
-              value={goalValue}
-              onChangeText={setGoalValue}
-            />
-            <TouchableOpacity
-              style={[base.input, base.justifyContentSpaceBetween, { backgroundColor: colors.gray_825 }]}
-              onPress={() => {} /* lógica para escolher ícone */}
-            >
-              <View style={styles.row}>
-                <FontAwesome6 name="image" color={colors.gray_100} size={20} />
-                <Text style={base.inputText}>Ícone</Text>
-              </View>
-              <FontAwesome6 name={icon} color={colors.gray_100} size={20} />
-            </TouchableOpacity>
-            <View style={[base.flexRow, base.justifyContentSpaceBetween, base.mt_10]}>
-              {goal && (
-                <TouchableOpacity style={[base.button, base.btnCancel]} onPress={handleDelete}>
-                  <Text style={[base.btnText]}>Excluir</Text>
-                </TouchableOpacity>
-              )}
-              <TouchableOpacity style={[base.button, base.btnSave]} onPress={handleSave}>
-                <Text style={[base.btnText]}>{goal ? 'Salvar Alterações' : 'Adicionar Meta'}</Text>
-              </TouchableOpacity>
+	const handleSelectIcon = (icon: string): void => {
+        setIcon(icon);
+        setIsIconPickerVisible(false);
+    };
+
+    const handleChangeGoalValue = (text: string): void => {
+        setGoalValue(parseInt(text.replace(/[^\d]/g, '')));
+    };
+
+    const handleChangeInitialValue = (text: string): void => {
+        setInitialValue(parseInt(text.replace(/[^\d]/g, '')));
+    };
+
+    return (
+        <Modal
+            isVisible={isVisible}
+            onBackdropPress={onClose}
+            backdropOpacity={0.5}
+            style={[base.justifyContentEnd, base.m_0]}
+        >
+            <View style={[styles.containerCreditCard]}>
+                <View style={[base.gap_25, base.w_100]}>
+                    <View style={[base.gap_10]}>
+                        <Text style={[styles.inputText]}>Nome</Text>
+                        <Input
+                            styleInput={[base.input, { backgroundColor: colors.gray_800 }]}
+                            placeholder="Ex: Comprar um carro"
+                            placeholderTextColor={colors.gray_400}
+                            onChangeText={setName}
+                            value={name}
+                            maxLength={25}
+                        />
+                    </View>
+                    <View style={[base.gap_10]}>
+                        <Text style={[styles.inputText]}>Valor da meta</Text>
+                        <Input
+                            styleInput={[base.input, { backgroundColor: colors.gray_800 }]}
+                            keyboardType="numeric"
+                            placeholder="R$ 0,00"
+                            placeholderTextColor={colors.gray_400}
+                            onChangeText={handleChangeGoalValue}
+                            value={formatValueInput(goalValue)}
+                            maxLength={14}
+                        />
+                    </View>
+					<View style={[base.gap_10]}>
+                        <Text style={[styles.inputText]}>Valor inicial (opcional)</Text>
+                        <Input
+                            styleInput={[base.input, { backgroundColor: colors.gray_800 }]}
+                            keyboardType="numeric"
+                            placeholder="R$ 0,00"
+                            placeholderTextColor={colors.gray_400}
+                            onChangeText={handleChangeInitialValue}
+                            value={formatValueInput(initialValue)}
+                            maxLength={14}
+                        />
+                    </View>
+                    <View style={[base.gap_10]}>
+                        <Text style={[styles.inputText]}>Data final da meta</Text>
+                            <TouchableOpacity style={[base.input, base.gap_5, base.justifyContentStart, { backgroundColor: colors.gray_825 }]} onPress={() => setIsCalendarVisible(true)}>
+                            <FontAwesome6 name="calendar-day" color={colors.gray_100} size={20} />
+                        <Text style={[styles.textBtnDate, {color: formattedDate ? colors.gray_100 : colors.gray_400}]}>{formattedDate || 'Selecione a data'}</Text>
+                    </TouchableOpacity>
+                    </View>
+					<TouchableOpacity style={[base.input, base.justifyContentSpaceBetween, { backgroundColor: colors.gray_825 }]} onPress={() => setIsColorPickerVisible(true)}>
+						<View style={[base.flexRow, base.alignItemsCenter, base.gap_15]}>
+                            <FontAwesome6 name="palette" color={colors.gray_100} size={20}/>
+                            <Text style={base.inputText}>Cor</Text>
+                        </View>
+                        <View style={[styles.colorCircle, base.m_0, { backgroundColor: color }]} />
+                    </TouchableOpacity>
+					<TouchableOpacity style={[base.input, base.justifyContentSpaceBetween, { backgroundColor: colors.gray_825 }]} onPress={() => setIsIconPickerVisible(true)}>
+                        <View style={[base.flexRow, base.alignItemsCenter, base.gap_15]}>
+                            <FontAwesome6 name="image" color={colors.gray_100} size={20}/>
+                            <Text style={base.inputText}>Ícone</Text>
+                        </View>
+                        <FontAwesome6 name={icon} color={color} size={20}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[base.button, base.btnSave, base.w_100, base.mt_5]} onPress={onSave}>
+                        <Text style={[base.btnText]}>Salvar</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
-          </View>
-        </ScrollView>
-      </View>
-    </Modal>
-  );
+			<ColorPickerModal
+                isVisible={isColorPickerVisible}
+                handleSelectColor={handleSelectColor}
+                setIsColorPickerVisible={setIsColorPickerVisible}
+            />
+			<IconPickerModal
+                isVisible={isIconPickerVisible}
+                handleSelectIcon={handleSelectIcon}
+                setIsIconPickerVisible={setIsIconPickerVisible}
+            />
+            <Calendar
+                isVisible={isCalendarVisible}
+                selectedTempDate={tempEndDate || endDate}
+                handleSelectTempDate={handleSelectTempDate}
+                handleSelectDate={handleSelectDate}
+                handleCancelCalendar={handleCancelCalendar}
+            />
+		</Modal>
+    );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.gray_875,
-    width: '100%',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-    paddingBottom: 30,
-    gap: 15,
-  },
-  textNewGoal: {
-    fontFamily: 'Outfit_400Regular',
-    fontSize: 18,
-    color: colors.white,
-    marginBottom: 5,
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 15,
-  },
+    containerCreditCard: {
+        backgroundColor: colors.gray_875,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        paddingHorizontal: 20,
+        paddingVertical: 25
+    },
+    inputText: {
+        fontFamily: 'Outfit_500Medium',
+        fontSize: 16,
+        color: colors.white,
+        lineHeight: 18,
+    },
+    creditCardIconModal: {
+        borderRadius: 50,
+        width: 25,
+        height: 25
+    },
+    ellipsisIcon: {
+        width: 18
+    },
+	colorCircle: {
+        width: 22,
+        height: 22,
+        borderRadius: 25,
+    },
+    textBtnDate: {
+        fontSize: 16,
+        fontFamily: 'Outfit_500Medium',
+        marginLeft: 10,
+    },
 });
+
+export default AccountModal;

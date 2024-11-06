@@ -27,7 +27,7 @@ const BankIconModal: React.FC<IconModalProps> = ({
         <Modal
             isVisible={isVisible}
             onBackdropPress={onClose}
-            backdropOpacity={0.4}
+            backdropOpacity={0.5}
             style={[base.justifyContentEnd, base.m_0]}
         >
             <View style={styles.accountsIconModal}>

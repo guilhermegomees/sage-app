@@ -14,6 +14,7 @@ import { TransactionProvider } from '~/context/TransactionContext';
 import Categories from '~/screens/Categories';
 import CreditCardDetails from '~/screens/CreditCardDetails';
 import CreditCards from '~/screens/CreditCards';
+import EditProfile from '~/screens/EditProfile';
 
 const Stack = createStackNavigator();
 
@@ -68,6 +69,11 @@ export default function RootStack() {
                                 <Stack.Screen
                                     name="Goals"
                                     component={Goals}
+                                    options={{ headerShown: false }}
+                                />
+                                <Stack.Screen
+                                    name="EditProfile"
+                                    component={EditProfile}
                                     options={{ headerShown: false }}
                                 />
                             </Stack.Navigator>

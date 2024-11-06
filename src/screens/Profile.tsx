@@ -4,7 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { getAuth, signOut, updateProfile } from 'firebase/auth';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { CommonActions, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { CommonActions, useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import useUser from '~/hooks/useUser';
 import colors from '~/css/colors';
@@ -12,56 +12,62 @@ import { app, db } from '~/config/firebase';
 import { FontAwesome6 } from '@expo/vector-icons';
 import base from '~/css/base';
 
-type ProfileScreenNavigationProp = StackNavigationProp<any, 'Profile'>;
-
-type ProfileScreenRouteProp = RouteProp<StackParamList, 'Profile'>;
-
-type StackParamList = {
-    Profile: { fromScreen?: string };
-};
-
 const Profile: React.FC = () => {
-    const navigation = useNavigation<ProfileScreenNavigationProp>();
+    const navigation = useNavigation<StackNavigationProp<any, 'Profile'>>();
     const user = useUser();
-    const route = useRoute<ProfileScreenRouteProp>();
+    const route = useRoute();
     const { fromScreen } = route.params || {};
     const [profileImage, setProfileImage] = useState<string | null>(null);
-    
-    const auth = getAuth(app);
-    const storage = getStorage(app)
-    
-    useEffect(() => {
-        const fetchUserProfile = async () => {
-            if (user) {
-                const userDocRef = doc(db, 'users', user.uid);
-                const userDoc = await getDoc(userDocRef);
-                if (userDoc.exists()) {
-                    const photoURL = userDoc.data()?.photoURL as string;
-                    setProfileImage(photoURL);
-                }
-            }
-        };
 
-        fetchUserProfile();
-    }, [user, db]);
+    const auth = getAuth(app);
+    const storage = getStorage(app);
+
+    // Função para recarregar os dados do perfil
+    const fetchUserProfile = async () => {
+        if (user) {
+            const userDocRef = doc(db, 'users', user.uid);
+            const userDoc = await getDoc(userDocRef);
+            if (userDoc.exists()) {
+                const photoURL = userDoc.data()?.photoURL as string;
+                setProfileImage(photoURL);
+            }
+        }
+    };
+
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+
+
+    useFocusEffect(
+        React.useCallback(() => {
+            const fetchUserData = async () => {
+                if (user) {
+                    const userDocRef = doc(db, 'user', user.uid);
+                    const userDoc = await getDoc(userDocRef);
+                    
+                    if (userDoc.exists()) {
+                        setName(userDoc.data()?.name || '');
+                        setEmail(userDoc.data()?.email || '');
+                        setProfileImage(userDoc.data()?.photoURL || null); // Atualiza a imagem de perfil
+                    }
+                }
+            };
+            fetchUserData();
+        }, [user]) // Recarregar os dados toda vez que a tela for exibida
+    );
 
     const uploadImage = async (uri: string): Promise<string> => {
         if (!user?.uid) throw new Error("Usuário não autenticado");
-        
-        // Converta a URI da imagem para um Blob
+
         const response = await fetch(uri);
         const blob = await response.blob();
-        
+
         const filename = `images/${user.uid}`;
         const storageRef = ref(storage, filename);
-        console.log(blob);
-        // Fazer o upload do Blob para o Firebase Storage
         await uploadBytes(storageRef, blob);
-        
-        // Obter a URL de download
+
         return await getDownloadURL(storageRef);
     };
-    
 
     const handleImagePick = async () => {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -69,27 +75,25 @@ const Profile: React.FC = () => {
             alert('Precisamos da permissão para acessar suas fotos!');
             return;
         }
-    
+
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
             quality: 1,
         });
-    
+
         if (!result.canceled && result.assets?.[0].uri) {
             const uri = result.assets[0].uri;
             try {
                 const imageUrl = await uploadImage(uri);
-                
-                // Atualizar o perfil do usuário no Firebase Auth
+
                 if (auth.currentUser) {
                     await updateProfile(auth.currentUser, { photoURL: imageUrl });
                 }
-    
-                // Salvar a URL da imagem no Firestore
+
                 const userDocRef = doc(db, 'users', user?.uid || '');
                 await setDoc(userDocRef, { photoURL: imageUrl }, { merge: true });
-    
+
                 setProfileImage(imageUrl);
             } catch (error) {
                 console.error("Erro ao fazer upload da imagem:", error);
@@ -109,82 +113,85 @@ const Profile: React.FC = () => {
         } catch (error) {
             console.log("Erro ao deslogar:", error);
         }
-    };    
-    
+    };
+
     return (
         <View style={[base.flex_1, base.gap_50, { backgroundColor: colors.gray_900 }]}>
             <View style={styles.container}>
-                <View style={[base.alignItemsCenter, base.gap_20, { marginTop: fromScreen === 'Home' ? 0 : 30}]}>
+                <View style={[base.alignItemsCenter, base.gap_20, { marginTop: fromScreen === 'Home' ? 0 : 30 }]}>
                     <TouchableOpacity onPress={handleImagePick}>
-                        <Image 
-                            source={profileImage 
-                                ? { uri: profileImage } 
+                        <Image
+                            source={profileImage
+                                ? { uri: profileImage }
                                 : require("./../assets/images/blank-profile-picture.png")}
-                            style={styles.image} 
+                            style={styles.image}
                         />
                     </TouchableOpacity>
                     <View style={[base.alignItemsCenter, base.gap_8]}>
-                        <Text style={[styles.userName]}>{user?.name}</Text>
-                        <Text style={[styles.userEmail]}>{user?.email}</Text>
+                        <Text style={styles.userName}>{user?.name}</Text>
+                        <Text style={styles.userEmail}>{user?.email}</Text>
+                        <TouchableOpacity style={styles.editButton} onPress={() => { navigation.navigate('EditProfile'); }}>
+                            <Text style={styles.editButtonText}>Editar</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </View>
-            <View style={[styles.bottomMenu]}>
+            <View style={styles.bottomMenu}>
                 <TouchableOpacity onPress={() => { navigation.navigate('Accounts'); }}>
-                    <View style={[styles.containerMenu]}>
+                    <View style={styles.containerMenu}>
                         <View style={[base.flexRow, base.gap_18, base.alignItemsCenter]}>
-                            <View style={[styles.containerIcon]}>
-                                <FontAwesome6 name="building-columns" size={23} color={colors.gray_100}/>
+                            <View style={styles.containerIcon}>
+                                <FontAwesome6 name="building-columns" size={23} color={colors.gray_100} />
                             </View>
-                            <Text style={[styles.menuText]}>Contas</Text>
+                            <Text style={styles.menuText}>Contas</Text>
                         </View>
-                        <FontAwesome6 name="angle-right" size={20} color={colors.gray_100}/>
+                        <FontAwesome6 name="angle-right" size={20} color={colors.gray_100} />
                     </View>
                 </TouchableOpacity>
-                <View style={[styles.line]} />
+                <View style={styles.line} />
                 <TouchableOpacity onPress={() => { navigation.navigate('CreditCards'); }}>
-                    <View style={[styles.containerMenu]}>
+                    <View style={styles.containerMenu}>
                         <View style={[base.flexRow, base.gap_18, base.alignItemsCenter]}>
-                            <View style={[styles.containerIcon]}>
-                                <FontAwesome6 name="credit-card" size={23} color={colors.gray_100}/>
+                            <View style={styles.containerIcon}>
+                                <FontAwesome6 name="credit-card" size={23} color={colors.gray_100} />
                             </View>
-                            <Text style={[styles.menuText]}>Cartões</Text>
+                            <Text style={styles.menuText}>Cartões</Text>
                         </View>
-                        <FontAwesome6 name="angle-right" size={20} color={colors.gray_100}/>
+                        <FontAwesome6 name="angle-right" size={20} color={colors.gray_100} />
                     </View>
                 </TouchableOpacity>
-                <View style={[styles.line]} />
+                <View style={styles.line} />
                 <TouchableOpacity onPress={() => { navigation.navigate('Categories'); }}>
-                    <View style={[styles.containerMenu]}>
+                    <View style={styles.containerMenu}>
                         <View style={[base.flexRow, base.gap_18, base.alignItemsCenter]}>
-                            <View style={[styles.containerIcon]}>
-                                <FontAwesome6 name="shapes" size={23} color={colors.gray_100}/>
+                            <View style={styles.containerIcon}>
+                                <FontAwesome6 name="shapes" size={23} color={colors.gray_100} />
                             </View>
-                            <Text style={[styles.menuText]}>Categorias</Text>
+                            <Text style={styles.menuText}>Categorias</Text>
                         </View>
-                        <FontAwesome6 name="angle-right" size={20} color={colors.gray_100}/>
+                        <FontAwesome6 name="angle-right" size={20} color={colors.gray_100} />
                     </View>
                 </TouchableOpacity>
-                <View style={[styles.line]} />
+                <View style={styles.line} />
                 <TouchableOpacity onPress={() => { navigation.navigate('Goals'); }}>
-                <View style={[styles.containerMenu]}>
-                    <View style={[base.flexRow, base.gap_18, base.alignItemsCenter]}>
-                        <View style={[styles.containerIcon]}>
-                            <FontAwesome6 name="bullseye" size={23} color={colors.gray_100}/>
+                    <View style={styles.containerMenu}>
+                        <View style={[base.flexRow, base.gap_18, base.alignItemsCenter]}>
+                            <View style={styles.containerIcon}>
+                                <FontAwesome6 name="bullseye" size={23} color={colors.gray_100} />
+                            </View>
+                            <Text style={styles.menuText}>Metas</Text>
                         </View>
-                        <Text style={[styles.menuText]}>Metas</Text>
+                        <FontAwesome6 name="angle-right" size={20} color={colors.gray_100} />
                     </View>
-                    <FontAwesome6 name="angle-right" size={20} color={colors.gray_100}/>
-                </View>
                 </TouchableOpacity>
-                <View style={[styles.line]} />
-                <View style={[styles.containerMenu]}>
+                <View style={styles.line} />
+                <View style={styles.containerMenu}>
                     <TouchableOpacity onPress={signOutUser}>
                         <View style={[base.flexRow, base.gap_18, base.alignItemsCenter]}>
-                            <View style={[styles.containerIcon]}>
-                                <FontAwesome6 name="arrow-right-from-bracket" size={23} color={colors.gray_100}/>
+                            <View style={styles.containerIcon}>
+                                <FontAwesome6 name="arrow-right-from-bracket" size={23} color={colors.gray_100} />
                             </View>
-                            <Text style={[styles.menuText]}>Encerrar sessão</Text>
+                            <Text style={styles.menuText}>Encerrar sessão</Text>
                         </View>
                     </TouchableOpacity>
                 </View>
@@ -197,14 +204,6 @@ const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
         paddingHorizontal: 30
-    },
-    containerBack: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        width: '100%',
-        marginTop: 30,
-        marginBottom: 25,
     },
     image: {
         width: 80,
@@ -223,27 +222,8 @@ const styles = StyleSheet.create({
         color: colors.gray_200,
         lineHeight: 18,
     },
-    balance: {
-        fontFamily: 'Outfit_500Medium',
-        fontSize: 20,
-        color: colors.gray_100
-    },
-    entrance: {
-        color: colors.green_500,
-    },
-    exits: {
-        color: colors.red_500,
-    },
-    remainder: {
-        color: colors.blue_300,
-    },
-    valueBalance: {
-        fontFamily: 'Outfit_500Medium',
-        fontSize: 18,
-    },
     bottomMenu: {
         backgroundColor: colors.gray_800,
-        //height: '63%',
         flex: 1,
         width: '100%',
         borderTopRightRadius: 30,
@@ -273,6 +253,18 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: colors.gray_600,
     },
+    editButtonText: {
+        color: colors.gray_50,
+        fontFamily: 'Outfit_400Regular',
+        fontSize: 16,
+        lineHeight: 16,
+    },
+    editButton: {
+        backgroundColor: colors.gray_600,
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 6,
+    }
 });
 
 export default Profile;

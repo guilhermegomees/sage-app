@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { IGoal, IUser } from '~/interfaces/interfaces';
 import { db } from '~/config/firebase';
 
@@ -15,9 +15,10 @@ export const GoalProvider = ({ children } : { children: React.ReactNode }) => {
 
     const goalCollectionRef = collection(db, "goal");
 
-    const fetchGoals = async (): Promise<void> => {
+    const fetchGoals = async (user: IUser): Promise<void> => {
         try {
-            const querySnapshot = await getDocs(goalCollectionRef);
+            const q = query(goalCollectionRef, where("uid", "==", user.uid));
+            const querySnapshot = await getDocs(q);
             const data: IGoal[] = querySnapshot.docs.map(doc => ({
                 id: doc.id,
                 name: doc.data().name,

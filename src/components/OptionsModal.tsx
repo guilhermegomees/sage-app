@@ -16,10 +16,11 @@ interface Option {
 interface OptionsModalProps {
     isVisible: boolean;
     onClose: () => void;
+    modalName?: string;
     options: Option[];
 }
 
-const OptionsModal: React.FC<OptionsModalProps> = ({ isVisible, onClose, options }) => {
+const OptionsModal: React.FC<OptionsModalProps> = ({ isVisible, onClose, modalName, options }) => {
     return (
         <Modal
             isVisible={isVisible}
@@ -28,7 +29,7 @@ const OptionsModal: React.FC<OptionsModalProps> = ({ isVisible, onClose, options
             style={[base.justifyContentEnd, base.m_0]}
         >
             <View style={styles.container}>
-                <Text style={styles.label}>Opções</Text>
+                <Text style={styles.label}>{modalName || 'Opções'}</Text>
                 <View style={base.gap_30}>
                     {options.map((option, index) => (
                         <TouchableOpacity key={index} onPress={() => { option.onPress(); onClose(); }} disabled={option.disabled}>

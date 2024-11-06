@@ -14,7 +14,7 @@ import GoalModal from '~/components/GoalModal';
 import NoData from '~/components/NoData';
 import Modal from "react-native-modal";
 import Input from '~/components/Input';
-import { useGoals } from '~/context/goalContext';
+import { useGoals } from '~/context/GoalContext';
 
 export default function Goals() {
     const user = useUser();

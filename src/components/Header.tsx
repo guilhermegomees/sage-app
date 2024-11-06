@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { HeaderContext } from '~/context/HeaderContext';
 import { FontAwesome6 } from '@expo/vector-icons';
@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import base from '~/css/base';
 import colors from '~/css/colors';
 import useUser from '~/hooks/useUser';
+import { useProfile } from '~/context/ProfileContext';
 
 type HeaderNavigationProp = StackNavigationProp<any, 'Header'>;
 
@@ -15,6 +16,14 @@ export default function Header() {
     const user = useUser();
     const { showValues, setShowValues } = useContext(HeaderContext);
 
+    const { profileInfo, profilePicture, fetchProfileInfo } = useProfile();
+
+    useEffect(() => {
+        if(user){
+            fetchProfileInfo(user);
+        }
+    }, [user]);
+
     const toggleShowValues = () => {
         setShowValues(!showValues);
     }
@@ -22,15 +31,15 @@ export default function Header() {
     const handleNavigateToProfile = () => {
         navigation.navigate('Profile');
     }
-
+    
     return (
         <View style={[base.flexRow, base.flexSpaceBetween, base.alignItemsCenter, base.px_30, styles.container]}>
             <View style={[base.flexRow, base.alignItemsCenter, base.gap_10]}>
                 <TouchableOpacity onPress={handleNavigateToProfile}>
                     <View style={[styles.containerPhoto]}>
                         <Image 
-                            source={user?.photoURL
-                                ? { uri: user?.photoURL }
+                            source={(profileInfo.length > 0 && profileInfo[0].photoURL) || profilePicture 
+                                ? { uri: profileInfo[0].photoURL || profilePicture }
                                 : require("./../assets/images/blank-profile-picture.png")}
                             style={[styles.userPhoto]}
                         />
@@ -38,7 +47,7 @@ export default function Header() {
                 </TouchableOpacity>
                 <View style={[base.gap_2]}>
                     <Text style={styles.textHello}>Olá,</Text>
-                    <Text style={styles.userName}>{user?.name}</Text>
+                    <Text style={styles.userName}>{profileInfo.length > 0 && profileInfo[0].name}</Text>
                 </View>
             </View>
             <View style={[styles.containerEye]}>

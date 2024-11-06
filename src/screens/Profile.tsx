@@ -11,95 +11,20 @@ import colors from '~/css/colors';
 import { app, db } from '~/config/firebase';
 import { FontAwesome6 } from '@expo/vector-icons';
 import base from '~/css/base';
+import { useProfile } from '~/context/ProfileContext';
 
 const Profile: React.FC = () => {
     const navigation = useNavigation<StackNavigationProp<any, 'Profile'>>();
     const user = useUser();
-    const route = useRoute();
-    const { fromScreen } = route.params || {};
-    const [profileImage, setProfileImage] = useState<string | null>(null);
-
     const auth = getAuth(app);
-    const storage = getStorage(app);
 
-    // Função para recarregar os dados do perfil
-    const fetchUserProfile = async () => {
-        if (user) {
-            const userDocRef = doc(db, 'users', user.uid);
-            const userDoc = await getDoc(userDocRef);
-            if (userDoc.exists()) {
-                const photoURL = userDoc.data()?.photoURL as string;
-                setProfileImage(photoURL);
-            }
+    const { profileInfo, profilePicture, fetchProfileInfo } = useProfile();
+
+    useEffect(() => {
+        if(user){
+            fetchProfileInfo(user);
         }
-    };
-
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-
-
-    useFocusEffect(
-        React.useCallback(() => {
-            const fetchUserData = async () => {
-                if (user) {
-                    const userDocRef = doc(db, 'user', user.uid);
-                    const userDoc = await getDoc(userDocRef);
-                    
-                    if (userDoc.exists()) {
-                        setName(userDoc.data()?.name || '');
-                        setEmail(userDoc.data()?.email || '');
-                        setProfileImage(userDoc.data()?.photoURL || null); // Atualiza a imagem de perfil
-                    }
-                }
-            };
-            fetchUserData();
-        }, [user]) // Recarregar os dados toda vez que a tela for exibida
-    );
-
-    const uploadImage = async (uri: string): Promise<string> => {
-        if (!user?.uid) throw new Error("Usuário não autenticado");
-
-        const response = await fetch(uri);
-        const blob = await response.blob();
-
-        const filename = `images/${user.uid}`;
-        const storageRef = ref(storage, filename);
-        await uploadBytes(storageRef, blob);
-
-        return await getDownloadURL(storageRef);
-    };
-
-    const handleImagePick = async () => {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== 'granted') {
-            alert('Precisamos da permissão para acessar suas fotos!');
-            return;
-        }
-
-        const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            quality: 1,
-        });
-
-        if (!result.canceled && result.assets?.[0].uri) {
-            const uri = result.assets[0].uri;
-            try {
-                const imageUrl = await uploadImage(uri);
-
-                if (auth.currentUser) {
-                    await updateProfile(auth.currentUser, { photoURL: imageUrl });
-                }
-
-                const userDocRef = doc(db, 'users', user?.uid || '');
-                await setDoc(userDocRef, { photoURL: imageUrl }, { merge: true });
-
-                setProfileImage(imageUrl);
-            } catch (error) {
-                console.error("Erro ao fazer upload da imagem:", error);
-            }
-        }
-    };
+    }, [user]);
 
     const signOutUser = async () => {
         try {
@@ -118,20 +43,18 @@ const Profile: React.FC = () => {
     return (
         <View style={[base.flex_1, base.gap_50, { backgroundColor: colors.gray_900 }]}>
             <View style={styles.container}>
-                <View style={[base.alignItemsCenter, base.gap_20, { marginTop: fromScreen === 'Home' ? 0 : 30 }]}>
-                    <TouchableOpacity onPress={handleImagePick}>
-                        <Image
-                            source={profileImage
-                                ? { uri: profileImage }
-                                : require("./../assets/images/blank-profile-picture.png")}
-                            style={styles.image}
-                        />
-                    </TouchableOpacity>
+                <View style={[base.alignItemsCenter, base.gap_20, base.mt_30]}>
+                    <Image
+                        source={(profileInfo.length > 0 && profileInfo[0].photoURL) || profilePicture 
+                            ? { uri: profileInfo[0].photoURL || profilePicture }
+                            : require("./../assets/images/blank-profile-picture.png")}
+                        style={styles.image}
+                    />
                     <View style={[base.alignItemsCenter, base.gap_8]}>
-                        <Text style={styles.userName}>{user?.name}</Text>
-                        <Text style={styles.userEmail}>{user?.email}</Text>
+                        <Text style={styles.userName}>{profileInfo.length > 0 && profileInfo[0].name}</Text>
+                        <Text style={styles.userEmail}>{profileInfo.length > 0 && profileInfo[0].email}</Text>
                         <TouchableOpacity style={styles.editButton} onPress={() => { navigation.navigate('EditProfile'); }}>
-                            <Text style={styles.editButtonText}>Editar</Text>
+                            <Text style={styles.editButtonText}>Editar perfil</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -255,7 +178,7 @@ const styles = StyleSheet.create({
     },
     editButtonText: {
         color: colors.gray_50,
-        fontFamily: 'Outfit_400Regular',
+        fontFamily: 'Outfit_500Medium',
         fontSize: 16,
         lineHeight: 16,
     },

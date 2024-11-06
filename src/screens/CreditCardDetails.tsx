@@ -73,14 +73,15 @@ export default function CreditCardDetails() {
 	}, [month, cardTransactions]);
 
     const updateInvoiceForPeriod = (month: string, year: number) => {
-        if(creditCardDetails){
+        if (creditCardDetails) {
             const selectedMonthKey = `${year}-${String(monthsList.indexOf(month) + 1).padStart(2, '0')}`;
             const selectedInvoice = creditCardDetails.invoices.find(invoice => invoice.month === selectedMonthKey);
-            const invoiceValue = formatValue(selectedInvoice ? selectedInvoice.totalAmount : 0);
-        
-            setInvoiceValue(parseFloat(invoiceValue));
+            const invoiceValue = selectedInvoice ? selectedInvoice.totalAmount : 0;
+
+            setInvoiceValue(Math.round(invoiceValue * 100) / 100);
         }
     };
+
 
     useEffect(() => {
         updateInvoiceForPeriod(month, year);
@@ -244,7 +245,7 @@ export default function CreditCardDetails() {
                         </View>
                         <View style={[base.gap_5]}>
                             <Text style={[styles.title]}>Total da fatura</Text>
-                            <Text style={[styles.label, { color: colors.red_500 }]}>R$ {invoiceValue}</Text>
+                            <Text style={[styles.label, { color: colors.red_500 }]}>R$ {invoiceValue.toFixed(2).replace('.', ',')}</Text>
                         </View>
                     </View>
                 </View>

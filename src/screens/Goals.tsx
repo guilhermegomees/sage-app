@@ -7,7 +7,6 @@ import colors from '~/css/colors';
 import { db } from "~/config/firebase";
 import { collection, addDoc, doc, updateDoc, deleteDoc, getDocs, setDoc, getDoc } from 'firebase/firestore';
 import OptionsModal from '~/components/OptionsModal';
-import { useGoals } from '~/context/GoalContext';
 import { IGoal } from '~/interfaces/interfaces';
 import ConfirmationModal from '~/components/ConfirmationModal';
 import useUser from '~/hooks/useUser';
@@ -15,6 +14,7 @@ import GoalModal from '~/components/GoalModal';
 import NoData from '~/components/NoData';
 import Modal from "react-native-modal";
 import Input from '~/components/Input';
+import { useGoals } from '~/context/goalContext';
 
 export default function Goals() {
     const user = useUser();

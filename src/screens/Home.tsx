@@ -21,6 +21,9 @@ import BankIconModal from '~/components/BankIconModal';
 import { banks } from '~/constants/banks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import MainFloatingButton from '~/components/MainFloatingButton';
+import FloatingActionButton from '~/components/FloatingActionButton';
+import { useSharedValue } from 'react-native-reanimated';
 
 type HomeScreenNavigationProp = StackNavigationProp<any, 'Home'>;
 
@@ -51,6 +54,12 @@ export default function Home() {
 
     const accountCollectionRef = collection(db, "account");
     const transactionCollectionRef = collection(db, "transaction");
+
+    const isExpanded = useSharedValue(false);
+
+    const handlePress = () => {
+        isExpanded.value = !isExpanded.value;
+    };
 
     useEffect(() => {
         if (user) {
@@ -298,6 +307,14 @@ export default function Home() {
                     </View>
                 </View>
             </ScrollView>
+            {/* <View style={styles.mainContainer}>
+                <View style={styles.buttonContainer}>
+                    <MainFloatingButton onPress={handlePress} isExpanded={isExpanded} />
+                    <FloatingActionButton isExpanded={isExpanded} index={1} buttonLetter="M" />
+                    <FloatingActionButton isExpanded={isExpanded} index={2} buttonLetter="W" />
+                    <FloatingActionButton isExpanded={isExpanded} index={3} buttonLetter="S" />
+                </View>
+            </View> */}
             <AccountModal
                 isVisible={isAccountModalVisible}
                 isEditing={isEditing}
@@ -549,5 +566,18 @@ const styles = StyleSheet.create({
     noCreditCardIcon: {
         width: 60,
         height: 60
-    }
+    },
+    mainContainer: {
+        position: 'relative',
+        width: '100%',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+    },
+        buttonContainer: {
+        position: 'absolute',
+        bottom: 80,
+        right: 20,
+        flexDirection: 'column',
+        alignItems: 'center',
+    },
 })
